@@ -8,12 +8,24 @@ conform.setup({
         lua = { "stylua" },
         go = { "goimports", "gofumpt" },
         yaml = { "yamlfmt" },
+
+        -- JavaScript/TypeScript 生态
         javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascriptreact = { "prettierd", "prettier", stop_after_first = true },
         typescript = { "prettierd", "prettier", stop_after_first = true },
+        typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+
+        -- 其他前端格式
         json = { "prettierd", "prettier", stop_after_first = true },
         jsonc = { "prettierd", "prettier", stop_after_first = true },
         markdown = { "prettierd", "prettier", stop_after_first = true },
-        python = { "ruff_format", "ruff" },
+        html = { "prettierd", "prettier", stop_after_first = true },
+        css = { "prettierd", "prettier", stop_after_first = true },
+        scss = { "prettierd", "prettier", stop_after_first = true },
+
+        -- Python: ruff_format 已包含格式化，ruff_fix 处理 lint 修复
+        python = { "ruff_organize_imports", "ruff_format" },
+
         sql = { "sqlfmt" },
         sh = { "shfmt" },
         bash = { "shfmt" },
@@ -25,7 +37,9 @@ conform.setup({
         lsp_format = "fallback",
     },
     format_on_save = function(bufnr)
-        if vim.api.nvim_buf_get_name(bufnr):match("/node_modules/") then
+        -- 排除 node_modules 和其他不需要格式化的目录
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        if bufname:match("/node_modules/") or bufname:match("/%.git/") or bufname:match("/vendor/") then
             return
         end
         return { timeout_ms = 500, lsp_format = "fallback" }
