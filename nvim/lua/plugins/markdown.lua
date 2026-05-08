@@ -24,7 +24,7 @@ require("render-markdown").setup({
         style = "language",
     },
     heading = {
-        icons = { " 󰬺 ", " 󰬻 ", " 󰬼 ", " 󰬽 ", " 󰬾 ", " 󰬿 " },
+        icons = { "", "", "", "", "", "" },
         position = "inline",
         border = false,
         render_modes = true, -- keep rendering while inserting
@@ -32,7 +32,8 @@ require("render-markdown").setup({
     bullet = {
         enabled = true,
         render_modes = false,
-        icons = { "", "", "", "" },
+        -- icons = { "", "", "", "" },
+        icons = { "", "", "", "" },
     },
     checkbox = {
         enabled = true,
