@@ -68,9 +68,12 @@ vim.filetype.add({
         ["docker-compose.yaml"] = "yaml",
         ["docker-compose.yml"] = "yaml",
         ["go.work"] = "gowork",
+        [".yamllint"] = "yaml",
+        [".yamlfmt"] = "yaml",
     },
     pattern = {
         ["docker%-compose%..*%.ya?ml"] = "yaml",
         [".*%.gotmpl"] = "gotmpl",
+        [".*%.yamllint"] = "yaml",
     },
 })
