@@ -11,6 +11,8 @@ set -gx GRADLE_USER_HOME $HOME/Documents/Tools/gradle/gradle-repository
 
 set -gx PATH /opt/homebrew/bin $PATH
 
+source "$HOME/.cargo/env.fish"
+
 # 3. 路径管理
 # $GOPATH/bin: go install xxx 的存放路径
 # /opt/homebrew/opt/go: 是 Homebrew 指向当前 Go 版本的软链
@@ -20,3 +22,6 @@ fish_add_path $GOPATH/bin
 fish_add_path $JAVA_HOME/bin
 fish_add_path $MAVEN_HOME/bin
 fish_add_path $GRADLE_HOME/bin
+
+fish_add_path /opt/homebrew/opt/imagemagick-full/bin
+fish_add_path /opt/homebrew/opt/ffmpeg-full/bin
