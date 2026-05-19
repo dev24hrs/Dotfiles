@@ -99,10 +99,11 @@ brew bundle cleanup --file=~/Dotfiles/Brewfile --force
 brew bundle dump --file=~/Dotfiles/Brewfile --force
 ```
 
--   Fish脚本
+-   [Fish脚本](https://github.com/dev24hrs/Dotfiles/blob/main/fish/functions/brewup.fish)
 
 ~~~bash
-
+# 生成 brewfile, 无vscode 相关依赖
+brewup file
 ~~~
 
 ## Enhance terminal
