@@ -1,0 +1,10 @@
+.DS_Store
+
+# API Keys - never commit
+fish/conf.d/apiKey.fish
+fish/fish_variables
+
+yazi/plugins/
+yazi/flavors/
+
+tmux/plugins/
