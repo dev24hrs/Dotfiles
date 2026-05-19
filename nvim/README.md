@@ -21,7 +21,7 @@ The simplest and most effective way is to read the plugin's `readme.md`.
 
 ## Supported Languages
 
-use brew install `gopls` & `lua-language-server` & `typescript-language-server`, not `mason` install.
+use brew install `gopls` & `lua-language-server` & `typescript-language-server` & `rust-analyzer`, installed by `homebrew`.
 
 ```bash
 # gopls
@@ -35,6 +35,8 @@ brew install lua-language-server
 brew install node
 brew install typescript typescript-language-server
 
+# rust
+brew install rust-analyzer
 ```
 
 | Language              | LSP           | Formatter           | Linter        |

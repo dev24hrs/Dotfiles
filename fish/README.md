@@ -21,15 +21,22 @@ chsh -s $(which fish)
 `~/.config/fish/`
 
 ```bash
+# 将 apiKey.fish 加入.gitignore
+fish/conf.d/apiKey.fish
+# 同时新增 apiKey.fish.example文件
+```
+
+```bash
 ├── completions 		## functions补全提示
-│ ├── brew-clean.fish
+│ ├── brewup.fish
 │ ├── proxy.fish
 │ └── tool.fish
 ├── conf.d
 │ ├── envPath.fish 		## env path相关
+│ ├── apiKey.fish 		## deepseek api等
 │ └── lastPwd.fish 		## 上一次目录
 ├── functions
-│ ├── brew-clean.fish 	## 清理未使用的home brew taps/deps
+│ ├── brewup.fish 		## homebrew工具
 │ ├── proxy.fish 		## 开启/关闭/查看git代理
 │ └── tool.fish 		## 自定义工具
 ├── README.md
@@ -87,8 +94,8 @@ eval (/opt/homebrew/bin/brew shellenv)
 # aliases
 alias lg='lazygit'
 alias mu='musicfox'
-alias bt='btop'
-# lsd
+
+# eza
 alias ls='eza -a --icons --group-directories-first'
 alias la='eza -la --icons --group-directories-first'
 alias lt='eza -aT --icons --group-directories-first --git-ignore'

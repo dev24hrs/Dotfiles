@@ -47,7 +47,7 @@ default keybindings refer to [tmux_cheatsheet](https://tmuxcheatsheet.com/)
 **Steps**
 
 1.  使用`tmux new -s  <name>` 新建session,当前只有1个window
-2.  使用`prefix + ,` 重命名当前window为`project-A`,开始代码
+2.  使用`prefix + r` 重命名当前window为`project-A`,开始代码
 3.  使用中发现需要多个`window` 即 `project` 切换, 可以使用`prefix + c`创建新window
 4.  使用`prefix + p` or `prefix + n` or `prefix + 0-9` 切换不同的window
 5.  在单个window中,可能需要多个pane做不同操作,根据需要使用`prefix + -` `prefix + =`把当前window切换成横向竖向布局`pane`
@@ -79,7 +79,7 @@ default keybindings refer to [tmux_cheatsheet](https://tmuxcheatsheet.com/)
 |   key    |  key  |           desc            |
 | :------: | :---: | :-----------------------: |
 | Ctrl + b |   w   |     show all windows      |
-| Ctrl + b |   ,   |   rename current window   |
+| Ctrl + b |   r   |   rename current window   |
 | Ctrl + b |   c   |       new a window        |
 | Ctrl + b |   q   |   close current window    |
 | Ctrl + b |   -   |  split window vertically  |

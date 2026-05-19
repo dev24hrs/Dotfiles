@@ -10,13 +10,70 @@
 
 ---
 
+## setup.sh & cfg.sh
+
+### setup.sh
+
+新mac: 无任何环境配置
+
+```bash
+git clone https://github.com/dev24hrs/Dotfiles.git ~/Documents/Dotfiles
+cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
+# setup.sh 脚本会执行dotfiles的所有配置
+```
+
+### cfg.sh
+
+相关使用场景:
+
+-   `./cfg.sh symlinks`: 当前mac环境,之前手动配置 `~/.config`,也手动维护`dotfiles`目录,现在改成symlink方式
+
+~~~bash
+# 在Dotfiles目录执行 ./cfg.sh symlinks
+# 自动在 ~/.config目录下创建相关链接,并链接到Dotfiles的对应配置目录
+# 同时备份之前手动管理的配置
+~~~
+
+-   `./cfg.sh add `,假如后续想安装某个某些软件,需要配置 `~/.config` / `~`目录
+
+```bash
+# 比如新安装了yazi,则在Dotfiles目录下执行
+./cfg.sh add ~/.config/yazi
+# 或者
+./cfg.sh add ~/.hammerspoon
+
+# 然后手动在 cfg.sh 的 setup_symlinks() 里补上对应的 make_link
+# 最后 git 提交Dotfiles更新
+```
+
+-   `./cfg migrate`: 当前mac环境,之前只手动配置``~/.config``,无`dotfiles`
+
+```bash
+mkdir-p ~/Dotfiles && cd ~/Dotfiles
+
+# 把config 已有配置都迁移进 Dotfiles
+./cfg.sh migrate
+
+# 检查结果
+ls -la ~/.config/fish   # 应该显示 -> ~/Dotfiles/fish
+
+# 3. 提交
+git add .
+git commit -m "chore: migrate existing configs to Dotfiles"
+git push
+```
+
 ## Enhance terminal
+
+>   [!NOTE]
+>
+>   已存在于 [setup.sh](https://github.com/dev24hrs/Dotfiles/blob/main/setup.sh) 自动配置
 
 ```bash
 #  Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 # Set a blazingly fast keyboard repeat rate
-  defaults write NSGlobalDomain KeyRepeat -int 1  # default 2，recommend 1
+defaults write NSGlobalDomain KeyRepeat -int 1  # default 2，recommend 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # mac app id
@@ -31,22 +88,19 @@ refer to [git config](https://github.com/dev24hrs/Dotfiles/tree/main/git)
 
 ## Homebrew
 
-Use pkg to install [homebrew](https://github.com/Homebrew/brew/releases/), but need to config `~/.zshrc` or `config.fish`
+Use pkg to install [homebrew](https://github.com/Homebrew/brew/releases/), but need to config `config.fish`
 
 ```bash
 # add to config.fish
 # homebrew
 eval (/opt/homebrew/bin/brew shellenv)
 
-# add to ~/.zshrc
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-
 # set ustc mirrors
 # export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"
 # export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
 # export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
 # then
-source ~/.zshrc
+source ~/.config/fish/config.fish
 
 brew update
 # if unistall
@@ -121,7 +175,7 @@ brew install starship
 starship init fish | source
 
 # config
-# use preset & restart terminal starship preset nerd-font-symbols -o ~/.config/starship.toml
+# use preset & restart terminal starship preset nerd-font-symbols -o ~/.config/starship/starship.toml
 # or can refer to github dotfiles
 ```
 
@@ -209,23 +263,6 @@ brew install git-delta
   alias lt='eza -aT --icons --group-directories-first --git-ignore'
   ```
 
-~~### Lsd~~
-
-- install [lsd](https://github.com/lsd-rs/lsd)
-
-```bash
-brew install lsd
-```
-
-- with fish
-
-```bash
-# lsd
-alias ls='lsd'
-alias la='lsd -la'
-alias lt='lsd --tree'
-```
-
 ### Fd & RipGrep
 
 - install [fd](https://github.com/sharkdp/fd)
@@ -280,30 +317,6 @@ brew install anhoder/go-musicfox/go-musicfox
 alias mu='musicfox'
 ```
 
-### Btop
-
-- install [btop](https://github.com/aristocratos/btop)
-
-```bash
-brew install btop
-```
-
-- config
-
-```bash
-# config path is : $HOME/.config/btop/btop.conf
-# themes path is : $HOME/.config/btop/themes/
-# add https://github.com/aristocratos/btop/blob/main/themes/gruvbox_material_dark.theme to theme path
-
-# use bt and the press m to option config to set theme as gruvbox_material_dark
-```
-
-- with fish
-
-```bash
-alias bt='btop'
-```
-
 ## WezTerm
 
 refer to [wezterm config](https://github.com/dev24hrs/dotfiles/tree/main/wezterm)
@@ -325,6 +338,10 @@ config refer to [nvim dotfiles](https://github.com/dev24hrs/dotfiles/tree/main/n
 ## Vimrc
 
 Refer to [vimrc](https://github.com/dev24hrs/Dotfiles/blob/main/vimrc/vimrc)
+
+## Rime 输入法
+
+Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
 
 ## Golang
 
@@ -453,18 +470,6 @@ rustup update
 
   If use typora & picgo app, when u pasted images in typora,it will cached images in the path`$home/Library/Application\ Support/typora-user-images`,so u need clean it.
 
-## Rime
-
-Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
-
-## setup.sh
-
-```bash
-新mac安装环境:
-git clone https://github.com/dev24hrs/Dotfiles.git ~/Documents/Dotfiles
-cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
-
 # LICENSE
 
 This project is licensed under the MIT License.
-```
