@@ -1,0 +1,1695 @@
+/* =========================================
+   Claude Light Theme — Typora 亮色主题
+   整理版本：优化结构 / 无损原样
+   ========================================= */
+
+/* =========================================
+   1. 全局重置与基础
+   ========================================= */
+
+* {
+    box-sizing: border-box;
+    outline-color: #2c84db;
+}
+
+*,
+:before,
+:after {
+    border-color: var(--border-color);
+    border-width: 0;
+    border-style: solid;
+}
+
+html {
+    font-size: 16px;
+    background-color: var(--bg-color);
+    display: block;
+}
+
+html,
+:host {
+    line-height: 1.5;
+    tab-size: 4;
+}
+
+html,
+body {
+    font-family: var(--font-sans);
+}
+
+/* =========================================
+   2. CSS 变量
+   ========================================= */
+
+:root {
+    /* --- 颜色变量 --- */
+    --bg-color: #faf9f5;
+    --hover-color: #f0eee6;
+    --font-color: #141413;
+    --border-color: #1f1e1d;
+    --border-color-15: #1f1e1d26;       /* 侧边栏、输入框、按钮（0.15透明度） */
+    --border-color-30: #1f1e1d4d;       /* （搜索）弹出窗口、new project按钮（0.3透明度） */
+    --sidebar-font-color: #3d3d3a;
+
+    /* 对应claude话题搜索弹出窗口 */
+    --file-search-list-font-color: #3d3d3a;
+    --file-search-list-bg-color: #ffffff;
+    --file-search-list-focus-bg-color: #f5f4ed;
+
+    --button-bg-color: #e8e6dc;         /* new project按钮背景色 / Typora中的YAML背景色 */
+
+    --sidebar-gradient-to: #f5f4ed4d;
+    --sidebar-gradient-from: #f5f4ed0d;
+
+    --scrollbar-color: #1f1e1d59;
+    --scrollbar-hover-color: #5a5959;
+
+    --pre-bg-color: #ffffff80;
+    --pre-border-color: #1f1e1d26;
+    --pre-inputfont-color: #73726c;
+
+    --hr-color: #1f1e1d4d;
+
+    --table-th-border: #1f1e1d99;
+    --table-td-border: #1f1e1d4d;
+
+    --code-bg-color: #3d3d3a0d;
+    --code-font-color: #8a2424;
+    --code-border: #1f1e1d26;
+
+    --quote-font-color: #3d3d3a;
+    --quote-boder: #1f1e1d1a;
+
+    --LOGO-color: #D97757;
+
+    /* --- 阴影变量 --- */
+    --border-100: 30 3.3% 11.8%;
+    --border-200: 30 3.3% 11.8%;
+    --border-300: 30 3.3% 11.8%;
+    --always-black: 0 0% 0%;
+
+    /* 对应typora的侧边栏 */
+    --box-shadow-search: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgb(0 0 0 / .25);
+    --box-shadow-userinput: 0 .25rem 1.25rem hsl(var(--always-black) / 3.5%), 0 0 0 .5px hsla(var(--border-300) / .15);
+    --box-shadow-userinput-hover: 0 0.25rem 1.25rem hsl(var(--always-black) / 3.5%), 0 0 0 0.5px hsla(var(--border-200) / 0.3);
+    --box-shadow-userinput-focus: 0 0.25rem 1.25rem hsl(var(--always-black) / 7.5%), 0 0 0 0.5px hsla(var(--border-200) / 0.3);
+
+    /* --- 字体变量 --- */
+    --font-serif: "RecMonoCasual Nerd Font Mono","FiraMono Nerd Font Mono","Source Han Sans SC VF";
+    --font-sans: "RecMonoCasual Nerd Font Mono","FiraMono Nerd Font Mono","Source Han Sans SC VF",-apple-system,system-ui,Arial, sans-serif;
+    --font-mono: "RecMonoCasual Nerd Font Mono","FiraMono Nerd Font Mono","Source Han Sans SC VF", ui-monospace, monospace;
+
+    --font-weight: 400;
+    --font-strong: 600;
+    --pre-inputfont-weight: 430;
+    --sidebar-font-weight: 430;
+}
+
+/* =========================================
+   3. 插件特调
+   ========================================= */
+
+#plugin-action-buttons .action-item {
+    color: var(--sidebar-font-color) !important;
+    border-color: var(--border-color-15) !important;
+    border-width: 0.5px !important;
+}
+
+/* 切换源码模式按钮的背景 */
+.typora-sourceview-on #toggle-sourceview-btn {
+    background: transparent !important;
+}
+
+/* =========================================
+   4. 设置界面
+   ========================================= */
+
+.pane-group {
+    color: var(--sidebar-font-color) !important;
+}
+
+/* 设置界面激活列表项的背景颜色 */
+.pane-sm.sidebar .nav-group-item.active {
+    background-color: var(--hover-color) !important;
+}
+
+/* 导出窗口 */
+.export-detail {
+    background-color: var(--hover-color)!important;
+}
+
+.export-item.active {
+    background-color: var(--hover-color)!important;
+}
+
+/* =========================================
+   5. 全局排版与色调覆盖
+   ========================================= */
+
+body {
+    line-height: inherit;
+    color: var(--font-color);
+    font-size: 1rem;
+    font-weight: var(--font-weight);
+
+    /* 覆盖软件默认列表选项及悬浮颜色变量 */
+    --item-hover-bg-color: var(--hover-color);
+    --side-bar-bg-color: var(--bg-color);
+}
+
+/* 实际书写区 */
+#write {
+    font-family: var(--font-serif);
+    width: 100%;
+    max-width: 80%;
+    padding: 2.25rem 1rem 4.375rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    caret-color: #D97757;
+}
+
+/* ---------- 右键菜单 ---------- */
+
+/* 右键菜单阴影 */
+#context-menu,
+.dropdown-menu {
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgb(0 0 0 / .25), 0 -8px 30px -6px rgb(0 0 0 / .15);
+}
+
+/* 右键菜单的圆角 */
+#context-menu,
+.dropdown-menu {
+    border-radius: 10px;
+}
+
+/* 右键菜单栏的分割线 */
+.dropdown-menu .divider {
+    border-top-color: var(--border-color-15);
+}
+
+/* ---------- 滚动条 ---------- */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* 滑块 */
+::-webkit-scrollbar-thumb {
+    background-clip: border-box;
+    background: var(--scrollbar-color);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-hover-color);
+}
+
+/* 滑块轨道背景 */
+::-webkit-scrollbar:hover {
+    background-color: transparent;
+}
+
+/* 去除文件树的滑块 */
+.stopselect.dropmenu.sidebar-menu.open.active-tab-files.use-file-tree-style ::-webkit-scrollbar-thumb {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* 去除编辑区底栏的上边框 */
+.show-footer footer.ty-footer {
+    border-top-width: 0 !important;
+}
+
+/* =========================================
+   6. Markdown 样式
+   ========================================= */
+
+/* ---------- 6.1 标题 ---------- */
+
+#write h1 {
+    font-size: 1.375rem;
+    line-height: 1.65rem;
+    font-weight: var(--font-strong);
+    margin: 0.75rem 0 -0.25rem 0;
+    padding: 0 2rem 0 0.5rem;
+}
+
+#write h2 {
+    font-size: 1.125rem;
+    line-height: 1.65rem;
+    font-weight: var(--font-strong);
+    margin: 0.75rem 0 -0.25rem 0;
+    padding: 0 2rem 0 0.5rem;
+}
+
+#write h3 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: var(--font-strong);
+    margin: 0.5rem 0 -0.25rem 0;
+    padding: 0 2rem 0 0.5rem;
+}
+
+#write h4 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: var(--font-strong);
+    margin: 0.5rem 0 -0.25rem 0;
+    padding: 0 2rem 0 0.5rem;
+}
+
+#write h5,
+#write h6 {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    margin: 0.5rem 0 -0.25rem 0;
+    padding: 0 2rem 0 0.5rem;
+}
+
+/* ---------- 6.2 段落与文本 ---------- */
+
+#write p {
+    padding: 0 2rem 0 0.5rem;
+    margin: 0;
+}
+
+#write strong {
+    font-weight: var(--font-strong);
+}
+
+/* 修改普通文本的选中高亮颜色 */
+::selection {
+    background-color: var(--LOGO-color) !important;
+    color: var(--font-color) !important;
+}
+
+/* ---------- 6.3 有序列表和无序列表 ---------- */
+
+.write ul,
+.write ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    line-height: 1.65rem;
+}
+
+.write li {
+    padding: 0 0 0 0.5rem;
+    margin: 0;
+}
+
+#write li > p {
+    padding: 0;
+}
+
+.write > ul,
+.write > ol {
+    padding: 0 2rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.write > ul ul,
+markdown > ol ol {
+    padding: 0 2rem 0.25rem 2rem;
+    margin: 0.25rem 0 0 0;
+}
+
+/* 将所有嵌套层级的普通无序列表修改为实心圆点，同时排除任务列表 */
+#write ul:not(.task-list) {
+    list-style-type: disc;
+}
+
+/* ---------- 6.4 复选框 ---------- */
+
+#write li.md-task-list-item > input[type="checkbox"] {
+    display: inline-block;
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    width: 13px !important;
+    height: 13px !important;
+    position: absolute;
+    top: 3px;
+    left: 2px;
+    margin-left: -1.3em !important;
+    margin-top: calc(1em - 12px) !important;
+    border: 1px solid #d0cfce !important;
+    border-radius: 2px !important;
+    background-color: #f7f6f5 !important;
+    cursor: pointer;
+}
+
+/* 选中状态下的背景色 */
+#write li.md-task-list-item > input[type="checkbox"]:checked {
+    background-color: #d0d0cf !important;
+    border-color: #d0cfce !important;
+}
+
+/* 精确复刻默认的勾号 (√) */
+#write li.md-task-list-item > input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    left: 3px;
+    top: 0px;
+    width: 5px;
+    height: 9px;
+    border: solid #ececec !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg);
+}
+
+/* ---------- 6.5 表格 ---------- */
+
+.write .md-table-fig.table-figure {
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    padding: 0 0.5rem;
+}
+
+.write table {
+    border: none;
+    width: 100%;
+    line-height: 1.65rem;
+}
+
+.write th,
+.write td {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom-width: 0.5px;
+    padding: 0.5rem 1rem 0.5rem 1px !important;
+    height: 1px; /* 魔法属性：让内层 height: 100% 生效 */
+}
+
+.write tr:last-child td {
+    border-bottom-style: solid;
+    border-bottom-width: 0.5px;
+}
+
+.write table thead {
+    border-bottom-style: solid;
+    border-bottom-width: 0.5px;
+}
+
+.md-plain {
+    padding: 0;
+}
+
+#write th {
+    border-bottom-color: var(--table-th-border);
+    font-weight: var(--font-strong);
+}
+
+#write td {
+    border-bottom-color: var(--table-td-border);
+    font-weight: var(--font-weight);
+}
+
+/* 工具栏 */
+.ty-table-edit {
+    max-width: 696px;
+    width: 100%;
+}
+
+.ty-table-edit .btn-group-xs>.btn {
+    border: none;
+}
+
+/* 紧挨着表格容器的标题去除底部外间距 */
+.md-table-fig.table-figure + h1,
+.md-table-fig.table-figure + h2,
+.md-table-fig.table-figure + h3,
+.md-table-fig.table-figure + h4 {
+    margin-top: 0 !important;
+}
+
+/* 取消表格行与列的拖拽区 */
+.typora-table-drag-area {
+    display: none;
+}
+.ty-table-edit.md-table-edit.md-tooltip-remove {
+    margin-top: -15px!important;
+}
+
+/* ---------- 6.6 分割线 ---------- */
+
+hr {
+    border: none;
+    border-top-style: solid;
+    margin: .75rem .375rem;
+    border-top-width: 1px;
+    border-color: var(--hr-color);
+}
+
+/* 紧挨着hr容器的标题去除底部外间距 */
+.md-hr.md-end-block + h1,
+.md-hr.md-end-block + h2,
+.md-hr.md-end-block + h3,
+.md-hr.md-end-block + h4 {
+    margin-top: 0 !important;
+}
+
+/* ---------- 6.7 代码块 ---------- */
+
+/* 去除代码行背景的白色背景 */
+.CodeMirror-gutter-filler,
+.CodeMirror-scrollbar-filler,
+.CodeMirror.cm-s-inner.cm-s-null-scroll.CodeMirror-wrap {
+    background-color: transparent;
+}
+
+/* 主容器 */
+.md-fences {
+    margin: 0 !important;
+    padding: 2.8rem 0.875rem 0.875rem 0.875rem;
+    background-color: var(--pre-bg-color);
+    border-style: solid;
+    border-width: 0.5px;
+    border-color: var(--pre-border-color);
+    border-radius: 0.5rem;
+}
+
+/* 代码和代码行 */
+.CodeMirror-lines {
+    font-size: 0.875rem;
+    font-weight: var(--font-weight);
+    line-height: 1.625;
+    font-family: var(--font-mono);
+}
+
+.CodeMirror pre {
+    padding: 0 !important;
+}
+
+/* 语法标签栏输入框 */
+.ty-input.ty-input-after.ty-cm-lang-input {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    color: var(--pre-inputfont-color) !important;
+    font-weight: var(--pre-inputfont-weight) !important;
+    font-size: 0.75rem !important;
+    font-family: var(--font-sans);
+}
+
+/* 语法标签栏 - 定位至内左上角 */
+.code-tooltip.md-tooltip-remove {
+    font-size: 0.75rem !important;
+    font-family: var(--font-sans);
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 14px 0 0 15px !important;
+    line-height: 17px;
+    height: auto;
+    top: 0px !important;
+    bottom: auto !important;
+    left: 0px !important;
+}
+
+/* ----- 未点击代码块时的语言标签 ----- */
+
+/* 静态常驻的语言标签 */
+.md-fences[lang]:not([lang=""])::before {
+    content: attr(lang);
+    position: absolute;
+    display: block;
+    top: 0px !important;
+    left: 0px !important;
+    padding: 14px 0 0 15px !important;
+    line-height: 17px !important;
+    color: var(--pre-inputfont-color) !important;
+    font-weight: var(--pre-inputfont-weight) !important;
+    font-size: 0.75rem !important;
+    font-family: var(--font-sans) !important;
+    z-index: 9;
+    pointer-events: none;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 获得焦点时，让静态标签瞬间"隐身" */
+.md-fences.md-focus[lang]::before {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* 原生输入框（所有状态全覆盖） */
+.md-fences .code-tooltip {
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+    bottom: auto !important;
+    right: auto !important;
+    padding: 14px 0 0 15px !important;
+    margin: 0 !important;
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    transition: none !important;
+    animation: none !important;
+    z-index: 10;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 失去焦点时，瞬间隐藏原生输入框 */
+.md-fences:not(.md-focus) .code-tooltip {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    display: none !important;
+}
+
+/* 统一原生输入框内文字的样式 */
+.md-fences .code-tooltip .ty-input {
+    color: var(--pre-inputfont-color) !important;
+    font-weight: var(--pre-inputfont-weight) !important;
+    font-size: 0.75rem !important;
+    font-family: var(--font-sans) !important;
+    line-height: 17px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    text-align: left !important;
+}
+
+/* ----- 语法高亮映射配置（不用变量） ----- */
+
+.md-fences .CodeMirror-linenumber,
+.md-fences .cm-comment,
+.md-fences .cm-meta {
+    color: #6e7687 !important;
+}
+
+.md-fences .cm-keyword,
+.md-fences .cm-builtin {
+    color: #8100c2 !important;
+}
+
+.md-fences .cm-string,
+.md-fences .cm-string-2 {
+    color: #008000 !important;
+}
+
+.md-fences .cm-number {
+    color: #008080 !important;
+}
+
+.md-fences .cm-tag,
+.md-fences .cm-attribute,
+.md-fences .cm-property,
+.md-fences .cm-qualifier,
+.md-fences .cm-link {
+    color: #b80a18 !important;
+}
+
+.md-fences .cm-operator,
+.md-fences .cm-atom,
+.md-fences .cm-variable {
+    color: #14181f !important;
+}
+
+.md-fences .cm-def {
+    color: #0051c2;
+}
+
+.md-fences .cm-variable-2,
+.md-fences .cm-variable-3 {
+    color: #b34a00 !important;
+}
+
+.md-fences .cm-bracket {
+    color: #14181f !important;
+}
+
+/* ---------- 6.8 行内代码 ---------- */
+
+code,
+tt {
+    font-family: var(--font-mono);
+    background-color: var(--code-bg-color);
+    color: #EB5757;
+    font-size: 0.9rem;
+    border-radius: 0.4rem;
+    border-color: var(--code-border);
+    border-width: 0.5px;
+    padding: 1px 0.25rem;
+}
+
+/* ---------- 6.9 引用块 ---------- */
+
+blockquote {
+    background-color: transparent;
+    margin: 0 0 0 0.5rem;
+    padding: 0 2rem 0 0.5rem;
+    border-left-width: 4px;
+    color: var(--quote-font-color);
+    border-color: var(--quote-boder);
+}
+
+/* 引用框下子段落的间距 */
+blockquote > p {
+    padding: 0 2rem 0 0.5rem;
+    margin: 0;
+}
+
+/* 引用框下有序/无序列表的左外间距 */
+blockquote ol,
+blockquote ul {
+    padding: 0 32px;
+    margin: 0 0 12px 0;
+}
+
+/* ---------- 6.10 公式块 ---------- */
+
+.md-rawblock-container.md-math-container > .MathJax {
+    margin: 0 !important;
+}
+
+/* claude的简单渐入渐出动画 */
+.md-math-block .md-math-container {
+    transition: background-color 0.15s ease-in-out !important;
+}
+
+/* 鼠标悬停/经过公式块时的背景颜色 */
+.md-math-block:hover .md-math-container {
+    background-color: var(--hover-color) !important;
+    border-radius: 8px;
+}
+
+/* 鼠标点击进去编辑/选中公式块时编辑区的背景颜色 */
+.md-rawblock-control.md-rawblock-before,
+.md-rawblock-control.md-rawblock-input.md-mathblock-input,
+.md-rawblock-control.md-rawblock-after {
+    background-color: var(--hover-color);
+}
+
+/* 右上角标签栏颜色统一 */
+.md-rawblock-tooltip.md-rawblock-control {
+    background-color: transparent !important;
+}
+
+.code-tooltip {
+    box-shadow: 0 1px 1px 0 #d9775733;
+}
+
+/* 隐藏公式块的水平滚动条 */
+.md-math-container::-webkit-scrollbar,
+.md-math-block .MathJax::-webkit-scrollbar,
+mjx-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* 兼容处理，彻底隐藏滚动条样式 */
+.md-math-container,
+.md-math-block .MathJax,
+mjx-container {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+/* ---------- 6.11 注释 ---------- */
+
+.md-comment {
+    color: var(--LOGO-color);
+}
+
+/* ---------- 6.12 链接（下划线） ---------- */
+
+a {
+    color: #2B73D9 !important;
+    text-decoration-color: var(--font-color);
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: #D97757;
+    text-decoration-color: #D97757;
+}
+
+/* =========================================
+   7. 侧边栏
+   ========================================= */
+
+/* 去除展开侧边栏和开启源码模式的按钮 */
+#toggle-sourceview-btn,
+#outline-btn-wrapper {
+    display: none !important;
+}
+
+
+.sidebar-content, 
+#typora-sidebar, 
+#file-library-search-panel, 
+.info-panel-tab-wrapper {
+    border: none !important;
+    outline: none !important;
+}
+
+.info-panel-tab-wrapper, 
+.sidebar-tabs,
+.info-panel-tab-title {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* ---------- 7.3 底栏 ---------- */
+
+/* 去除侧边栏底栏的边框 */
+#ty-sidebar-footer {
+    border: none;
+}
+
+/* 创建或重命名节点时的输入框、搜索框 */
+#typora-sidebar input {
+    color: var(--sidebar-font-color);
+}
+
+/* ---------- 7.4 顶栏 ---------- */
+
+/* 横条 */
+.info-panel-tab-border {
+    display: none;
+}
+
+/* 定位 */
+.info-panel-tab-wrapper {
+    position: absolute;
+}
+
+/* 两个选项（仿claude project按钮） */
+.info-panel-tab-title {
+    line-height: 19.6px;
+    padding: 8px 12px 8px 8px;
+    margin: 0px 0px;
+    border: solid;
+    height: 36px;
+    font-size: 16px;
+    font-weight: 400;
+    background-color: transparent;
+    color: var(--sidebar-font-color);
+    border-width: 1px;
+    border-radius: 8px;
+    border-color: #1f1e1d4d;
+
+    transition-property: background-color, border-color, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.1s;
+
+    position: relative;
+    bottom: 6px;
+}
+
+.info-panel-tab-title:hover {
+    background-color: #e8e6dc;
+    border-color: transparent;
+}
+
+.info-panel-tab-title:active {
+    transform: scale(0.95);
+}
+
+/* ---------- 7.5 文件列表 ---------- */
+
+#typora-sidebar .file-list-item {
+    transition: background-color 0.15s ease-out;
+}
+
+#typora-sidebar .file-list-item:hover {
+    background-color: var(--hover-color);
+}
+
+#typora-sidebar .file-list-item.active {
+    background-color: var(--hover-color);
+}
+
+/* 文件列表内容文字 */
+.file-list-item-summary {
+    color: var(--sidebar-font-color) !important;
+}
+
+/* 文件列表项的分隔线 */
+#typora-sidebar .file-list-item {
+    border-bottom-color: var(--border-color-15);
+}
+
+/* ---------- 7.6 文件树 ---------- */
+
+/* 隐藏md后缀 */
+.file-node-title-ext-part {
+    display: none;
+}
+
+/* ----- 节点展开动画 ----- */
+
+@keyframes treeItemIn {
+    0% {
+        opacity: 0;
+        transform: translate3d(-12px, 0, 0);
+    }
+    70% {
+        opacity: 1;
+        transform: translate3d(2px, 0, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+/* 防止子节点动画溢出 */
+.file-tree-node > .file-node-children {
+    overflow: hidden;
+}
+
+/* 鼠标命中层穿透，保护 hover 和点击 */
+.file-tree-node > .file-node-background {
+    pointer-events: none;
+}
+
+/* 分配接踵延迟变量 */
+.file-tree-node > .file-node-children > .file-library-node {
+    --tree-delay: 0s;
+}
+
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(1)  { --tree-delay: 0.00s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(2)  { --tree-delay: 0.04s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(3)  { --tree-delay: 0.08s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(4)  { --tree-delay: 0.12s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(5)  { --tree-delay: 0.16s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(6)  { --tree-delay: 0.20s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(7)  { --tree-delay: 0.24s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(8)  { --tree-delay: 0.28s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(9)  { --tree-delay: 0.32s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(10) { --tree-delay: 0.36s; }
+.file-tree-node.file-node-expanded:not(.file-node-root) > .file-node-children > .file-library-node:nth-of-type(n+11) { --tree-delay: 0.42s; }
+
+/* 基础滑入动画（所有子节点默认生效） */
+.file-tree-node.file-node-expanded:not(.file-node-root)
+> .file-node-children
+> .file-library-node
+> .file-node-content
+> :is(.file-node-open-state, .file-node-icon, .file-node-title, .file-tree-rename-div) {
+    animation: treeItemIn 0.35s ease-out both;
+    animation-delay: var(--tree-delay);
+}
+
+/* 核心修复：防止母节点首次展开时闪烁 */
+.file-tree-node.file-node-expanded:not(.file-node-root)
+> .file-node-children
+> .file-library-node.file-node-expanded
+> .file-node-content
+> :is(.file-node-open-state, .file-node-icon, .file-node-title, .file-tree-rename-div) {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+}
+
+/* 防止其内部的子项在收起瞬间回弹 */
+.file-tree-node.file-node-collapsed
+> .file-node-children
+:is(.file-node-content, .file-node-open-state, .file-node-icon, .file-node-title, .file-tree-rename-div),
+.file-tree-node:not(.file-node-root):not(.file-node-expanded)
+> .file-node-children
+:is(.file-node-content, .file-node-open-state, .file-node-icon, .file-node-title, .file-tree-rename-div) {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+}
+
+/* ----- 覆盖默认颜色变量 ----- */
+
+#file-library {
+    --control-text-color: var(--sidebar-font-color);
+    --control-text-hover-color: var(--font-color);
+    --active-file-text-color: var(--font-color);
+    --active-file-border-color: transparent;
+}
+
+/* 悬停时节点的背景色和左侧圆角 */
+.file-tree-node:has(> .file-node-content:hover) > .file-node-background {
+    background-color: var(--hover-color);
+    border-radius: 0.5rem;
+    margin: 0 0.5rem;
+}
+
+/* 点击后节点的背景色和左侧圆角 */
+.file-tree-node.active > .file-node-background {
+    background-color: var(--hover-color);
+    border-radius: 0.5rem;
+    margin: 0 0.5rem;
+}
+
+/* 文字位移（修复版 - 使用独立 translate） */
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon,
+.file-node-content .file-node-title {
+    transition: translate 0.25s ease-out;
+}
+
+#file-library-tree .file-library-file-node > .file-node-content:hover .file-node-icon,
+.file-node-content:hover .file-node-title {
+    translate: 4px 0;
+}
+
+/* 节点文字的字重 */
+.file-node-content {
+    font-weight: var(--sidebar-font-weight);
+    transition: all 0.15s ease-in-out;
+}
+
+/* 文件树行高 */
+.file-node-content {
+    line-height: 22px;
+}
+
+/* 根节点 */
+#file-library-tree > div:first-child > div:nth-child(2) > i:first-child {
+    display: none;
+}
+
+#file-library-tree > div:first-child > div:nth-child(1) {
+    height: 44px;
+}
+
+#file-library-tree > div:first-child > div:nth-child(2) {
+    font-size: 24px;
+    font-family: UnifrakturMaguntia;
+    line-height: 30px;
+    padding-top: 10px;
+}
+
+/* ---------- 7.7 节点图标 ---------- */
+
+/* 文件夹节点图标 */
+.fa-folder:before {
+    color: var(--LOGO-color);
+}
+
+/* 文件夹节点的小三角 */
+#file-library-tree .file-library-node[data-is-directory="true"] > .file-node-content .file-node-open-state i {
+    color: var(--LOGO-color);
+}
+
+/* 文件节点的图标 */
+
+/* 隐藏原有的默认图标 */
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon svg,
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon i,
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon::before {
+    display: none !important;
+    content: none !important;
+}
+
+/* 改造原图标的包裹容器 */
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+}
+
+/* 绘制实心圆点与朦胧光晕 */
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--LOGO-color);
+}
+
+/* ---------- 7.8 搜索 ---------- */
+
+/* 搜索框 */
+#file-library-search-input {
+    border-color: var(--border-color-30);
+    border-radius: 8px;
+    height: 28px;
+}
+
+#file-library-search-panel {
+    border-bottom: none;
+}
+
+/* 搜索列表背景 */
+.stopselect.dropmenu.sidebar-menu.open.active-tab-files.use-file-tree-style.ty-show-search.ty-on-search .sidebar-content {
+    background-color: var(--file-search-list-bg-color);
+}
+
+/* 文字与边框 */
+.ty-search-item {
+    color: var(--file-search-list-font-color);
+    border-bottom: 0;
+}
+
+/* 匹配关键字高亮 */
+.ty-file-search-match-text {
+    background-color: transparent;
+    color: var(--font-color);
+}
+
+/* 找到文件数的背景 */
+.file-list-item-count {
+    background-color: var(--hover-color);
+}
+
+/* 悬停 */
+.ty-search-item:hover {
+    background-color: var(--bg-color);
+}
+
+.ty-search-item-line:hover {
+    background-color: var(--hover-color);
+}
+
+/* 点击后 */
+.ty-search-item.active,
+.ty-search-item-line.active {
+    background-color: var(--file-search-list-focus-bg-color);
+}
+
+/* 跳转的关键词高亮 */
+.md-search-hit.md-search-select {
+    background-color: var(--LOGO-color);
+}
+
+/* ---------- 7.9 侧边栏的其他样式 ---------- */
+
+/* 消除文件树节点在点击时的默认虚线框 */
+.file-library-node:focus,
+.file-library-node:active,
+.file-node-content:focus,
+.file-node-content:active,
+.file-tree-node:focus,
+.file-tree-node:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* 去底部的水平滚动条 */
+#typora-sidebar ::-webkit-scrollbar:horizontal {
+    display: none !important;
+}
+
+#file-library {
+    overflow-x: hidden !important;
+}
+
+/* =========================================
+   8. YAML
+   ========================================= */
+
+#write pre.md-meta-block {
+    padding: 1rem;
+    font-size: 85%;
+    line-height: 1.5;
+    background-color: var(--button-bg-color);
+    border: 0;
+    border-radius: 10px;
+    color: var(--sidebar-font-color);
+    margin-top: 0 !important;
+}
+
+/* =========================================
+   9. 大纲
+   ========================================= */
+
+/* 去除 X 按钮 */
+#close-outline-filter-btn {
+    display: none !important;
+}
+.ty-show-outline-filter #file-library-search-panel {
+    border-bottom: none !important;
+}
+
+#sidebar-content {
+    border: none !important;
+}
+
+/* 去除大纲节点激活时的字重变化 */
+.pin-outline .outline-active {
+    font-weight: var(--font-weight);
+}
+
+/* 优化大纲搜索框的宽度 */
+#file-library-search-input {
+    width: calc(100% - 1px) !important;
+}
+
+/* 将搜索框向下位移（包括文件搜索框和大纲搜索框） */
+#file-library-search-panel {
+    top: 20px;
+}
+
+#outline-content {
+    color: var(--sidebar-font-color);
+}
+
+#toc-dropmenu {
+    top: calc(var(--title-bar-height) + 8px) !important;
+    right: 18px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+/* 大纲内的"固定（Pin）"按钮位置微调 */
+#toc-dropmenu #pin-outline-btn {
+    display: inline-block;
+    top: 10px;
+}
+
+/* 去除大纲内分割线的底部外边距 */
+#toc-dropmenu .divider {
+    margin-bottom: 0;
+}
+
+/* ----- 大纲列表项布局 ----- */
+
+.outline-content li {
+    position: relative;
+    z-index: 30;
+}
+
+/* 顶级第一个节点的连接线起点归零 */
+.outline-content > li:first-of-type::before {
+    top: 0;
+}
+
+/* 子菜单设置 */
+.outline-content li ul {
+    position: relative;
+    z-index: 48;
+    margin-left: 18px;
+    margin-top: 0 !important;
+}
+
+/* 不折叠大纲时，增加子节点的缩进量 */
+.no-collapse-outline .outline-content li ul {
+    margin-left: 21px;
+}
+
+/* ----- 大纲单个条目样式 ----- */
+
+.outline-content li .outline-item {
+    position: relative;
+    z-index: 50;
+    margin: 0 0 3px 7px;
+    width: calc(100% - 4px);
+    border-radius: 5px;
+    border: none;
+    line-height: 1;
+    padding: 0 0 0 4px;
+}
+
+/* 展开/折叠的小三角图标 */
+.outline-item > .outline-expander {
+    display: block;
+    float: left;
+    width: auto;
+    height: 0;
+    background: transparent;
+    padding-left: 0;
+}
+
+.outline-item > .outline-expander:before {
+    margin-top: 10px;
+    margin-left: -2px;
+    background: transparent;
+    padding: 0 4px 0 2px;
+    font-size: 10px;
+}
+
+/* 标题文字标签 */
+.outline-content li .outline-label {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 7px 7px 7px 8px;
+    font-size: 14px !important;
+    line-height: 1.2;
+    overflow-wrap: normal;
+    word-wrap: normal;
+    word-break: keep-all;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+/* 针对无子节点的独立条目，取消左内边距 */
+.outline-item-single .outline-label,
+.outline-item-single.outline-item-open .outline-label,
+.no-collapse-outline .outline-content li .outline-label {
+    padding-left: 0 !important;
+}
+
+/* 鼠标悬浮在展开按钮上时，或者节点处于展开状态时，标题文字的缩进微调 */
+.outline-item > .outline-expander:hover + .outline-label,
+.outline-item-open > .outline-item > .outline-label {
+    padding-left: 11px;
+}
+
+/* 非折叠模式下，展开节点的标题文字缩进归零 */
+.no-collapse-outline .outline-item-open > .outline-item > .outline-label {
+    padding-left: 0 !important;
+}
+
+/* 当前激活节点的缩进微调 */
+.outline-item-active > .outline-expander:hover + .outline-label,
+.outline-item-open > .outline-item-active > .outline-label {
+    padding-left: 12px;
+}
+
+/* ----- 树状结构连线绘制 ----- */
+
+/* 画出指向当前节点的水平和垂直折线 (L型线) */
+.outline-content li .outline-item::before {
+    content: '';
+    position: absolute;
+    z-index: 38;
+    left: -10px;
+    top: -27.5px;
+    width: 10px;
+    height: calc(50% + 28px);
+    background: transparent;
+    border-left: 1px solid var(--LOGO-color);
+    border-bottom: 1px solid var(--LOGO-color);
+}
+
+.os-windows .outline-content li .outline-item::before {
+    top: -28.5px;
+}
+
+/* 顶级第一个节点的树状线特殊处理 (只有下半部分) */
+.outline-content > li:first-of-type > .outline-item::before {
+    top: calc(50% - 1px);
+    height: calc(50% + 15px);
+    border-left: 1px solid var(--LOGO-color);
+    border-top: 1px solid var(--LOGO-color);
+    border-bottom: none;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 0;
+}
+
+/* 子节点中的首个节点，以及顶级第二个节点的连线高度微调 */
+.outline-children > li:first-child > .outline-item::before,
+.outline-content > li:nth-child(2) > .outline-item::before {
+    top: -11px;
+    height: calc(50% + 12px);
+}
+
+.os-windows .outline-children > li:first-child > .outline-item::before,
+.os-windows .outline-content > li:nth-child(2) > .outline-item::before {
+    top: -13px;
+    height: calc(50% + 13px);
+}
+
+.no-collapse-outline .outline-children > li:first-child > .outline-item::before,
+.no-collapse-outline .outline-content > li:nth-child(2) > .outline-item::before {
+    top: -8px;
+    height: calc(50% + 8px);
+}
+
+/* 列表最后项的连线左下角增加微小圆角 */
+.outline-content > li:last-child > .outline-item::before,
+.outline-children > li:last-child > .outline-item::before {
+    border-bottom-left-radius: 3px;
+}
+
+/* 画出贯穿父节点下属所有子节点的垂直主干线 (I型线) */
+.no-collapse-outline .outline-item-wrapper > .outline-children::before,
+.outline-item-open > .outline-children::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: -26px;
+    width: 1px;
+    height: calc(100% + 12px);
+    background: transparent;
+    border-left: 1px solid var(--LOGO-color);
+}
+
+.no-collapse-outline .outline-item-wrapper > .outline-children::before {
+    left: -24px;
+}
+
+/* 针对第一个顶层节点的主干线起始点微调 */
+.no-collapse-outline .outline-content > li.outline-item-wrapper:first-child > .outline-children::before,
+.outline-content > li.outline-item-open:first-child > .outline-children::before {
+    top: -15px;
+}
+
+/* 隐藏部分不需要的连线 */
+.outline-content > li:only-of-type > .outline-item::before,
+.no-collapse-outline .outline-item-wrapper:last-of-type > .outline-children::before,
+.no-collapse-outline .outline-children > li.outline-item-wrapper:last-child > .outline-children::before,
+.outline-item-open:last-of-type > .outline-children::before,
+.outline-children > li.outline-item-open:last-child > .outline-children::before {
+    display: none;
+}
+
+/* 如果大纲只有一个顶级节点，整体向左微调 */
+.outline-content > li:only-of-type {
+    margin-left: -8px;
+}
+
+/* ----- 悬停与激活状态下的动态效果 ----- */
+
+/* 节点被悬停或处于激活状态时，缩短水平线 */
+li > .outline-item-active:before,
+.outline-item:hover::before,
+.outline-item-active > .outline-item::before {
+    width: 7px !important;
+}
+
+/* 节点向右移动并增加左内边距 */
+li > .outline-item-active,
+li > .outline-item:hover,
+.outline-item-active > .outline-item {
+    margin-left: 4px !important;
+    padding-left: 7px !important;
+}
+
+/* 调整水平连接线的位置保持相连 */
+li > .outline-item-active::before,
+li > .outline-item:hover::before,
+.outline-item-active > .outline-item::before {
+    left: -7px !important;
+}
+
+/* 悬停或激活时，改变背景颜色 */
+.outline-item:hover,
+.outline-item:hover > .outline-label,
+.outline-item-active,
+.outline-item-active > .outline-label {
+    background: var(--hover-color) !important;
+}
+
+/* ----- 过滤/搜索大纲时的表现 ----- */
+
+/* 隐藏所有树状结构连线 */
+.ty-on-outline-filter .outline-content .outline-item::before,
+.ty-on-outline-filter .outline-content .outline-item::after {
+    display: none;
+}
+
+/* 取消原有的层级缩进 */
+.ty-on-outline-filter .outline-content > li > ul,
+.ty-on-outline-filter .outline-content .outline-item {
+    margin-left: 0;
+}
+
+/* 针对搜索命中类的节点容器适配 */
+.outline-content:has(.ty-outline-hit) {
+    padding-left: 14px;
+}
+
+/* 搜索状态下强制隐藏所有树状连线 */
+.outline-content li:has(.ty-outline-hit) *::before,
+.outline-content li:has(.ty-outline-hit) *::after {
+    content: '';
+    display: none;
+}
+
+/* 搜索状态下重置命中项的内外边距 */
+.outline-content li:has(.ty-outline-hit) .outline-item {
+    margin-left: 1px !important;
+    width: calc(100% - 1px);
+    padding-left: 0 !important;
+}
+
+/* 搜索命中项的标题文字内边距加宽 */
+.outline-content li:has(.ty-outline-hit) .outline-item > .outline-label {
+    padding: 8px 10px !important;
+}
+
+/* =========================================
+   10. 目录
+   ========================================= */
+
+/* 目录容器 */
+.md-toc {
+    margin: 16px 0 0 0;
+    font-size: 14px;
+}
+
+/* 目录内容区域 */
+.md-toc-content {
+    position: relative;
+    margin: 0 0 0 3px;
+    padding: 0 !important;
+}
+
+/* 左侧竖线 */
+.md-toc-content:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 1px;
+    height: calc(100% - 30px);
+    border-left: 1px solid var(--button-bg-color);
+}
+
+/* 聚焦状态 */
+.md-toc:focus .md-toc-content {
+    margin: 0 !important;
+    border: none !important;
+}
+
+/* 目录项容器 */
+.md-toc-content .md-toc-item {
+    position: relative;
+    padding: 6px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.1s ease;
+}
+
+/* 目录项前面的圆点 */
+.md-toc-content .md-toc-item:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: -2px;
+    width: 5px;
+    height: 5px;
+    background: #D977574d;
+    border-radius: 50%;
+}
+
+/* 一级目录项圆点颜色 */
+.md-toc-content .md-toc-h1::before {
+    background: var(--LOGO-color);
+}
+
+/* 目录链接内部 */
+.md-toc-item a.md-toc-inner:hover {
+    text-decoration: none;
+}
+
+/* 目录链接通用样式 */
+.md-toc-item a {
+    padding-left: 18px !important;
+}
+
+/* 一级目录链接 */
+.md-toc-content .md-toc-h1 a {
+    padding-left: 20px;
+}
+
+/* 目录工具提示 */
+#write div.md-toc-tooltip {
+    z-index: 100;
+    top: -52px;
+    border-top: 1px solid var(--border-color-30);
+    border-bottom: 1px solid var(--border-color-30);
+    padding: 3px 0;
+}
+
+/* 删除目录按钮 */
+#write div.md-toc-tooltip .md-delete-toc {
+    margin: 0 !important;
+    padding: 0 10px;
+    background: transparent;
+}
+
+#write div.md-toc-tooltip .md-delete-toc:hover {
+    background: var(--hover-color);
+    color: var(--sidebar-font-color);
+}
+
+/* 一级目录项文字样式 */
+#write .md-toc-h1 a.md-toc-inner {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sidebar-font-color) !important;
+}
+
+/* 目录链接通用文字样式 */
+#write a.md-toc-inner {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--sidebar-font-color);
+}
+
+/* ----- 目录交互逻辑 ----- */
+
+/* 容器优化：让整行看起来可点击 */
+.md-toc-content .md-toc-item {
+    cursor: pointer;
+    transition: background 0.1s ease;
+    border-radius: 4px;
+}
+
+/* 整行背景反馈 */
+.md-toc-content .md-toc-item:hover {
+    background: var(--hover-color);
+}
+
+/* 圆点联动 */
+.md-toc-content .md-toc-item:hover::before {
+    background: var(--LOGO-color);
+}
+
+/* 文字联动 */
+.md-toc-item:hover a.md-toc-inner {
+    color: var(--font-color) !important;
+    text-decoration: none;
+}
+
+/* 代码块联动 */
+.md-toc-item:hover a.md-toc-inner code {
+    background: var(--hover-color);
+    color: var(--font-color);
+}
+
+/* 扩大全行点击 */
+.md-toc-item a.md-toc-inner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* =========================================
+   11. 打印 / PDF 导出适配
+   ========================================= */
+
+@media print {
+    /* ---------- 列表：flexbox gap 在打印引擎中不生效，回退为传统 margin 间距 ---------- */
+    #write ul,
+    #write ol,
+    .write ul,
+    .write ol {
+        display: block;
+        gap: normal;
+    }
+
+    #write li,
+    .write li {
+        margin-bottom: 0.25rem;
+    }
+
+    #write li > p,
+    .write li > p {
+        padding: 0;
+        margin: 0;
+    }
+
+    #write > ul,
+    #write > ol,
+    .write > ul,
+    .write > ol {
+        padding: 0 2rem;
+        margin: 0 0 0.75rem 0;
+    }
+
+    #write > ul ul,
+    #write > ol ol,
+    .write > ul ul,
+    .write > ol ol {
+        padding: 0 2rem 0.25rem 2rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    /* ---------- 表格：0.5px 边框在 PDF 中会消失，同时显式补全列间距与行高 ---------- */
+    #write table,
+    .write table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        line-height: 1.7;
+    }
+
+    #write th,
+    #write td,
+    .write th,
+    .write td {
+        font-size: 0.875rem;
+        line-height: 1.7;
+        padding: 0.5rem 1rem 0.5rem 1px !important;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        border-bottom: 1px solid;
+        border-bottom-width: 1px !important;
+    }
+
+    #write th,
+    .write th {
+        border-bottom-color: var(--table-th-border);
+        font-weight: var(--font-strong);
+    }
+
+    #write td,
+    .write td {
+        border-bottom-color: var(--table-td-border);
+        font-weight: var(--font-weight);
+    }
+
+    #write tr:last-child td,
+    .write tr:last-child td {
+        border-bottom: 1px solid var(--table-td-border);
+    }
+
+    #write table thead,
+    .write table thead {
+        border-bottom: 1px solid var(--table-th-border);
+    }
+
+    /* ---------- 行内代码：防止跨页断裂 ---------- */
+    code {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    p, li {
+        widows: 2;
+        orphans: 2;
+    }
+
+    figure, pre, blockquote {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+

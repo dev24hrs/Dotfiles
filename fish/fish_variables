@@ -1,4 +1,0 @@
-# This file contains fish universal variable definitions.
-# VERSION: 3.0
-SETUVAR __fish_initialized:4300
-SETUVAR fish_user_paths:/opt/homebrew/opt/ffmpeg\x2dfull/bin\x1e/opt/homebrew/opt/imagemagick\x2dfull/bin\x1e/opt/homebrew/opt/go/bin\x1e/Users/asang24/Documents/Tools/maven/maven\x2d3\x2e9\x2e9/bin\x1e/Library/Java/JavaVirtualMachines/jdk\x2d17\x2ejdk/Contents/Home/bin\x1e/Users/asang24/Documents/Tools/GoPath/bin
