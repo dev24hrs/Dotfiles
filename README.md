@@ -26,15 +26,15 @@ cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
 
 相关使用场景:
 
--   `./cfg.sh symlinks`: 当前mac环境,之前手动配置 `~/.config`,也手动维护`dotfiles`目录,现在改成symlink方式
+- `./cfg.sh symlinks`: 当前mac环境,之前手动配置 `~/.config`,也手动维护`dotfiles`目录,现在改成symlink方式
 
-~~~bash
+```bash
 # 在Dotfiles目录执行 ./cfg.sh symlinks
 # 自动在 ~/.config目录下创建相关链接,并链接到Dotfiles的对应配置目录
 # 同时备份之前手动管理的配置
-~~~
+```
 
--   `./cfg.sh add `,假如后续想安装某个某些软件,需要配置 `~/.config` / `~`目录
+- `./cfg.sh add `: 假如后续想安装某个某些软件,需要配置 `~/.config` / `~`目录
 
 ```bash
 # 比如新安装了yazi,则在Dotfiles目录下执行
@@ -46,10 +46,10 @@ cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
 # 最后 git 提交Dotfiles更新
 ```
 
--   `./cfg migrate`: 当前mac环境,之前只手动配置``~/.config``,无`dotfiles`
+- `./cfg migrate`: 当前mac环境,之前只手动配置`~/.config`,无`dotfiles`
 
 ```bash
-mkdir-p ~/Dotfiles && cd ~/Dotfiles
+mkdir -p ~/Dotfiles && cd ~/Dotfiles
 
 # 把config 已有配置都迁移进 Dotfiles
 ./cfg.sh migrate
@@ -63,11 +63,53 @@ git commit -m "chore: migrate existing configs to Dotfiles"
 git push
 ```
 
+## Brewfile
+
+-   导出当前 mac 已安装的所有包
+
+```bash
+brew bundle dump --file=~/Dotfiles/Brewfile --force
+# --force 表示已存在则覆盖
+```
+
+-   在新 mac 上安装 Brewfile 里的所有包
+
+```bash
+brew bundle install --file=~/Dotfiles/Brewfile
+```
+
+-   检查哪些包已安装、哪些还没装
+
+```bash
+brew bundle check --file=~/Dotfiles/Brewfile
+```
+
+-   清理本机有但 Brewfile 里没有的包（同步删除）
+
+```bash
+brew bundle cleanup --file=~/Dotfiles/Brewfile
+# 加 --force 才会真正删除，不加只是预览
+brew bundle cleanup --file=~/Dotfiles/Brewfile --force
+```
+
+-   装了新包之后同步到 Brewfile
+
+```bash
+# 重新导出
+brew bundle dump --file=~/Dotfiles/Brewfile --force
+```
+
+-   Fish脚本
+
+~~~bash
+
+~~~
+
 ## Enhance terminal
 
->   [!NOTE]
+> [!NOTE]
 >
->   已存在于 [setup.sh](https://github.com/dev24hrs/Dotfiles/blob/main/setup.sh) 自动配置
+> 已存在于 [setup.sh](https://github.com/dev24hrs/Dotfiles/blob/main/setup.sh) 自动配置
 
 ```bash
 #  Disable press-and-hold for keys in favor of key repeat
