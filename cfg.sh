@@ -66,11 +66,9 @@ setup_symlinks() {
 
   # starship
   make_link "$DOTFILES_DIR/starship" "$HOME/.config/starship"
+
   # lazygit
   make_link "$DOTFILES_DIR/lazygit" "$HOME/.config/lazygit"
-
-  # hammerspoon
-  make_link "$DOTFILES_DIR/hammerspoon" "$HOME/.hammerspoon"
 
   # wezterm
   make_link "$DOTFILES_DIR/wezterm" "$HOME/.config/wezterm"
@@ -165,7 +163,6 @@ migrate_all() {
     "$HOME/.config/bat"
     "$HOME/.config/lazygit"
     "$HOME/.config/starship"
-    "$HOME/.hammerspoon"
     "$HOME/.gitconfig"
     "$HOME/.gitignore_global"
     "$HOME/.config/go-musicfox"
