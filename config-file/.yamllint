@@ -1,0 +1,113 @@
+# .yamllint
+extends: default
+
+# 忽略的文件和目录
+ignore: |
+  node_modules/
+  vendor/
+  .git/
+  venv/
+  .venv/
+  __pycache__/
+  dist/
+  build/
+  .github/workflows/
+
+rules:
+  # 行长度
+  line-length:
+    max: 120  # 最大行长度
+    level: warning  # 超出时警告而非错误
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+
+  # 缩进
+  indentation:
+    spaces: 2  # 2 空格缩进
+    indent-sequences: true  # 序列元素缩进
+    check-multi-line-strings: false
+
+  # 注释
+  comments:
+    min-spaces-from-content: 2  # 行尾注释前至少 2 个空格
+    require-starting-space: true
+    ignore-shebangs: true
+
+  # 文档开始标记 (---)
+  document-start:
+    present: false  # 不强制要求 ---
+
+  # 文档结束标记 (...)
+  document-end:
+    present: false  # 不要求 ...
+
+  # 空行
+  empty-lines:
+    max: 2  # 最多 2 个连续空行
+    max-start: 0  # 文件开头不允许空行
+    max-end: 1  # 文件末尾最多 1 个空行
+
+  # 尾随空格
+  trailing-spaces: enable
+
+  # 键重复
+  key-duplicates: enable
+
+  # 八进制值
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
+  # 引号
+  quoted-strings:
+    quote-type: any  # 允许单引号和双引号
+    required: false  # 不强制所有字符串加引号
+    extra-required: []
+    extra-allowed: []
+
+  # 真假值
+  truthy:
+    allowed-values: ['true', 'false']  # 只允许 true/false
+    check-keys: false  # 不检查键名
+
+  # 括号
+  brackets:
+    min-spaces-inside: 0  # [ 和 ] 内侧无空格
+    max-spaces-inside: 0
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
+
+  # 花括号
+  braces:
+    min-spaces-inside: 0  # { 和 } 内侧无空格
+    max-spaces-inside: 1
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
+
+  # 冒号
+  colons:
+    max-spaces-before: 0  # key: value 冒号前无空格
+    max-spaces-after: 1  # 冒号后 1 个空格
+
+  # 逗号
+  commas:
+    max-spaces-before: 0  # 逗号前无空格
+    min-spaces-after: 1  # 逗号后至少 1 个空格
+    max-spaces-after: 1
+
+  # 连字符
+  hyphens:
+    max-spaces-after: 1  # - 后 1 个空格
+
+  # 空值
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: true
+
+  # 新行
+  new-line-at-end-of-file: enable
+  new-lines:
+    type: unix  # LF 换行符
+
+  # 键排序（可选）
+  key-ordering: disable  # 不强制键排序

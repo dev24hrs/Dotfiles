@@ -1,0 +1,25 @@
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gofumpt
+    - goimports
+    - misspell
+    - unconvert
+    - unparam
+  disable:
+    - gofmt # 禁用 gofmt，避免冲突
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  govet:
+    check-shadowing: true
+  gofumpt:
+    extra-rules: true # 启用额外规则
+    module-path: github.com/your/module # 可选
+issues:
+  exclude-use-default: false
