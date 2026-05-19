@@ -30,6 +30,7 @@ function __fish_brewup_outdated_formulae
     brew outdated --formula 2>/dev/null | awk '{print $1}'
 end
 
+complete -c brewup -n __fish_brewup_needs_command -a file -d "导出 Brewfile"
 complete -c brewup -n __fish_brewup_needs_command -a formula -d "更新 formula"
 complete -c brewup -n __fish_brewup_needs_command -a cask -d "更新 cask"
 complete -c brewup -n __fish_brewup_needs_command -a deps -d "查看包的依赖关系 "

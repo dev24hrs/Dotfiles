@@ -21,6 +21,7 @@ function brewup --description "Homebrew 管理工具 - 支持子命令"
         echo "  brewup formula   # 仅更新 formula"
         echo "  brewup cask      # 仅更新 cask"
         echo "  brewup listformula      # 列出已安装的 formula"
+        echo "  file             # 重新导出 Brewfile 到 Dotfiles"
     end
 
     # 获取子命令
@@ -128,6 +129,15 @@ function brewup --description "Homebrew 管理工具 - 支持子命令"
             else
                 echo "所有 cask 都是最新的"
             end
+        case file
+            set brewfile "$HOME/Documents/Dotfiles/Brewfile"
+            echo "→ Dumping Brewfile to $brewfile ..."
+            brew bundle dump --file=$brewfile --force --no-vscode
+            or begin
+                echo "✗ Failed to dump Brewfile"
+                return 1
+            end
+            and echo "✓ Done: $brewfile"
         case cleandeps
             _brewup_cleandeps $argv
         case cleantaps
