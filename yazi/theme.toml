@@ -1,0 +1,10 @@
+[flavor]
+dark = "gruvbox-material"
+[git]
+unknown_sign = "?"
+untracked_sign = "?"
+modified_sign = "M"
+deleted_sign = "D"
+updated_sign = "U"
+added_sign = "A"
+ignored_sign = "I"
