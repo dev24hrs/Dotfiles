@@ -456,3 +456,15 @@ rustup update
 ## Rime
 
 Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
+
+## setup.sh
+
+```bash
+新mac安装环境:
+git clone https://github.com/dev24hrs/Dotfiles.git ~/Documents/Dotfiles
+cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
+
+# LICENSE
+
+This project is licensed under the MIT License.
+```
