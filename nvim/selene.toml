@@ -1,7 +1,6 @@
 # 开启标准库支持
 std = "lua51+nvim"
 
-# 如果你想更精细地控制，也可以手动添加全局变量
 [config]
 global_usage_check = true
 
