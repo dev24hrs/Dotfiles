@@ -1,0 +1,5 @@
+# apiKey
+set -x GEMINI_API_KEY
+
+# deepseek
+set -x DEEPSEEK_API_KEY
