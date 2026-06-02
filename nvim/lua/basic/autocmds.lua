@@ -37,48 +37,6 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- 注册 :PackClean
-vim.api.nvim_create_user_command("PackClean", function()
-    local unused_plugins = {}
-
-    for _, p in ipairs(vim.pack.get()) do
-        if not p.active then
-            table.insert(unused_plugins, p.spec.name)
-        end
-    end
-
-    if #unused_plugins == 0 then
-        return vim.notify("No unused plugins found.", vim.log.levels.INFO)
-    end
-
-    vim.notify("Detected unused plugins: " .. table.concat(unused_plugins, ", "), vim.log.levels.INFO)
-
-    if vim.fn.confirm("Delete these plugins from disk?", "&Yes\n&No", 2) == 1 then
-        vim.pack.del(unused_plugins)
-        vim.notify("Cleaned successfully.", vim.log.levels.INFO)
-    else
-        vim.notify("Cleaned canceled.", vim.log.levels.INFO)
-    end
-end, {})
-
--- 注册 :PackUpdate
-vim.api.nvim_create_user_command("PackUpdate", function()
-    local plugins_to_update = {}
-
-    for _, p in ipairs(vim.pack.get()) do
-        if p.active then
-            table.insert(plugins_to_update, p.spec.name)
-        end
-    end
-
-    if #plugins_to_update == 0 then
-        return vim.notify("No active plugins to update...", vim.log.levels.INFO)
-    end
-
-    vim.notify("Checking updates for all plugins...", vim.log.levels.INFO)
-    vim.pack.update(plugins_to_update)
-end, {})
-
 -- close some filetypes with <q>
 vim.api.nvim_create_autocmd("FileType", {
     desc = "Close specific buffers with <q>",
