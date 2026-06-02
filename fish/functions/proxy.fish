@@ -1,8 +1,8 @@
 function proxy --description 'proxy [on|off|show]'
     switch "$argv[1]"
         case on
-            git config --global http.proxy 127.0.0.1:12334
-            git config --global https.proxy 127.0.0.1:12334
+            git config --global http.proxy 127.0.0.1:7897
+            git config --global https.proxy 127.0.0.1:7897
             # set -gx http_proxy http://127.0.0.1:7890
             # set -gx https_proxy http://127.0.0.1:7890
             echo (set_color green)"󰄬 代理已开启 (Git & Session)"(set_color normal)
