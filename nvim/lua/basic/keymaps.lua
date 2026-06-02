@@ -20,7 +20,4 @@ keymap("v", "K", ":m '<-2<CR>gv=gv", "[Basic]: move selected line up")
 keymap({ "n", "v" }, "W", "^", "[Basic]: move cursor to line head")
 keymap({ "n", "v" }, "E", "$", "[Basic]: move cursor to line end")
 
--- keymap("n", "wh", "<C-w>h", "[Basic]: move to left split")
--- keymap("n", "wl", "<C-w>l", "[Basic]: move to right split")
-
-keymap("n", "wq", "<cmd>q<CR>", "[Basic]: quit in normal mode")
+keymap("n", "wq", "<cmd>wq<CR>", "[Basic]: quit in normal mode")

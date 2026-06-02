@@ -2,7 +2,7 @@ vim.pack.add({
     { src = "https://github.com/folke/todo-comments.nvim" },
 })
 
-vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufReadPost", "BufNewFile" }, {
     group = vim.api.nvim_create_augroup("User_TodoInit", { clear = true }),
     once = true,
     callback = function()
