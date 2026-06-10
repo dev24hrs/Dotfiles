@@ -75,8 +75,6 @@ function llama --description "Llama.cpp 统一命令入口"
                 -c $DEFAULT_CTX \
                 -t $DEFAULT_THREADS \
                 -n -1 \
-                -fa \
-                -cnv \
                 $extra_args
 
         case server
@@ -94,7 +92,6 @@ function llama --description "Llama.cpp 统一命令入口"
                 --host 0.0.0.0 \
                 -np 4 \
                 -cb \
-                -fa \
                 $extra_args
 
         case bench
