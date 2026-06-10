@@ -1,16 +1,47 @@
-git:
-  branchLogCmd: "git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit -n 20 --date=format:'%Y-%m-%d %H:%M %a'"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 gui:
-  border: single
-  mouseevents: false
+  expandFocusedSidePanel: true
+  showNumstatInFilesView: true
   nerdFontsVersion: "3"
-  wrapLinesInStagingView: true
+  mouseEvents: false
+  branchColorPatterns:
+    "^feature/": cyan
+    "^fix/": red
+    "^chore/": yellow
+    "^release/": green
+    "^main$": "#ffffff"
+    "^master$": "#ffffff"
   theme:
     activeBorderColor:
       - cyan
       - bold
-    optionsTextColor:
-      - yellow
-keybinding:
-  universal:
-    filteringMenu: "<c-f>"
+    inactiveBorderColor:
+      - default
+    selectedLineBgColor:
+      - blue
+    unstagedChangesColor:
+      - red
+git:
+  branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=format:'%C(yellow)%h%Creset %C(bold blue)%an%Creset %C(green)(%ar)%Creset %s %C(auto)%d%Creset' {{branchName}} --"
+os:
+  editPreset: "nvim"
+customCommands:
+  - key: "c"
+    command: "git commit -m '{{.Form.Type}}: {{.Form.Message}}'"
+    context: "files"
+    description: "Conventional commit"
+    prompts:
+      - type: "menu"
+        key: "Type"
+        title: "Commit type:"
+        options:
+          - name: "feat"
+          - name: "fix"
+          - name: "docs"
+          - name: "test"
+          - name: "style"
+          - name: "chore"
+          - name: "refactor"
+      - type: "input"
+        key: "Message"
+        title: "Message:"
