@@ -26,7 +26,7 @@ git:
 os:
   editPreset: "nvim"
 customCommands:
-  - key: "c"
+  - key: "C"
     command: "git commit -m '{{.Form.Type}}: {{.Form.Message}}'"
     context: "files"
     description: "Conventional commit"
@@ -36,12 +36,19 @@ customCommands:
         title: "Commit type:"
         options:
           - name: "feat"
+            value: "feat"
           - name: "fix"
+            value: "fix"
           - name: "docs"
+            value: "docs"
           - name: "test"
+            value: "test"
           - name: "style"
+            value: "style"
           - name: "chore"
+            value: "chore"
           - name: "refactor"
+            value: "refactor"
       - type: "input"
         key: "Message"
         title: "Message:"
