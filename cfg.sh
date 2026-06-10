@@ -150,24 +150,56 @@ migrate_to_dotfiles() {
 # ── 增量添加 ──────────────────────────────────────────────────────────────────
 
 # 把 Dotfiles 里的某个目录/文件软链到合适的位置
-# 用法: add_config <dotfiles-path>
-#   .* 开头的链到 $HOME (如 .gitconfig)
-#   其它链到 ~/.config/<name>
+# 用法: add_config <name|path>
+#   短名 (如 yazi / .gitconfig)        -> 拼接成 $DOTFILES_DIR/<name>
+#   ~ 或 / 开头的完整路径               -> 规范化后必须落在 $DOTFILES_DIR 下
+#   不支持 ./xxx 或 ../xxx 这类显式相对路径
+#   .* 开头的最终链到 $HOME (如 .gitconfig),其它链到 ~/.config/<name>
 add_config() {
-  local src="$1"
+  local input="$1"
 
-  if [ -z "$src" ]; then
-    err "usage: $0 add <path-in-dotfiles>"
-    err "example: $0 add $DOTFILES_DIR/yazi"
+  if [ -z "$input" ]; then
+    err "usage: $0 add <name|path>"
+    err "example: $0 add yazi"
+    err "example: $0 add .gitconfig"
+    err "example: $0 add ~/Documents/Dotfiles/yazi"
     exit 1
   fi
 
-  # 展开 ~ 并解析为绝对路径
-  src="${src/#\~/$HOME}"
-
-  if [ ! -e "$src" ]; then
-    err "source not found: $src"
+  # 显式相对路径前缀:直接拒绝
+  case "$input" in
+  ./* | ../* | . | ..)
+    err "explicit relative paths not supported: $input"
     exit 1
+    ;;
+  esac
+
+  # 展开 ~
+  input="${input/#\~/$HOME}"
+
+  local src
+  if [[ "$input" == */* ]]; then
+    # 路径形态:此时一定是绝对路径 (./ 和 ../ 已拒,~ 已展开)
+    # 规范化以容忍 .. 段,避免后续字符串前缀比较误判
+    if [ -d "$input" ]; then
+      src="$(cd "$input" && pwd)"
+    elif [ -e "$input" ]; then
+      src="$(cd "$(dirname "$input")" && pwd)/$(basename "$input")"
+    else
+      err "source not found: $input"
+      exit 1
+    fi
+    if [[ "$src" != "$DOTFILES_DIR"/* ]]; then
+      err "source must live under $DOTFILES_DIR: $src"
+      exit 1
+    fi
+  else
+    # 短名:直接拼
+    src="$DOTFILES_DIR/$input"
+    if [ ! -e "$src" ]; then
+      err "source not found: $src"
+      exit 1
+    fi
   fi
 
   local name
@@ -204,7 +236,7 @@ symlinks) setup_symlinks ;; # ./cfg.sh symlinks
 add)
   shift
   add_config "$1"
-  ;;                            # ./cfg.sh add ~/Documents/Dotfiles/yazi
+  ;;                            # ./cfg.sh add yazi  /  add .gitconfig  /  add ~/Documents/Dotfiles/yazi
 migrate) migrate_to_dotfiles ;; # ./cfg.sh migrate
 *) usage ;;
 esac

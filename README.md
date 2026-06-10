@@ -14,7 +14,7 @@
 
 ### setup.sh
 
-新mac: 无任何环境配置
+新mac: 无任何配置
 
 ```bash
 git clone https://github.com/dev24hrs/Dotfiles.git ~/Documents/Dotfiles
@@ -26,21 +26,45 @@ cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
 
 相关使用场景:
 
-- `./cfg.sh symlinks`: 当前mac环境,之前手动配置 `~/.config`,也手动维护`dotfiles`目录,现在改成symlink方式
+-   脚本里维护数据集
+
+```bash
+# 单一数据源,格式: <dotfiles 内的相对路径>:<目标绝对路径>
+# setup_symlinks 和 migrate_to_dotfiles 都基于这个清单工作
+DOTFILES_DIR="$HOME/Documents/Dotfiles"
+
+CONFIG_MAP=(
+  "tmux:$HOME/.config/tmux"
+  "fish:$HOME/.config/fish"
+  "nvim:$HOME/.config/nvim"
+  "git/.gitconfig:$HOME/.gitconfig"
+  "git/.gitignore_global:$HOME/.gitignore_global"
+  "ghostty:$HOME/.config/ghostty"
+  "bat:$HOME/.config/bat"
+  "starship:$HOME/.config/starship"
+  "lazygit:$HOME/.config/lazygit"
+  "wezterm:$HOME/.config/wezterm"
+  "yazi:$HOME/.config/yazi"
+  "go-musicfox:$HOME/.config/go-musicfox"
+)
+```
+
+- `./cfg.sh symlinks`: 当前mac环境,之前手动维护 `~/.config` & `dotfiles`,现在改成symlink方式
 
 ```bash
 # 在Dotfiles目录执行 ./cfg.sh symlinks
-# 自动在 ~/.config目录下创建相关链接,并链接到Dotfiles的对应配置目录
+# 自动在 ~/.config目录下创建相关链接,并链接到Dotfiles的对应配置目录/文件
 # 同时备份之前手动管理的配置
 ```
 
-- `./cfg.sh add `: 假如后续想安装某个某些软件,需要配置 `~/.config` / `~`目录
+- `./cfg.sh add `: 假如后续想安装某个/某些软件,在`Dotfiles`目录下配置之后
 
 ```bash
 # 比如新安装了yazi,则在Dotfiles目录下执行
-./cfg.sh add ~/.config/yazi
-# 或者
-./cfg.sh add ~/.hammerspoon
+# 短路径
+./cfg.sh add yazi
+# 或者绝对路径
+./cfg.sh add ~/Dotfiles/yazi
 
 # 然后手动在 cfg.sh 的 setup_symlinks() 里补上对应的 make_link
 # 最后 git 提交Dotfiles更新
