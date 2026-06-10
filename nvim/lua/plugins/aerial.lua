@@ -36,4 +36,4 @@ require("aerial").setup({
         vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Aerial Next" })
     end,
 })
-vim.keymap.set("n", "<leader>co", "<cmd>AerialToggle<CR>", { desc = "[Aerial]: Toggle Outline" })
+vim.keymap.set("n", "<leader>ll", "<cmd>AerialToggle<CR>", { desc = "[Aerial]: Toggle Outline" })
