@@ -25,8 +25,11 @@ git:
   branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=format:'%C(yellow)%h%Creset %C(bold blue)%an%Creset %C(green)(%ar)%Creset %s %C(auto)%d%Creset' {{branchName}} --"
 os:
   editPreset: "nvim"
+keybinding:
+  files:
+    commitChanges: "<disabled>" # 禁用默认的 c（打开 commit 界面）
 customCommands:
-  - key: "C"
+  - key: "c"
     command: "git commit -m '{{.Form.Type}}: {{.Form.Message}}'"
     context: "files"
     description: "Conventional commit"
