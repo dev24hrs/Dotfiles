@@ -3,13 +3,33 @@ set -e
 
 DOTFILES_DIR="$HOME/Documents/Dotfiles"
 
+# ── 配置映射 ──────────────────────────────────────────────────────────────────
+# 单一数据源,格式: <dotfiles 内的相对路径>:<目标绝对路径>
+# setup_symlinks 和 migrate_to_dotfiles 都基于这个清单工作
+
+CONFIG_MAP=(
+  "tmux:$HOME/.config/tmux"
+  "fish:$HOME/.config/fish"
+  "nvim:$HOME/.config/nvim"
+  "git/.gitconfig:$HOME/.gitconfig"
+  "git/.gitignore_global:$HOME/.gitignore_global"
+  "ghostty:$HOME/.config/ghostty"
+  "bat:$HOME/.config/bat"
+  "starship:$HOME/.config/starship"
+  "lazygit:$HOME/.config/lazygit"
+  "wezterm:$HOME/.config/wezterm"
+  "yazi:$HOME/.config/yazi"
+  "go-musicfox:$HOME/.config/go-musicfox"
+)
+
 # ── 工具函数 ──────────────────────────────────────────────────────────────────
 
-log() { echo "  $1"; }
 ok() { echo "  ✓ $1"; }
 warn() { echo "  ⚠ $1"; }
+err() { echo "  ✗ $1" >&2; }
 
-# 创建 symlink，目标已存在则备份后替换
+backup_path() { echo "${1}.bak.$(date +%Y%m%d%H%M%S)"; }
+
 make_link() {
   local src="$1"  # Dotfiles 里的源路径
   local dest="$2" # 目标路径 (~/.config/xxx 或 ~/.xxx)
@@ -17,219 +37,174 @@ make_link() {
   # 源不存在则跳过
   if [ ! -e "$src" ]; then
     warn "source not found, skipping: $src"
-    return
+    return 0
   fi
 
-  # 已经是正确的 symlink，跳过
-  if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+  # 已经是正确的 symlink，跳过(用 readlink -f 比较规范化路径,容忍尾斜杠等差异)
+  if [ -L "$dest" ] && [ "$(readlink -f "$dest" 2>/dev/null)" = "$(readlink -f "$src" 2>/dev/null)" ]; then
     ok "already linked: $dest"
-    return
+    return 0
   fi
 
-  # 目标存在但不是 symlink（真实文件/目录），备份
+  # 目标存在但不是 symlink（真实文件/目录），带时间戳备份
   if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-    warn "backing up existing: $dest -> ${dest}.bak"
-    mv "$dest" "${dest}.bak"
+    local backup
+    backup="$(backup_path "$dest")"
+    warn "backing up existing: $dest -> $backup"
+    mv "$dest" "$backup"
   fi
 
-  # 删掉旧的错误 symlink
-  [ -L "$dest" ] && rm "$dest"
+  # 删掉旧的错误 symlink(给出当前指向以便排障)
+  if [ -L "$dest" ]; then
+    warn "removing stale symlink: $dest -> $(readlink "$dest")"
+    rm "$dest"
+  fi
 
-  mkdir -p "$(dirname "$dest")"
+  # 父目录不存在才创建,避免无谓 syscall
+  local parent
+  parent="$(dirname "$dest")"
+  [ -d "$parent" ] || mkdir -p "$parent"
+
   ln -s "$src" "$dest"
   ok "linked: $dest -> $src"
 }
 
 # ── Symlinks ──────────────────────────────────────────────────────────────────
-
 setup_symlinks() {
   echo "→ Setting up symlinks..."
-
-  # tmux
-  make_link "$DOTFILES_DIR/tmux" "$HOME/.config/tmux"
-
-  # fish
-  make_link "$DOTFILES_DIR/fish" "$HOME/.config/fish"
-
-  # neovim
-  make_link "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
-
-  # git
-  make_link "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
-  make_link "$DOTFILES_DIR/git/.gitignore_global" "$HOME/.gitignore_global"
-
-  # ghostty
-  make_link "$DOTFILES_DIR/ghostty" "$HOME/.config/ghostty"
-
-  # bat
-  make_link "$DOTFILES_DIR/bat" "$HOME/.config/bat"
-
-  # starship
-  make_link "$DOTFILES_DIR/starship" "$HOME/.config/starship"
-
-  # lazygit
-  make_link "$DOTFILES_DIR/lazygit" "$HOME/.config/lazygit"
-
-  # wezterm
-  make_link "$DOTFILES_DIR/wezterm" "$HOME/.config/wezterm"
-
-  # yazi
-  make_link "$DOTFILES_DIR/yazi" "$HOME/.config/yazi"
-
-  # go-musicfox
-  make_link "$DOTFILES_DIR/go-musicfox" "$HOME/.config/go-musicfox"
+  local entry src dest
+  for entry in "${CONFIG_MAP[@]}"; do
+    src="${entry%%:*}"
+    dest="${entry#*:}"
+    make_link "$DOTFILES_DIR/$src" "$dest"
+  done
   echo ""
 }
 
-# ── 额外配置 ──────────────────────────────────────────────────────────────────
-setup_tmux() {
-  echo "→ Configuring tmux..."
+# ── migrate ──────────────────────────────────────────────────────────────────
+# 把现有的 ~/.config/xxx (或 ~/.xxx) 物理移动到 Dotfiles,然后建立软链
+# 适用场景:第一次接入 Dotfiles,本地已有配置,想把它们纳入版本管理
+migrate_to_dotfiles() {
+  echo "→ Migrating existing configs into Dotfiles..."
+  local entry src_rel dest src
+  local migrated=0 skipped=0 failed=0
 
-  # 安装 TPM
-  TPM_DIR="$HOME/.config/tmux/plugins/tpm"
-  if [ ! -d "$TPM_DIR" ]; then
-    git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
-    ok "TPM cloned"
-  else
-    ok "TPM already installed"
-  fi
+  for entry in "${CONFIG_MAP[@]}"; do
+    src_rel="${entry%%:*}"
+    dest="${entry#*:}"
+    src="$DOTFILES_DIR/$src_rel"
 
-  # 安装插件（headless）
-  tmux new-session -d -s cfg_setup 2>/dev/null || true
-  TMUX_PLUGIN_MANAGER_PATH="$HOME/.config/tmux/plugins" \
-    "$TPM_DIR/bin/install_plugins"
-  tmux kill-session -t cfg_setup 2>/dev/null || true
-  ok "tmux plugins installed"
-
-  echo ""
-}
-
-setup_git() {
-  echo "→ Configuring git..."
-
-  # 全局 gitignore 注册
-  git config --global core.excludesfile "$HOME/.config/git/.gitignore_global"
-  ok "global gitignore set"
-
-  echo ""
-}
-
-# 用法：./cfg.sh add <配置目录或文件的现有路径>
-# 示例：./cfg.sh add ~/.config/yazi
-
-add_config() {
-  local target="$1" # 已存在的配置路径，如 ~/.config/yazi
-
-  # 转换为绝对路径
-  target="$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
-
-  # 推导在 Dotfiles 里的对应位置
-  # ~/.config/yazi -> ~/Dotfiles/yazi
-  # ~/.npmrc       -> ~/Dotfiles/npm/.npmrc (需手动指定)
-  local name
-  name="$(basename "$target")"
-  local dest="$DOTFILES_DIR/$name"
-
-  if [ -e "$dest" ]; then
-    warn "already exists in Dotfiles: $dest"
-    return
-  fi
-
-  # 移动真实文件到 Dotfiles
-  mv "$target" "$dest"
-  ok "moved: $target -> $dest"
-
-  # 建立 symlink
-  make_link "$dest" "$target"
-
-  echo ""
-  echo "  记得在 cfg.sh 的 setup_symlinks() 里补上这行："
-  echo "  make_link \"\$DOTFILES_DIR/$name\" \"$target\""
-  echo ""
-  echo "  然后提交："
-  echo "  cd ~/Dotfiles && git add $name && git commit -m 'feat: add $name config'"
-}
-
-migrate_all() {
-  echo "→ Migrating existing ~/.config dirs to Dotfiles..."
-
-  # 需要纳入管理的目录列表
-  local configs=(
-    "$HOME/.config/tmux"
-    "$HOME/.config/fish"
-    "$HOME/.config/nvim"
-    "$HOME/.config/ghostty"
-    "$HOME/.config/wezterm"
-    "$HOME/.config/bat"
-    "$HOME/.config/lazygit"
-    "$HOME/.config/starship"
-    "$HOME/.gitconfig"
-    "$HOME/.gitignore_global"
-    "$HOME/.config/go-musicfox"
-    "$HOME/.config/yazi"
-  )
-
-  for target in "${configs[@]}"; do
-    local name
-    name="$(basename "$target")"
-    local dest="$DOTFILES_DIR/$name"
-
-    # 已经是 symlink，跳过
-    if [ -L "$target" ]; then
-      ok "already a symlink, skipping: $target"
+    # 目标根本不存在,无需迁移
+    if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then
+      warn "not present, skipping: $dest"
+      skipped=$((skipped + 1))
       continue
     fi
 
-    # 源不存在，跳过
-    if [ ! -e "$target" ]; then
-      warn "not found, skipping: $target"
+    # 目标已经是 symlink,说明已被管理(或被指到别处),不迁移
+    if [ -L "$dest" ]; then
+      warn "already a symlink, skipping: $dest -> $(readlink "$dest")"
+      skipped=$((skipped + 1))
       continue
     fi
 
-    # Dotfiles 里已有同名，备份后覆盖
-    if [ -e "$dest" ]; then
-      warn "conflict in Dotfiles, backing up: $dest -> ${dest}.bak"
-      mv "$dest" "${dest}.bak"
+    # Dotfiles 里已存在同名内容:不能盲目覆盖,先备份再迁移
+    if [ -e "$src" ]; then
+      local backup
+      backup="$(backup_path "$src")"
+      warn "dotfiles already has: $src -> backup to $backup"
+      mv "$src" "$backup"
     fi
 
-    # 移动真实文件/目录到 Dotfiles
-    mv "$target" "$dest"
-    ok "moved: $target -> $dest"
+    # 确保 Dotfiles 里父目录存在(如 git/.gitconfig 需要 git/ 已存在)
+    local parent
+    parent="$(dirname "$src")"
+    [ -d "$parent" ] || mkdir -p "$parent"
 
-    # 建立 symlink
-    ln -s "$dest" "$target"
-    ok "linked: $target -> $dest"
-
-    echo ""
+    # 真正迁移
+    if mv "$dest" "$src"; then
+      ok "migrated: $dest -> $src"
+      migrated=$((migrated + 1))
+    else
+      err "failed to migrate: $dest -> $src"
+      failed=$((failed + 1))
+    fi
   done
 
-  echo "✓ Migration done!"
   echo ""
-  echo "  记得提交："
-  echo "  cd ~/Dotfiles && git add . && git commit -m 'chore: migrate existing configs'"
+  echo "  summary: migrated=$migrated skipped=$skipped failed=$failed"
+  echo ""
+
+  # 仅在确实迁移过且无失败时,自动重建软链
+  if [ "$failed" -gt 0 ]; then
+    err "migration had failures, NOT running setup_symlinks automatically"
+    return 1
+  fi
+  if [ "$migrated" -eq 0 ]; then
+    echo "  nothing migrated, skip setup_symlinks"
+    return 0
+  fi
+  setup_symlinks
+}
+
+# ── 增量添加 ──────────────────────────────────────────────────────────────────
+
+# 把 Dotfiles 里的某个目录/文件软链到合适的位置
+# 用法: add_config <dotfiles-path>
+#   .* 开头的链到 $HOME (如 .gitconfig)
+#   其它链到 ~/.config/<name>
+add_config() {
+  local src="$1"
+
+  if [ -z "$src" ]; then
+    err "usage: $0 add <path-in-dotfiles>"
+    err "example: $0 add $DOTFILES_DIR/yazi"
+    exit 1
+  fi
+
+  # 展开 ~ 并解析为绝对路径
+  src="${src/#\~/$HOME}"
+
+  if [ ! -e "$src" ]; then
+    err "source not found: $src"
+    exit 1
+  fi
+
+  local name
+  name="$(basename "$src")"
+
+  local dest
+  case "$name" in
+  .*) dest="$HOME/$name" ;;
+  *) dest="$HOME/.config/$name" ;;
+  esac
+
+  echo "→ Adding new symlink..."
+  make_link "$src" "$dest"
+  echo ""
+  echo "  记得在 cfg.sh 的 CONFIG_MAP 里新增一行："
+  echo "  \"${src#"$DOTFILES_DIR"/}:$dest\""
+  echo ""
+  echo "  然后提交："
+  echo "  cd $DOTFILES_DIR && git add $name && git commit -m 'feat: add $name config'"
 }
 
 # ── 入口 ──────────────────────────────────────────────────────────────────────
 
 usage() {
-  echo "Usage: $0 <command>"
-  echo "  all       - 执行全部配置（symlinks + 各工具配置）"
-  echo "  symlinks  - 只建立 symlinks"
-  echo "  tmux      - 只配置 tmux + 插件"
-  echo "  git       - 只配置 git"
+  echo "Usage: $0 <command> [args]"
+  echo "  symlinks         - symlinks existing Dotfiles to new ~/.config"
+  echo "  migrate          - migrate existing ~/.config to new Dotfiles"
+  echo "  add <src>        - add new Dotfiles symlink to ~/.config (or \$HOME for dotfiles)"
   exit 1
 }
 
-case "${1:-all}" in
-all)
-  setup_symlinks
-  setup_tmux
-  setup_git
-  ;;
-symlinks) setup_symlinks ;;
-tmux) setup_tmux ;;
-git) setup_git ;;
-add) add_config "$2" ;; # ./cfg.sh add ~/.config/yazi
-migrate) migrate_all ;; # ./cfg.sh migrate
+case "${1:-}" in
+symlinks) setup_symlinks ;; # ./cfg.sh symlinks
+add)
+  shift
+  add_config "$1"
+  ;;                            # ./cfg.sh add ~/Documents/Dotfiles/yazi
+migrate) migrate_to_dotfiles ;; # ./cfg.sh migrate
 *) usage ;;
 esac
