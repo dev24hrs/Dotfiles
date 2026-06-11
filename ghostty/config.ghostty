@@ -1,7 +1,7 @@
 # font
 font-family                 = RecMonoCasual Nerd Font Mono
 font-family                 = Source Han Sans SC VF
-font-size                   = 20
+font-size                   = 19
 font-thicken                = false
 font-feature                = -calt, -liga, -dlig
 font-family-italic          = true
@@ -14,8 +14,7 @@ term                        = xterm-256color
 
 # background-opacity          = 0.96
 # faint-opacity               = 0.96
-background-blur             = 25
-selection-invert-fg-bg      = true
+background-blur             = 24
 
 # cursor
 cursor-style                = bar
@@ -41,12 +40,6 @@ macos-custom-icon           = ~/.config/ghostty/Ghostty.icns
 shell-integration           = detect
 shell-integration-features  = true
 
-# quick terminal
-keybind                             = global:cmd+ctrl+t=toggle_quick_terminal
-quick-terminal-position             = top
-quick-terminal-size                 = 50%,50%
-quick-terminal-animation-duration   = 0
-
 # other
 bell-features                   = no-audio
 bell-audio-volume               = 0
@@ -55,16 +48,5 @@ copy-on-select                  = clipboard
 quit-after-last-window-closed   = true
 
 # Key bindings
-# split
-keybind                     = cmd+s>\=new_split:right
-keybind                     = cmd+s>-=new_split:down
-
-keybind                     = cmd+s>j=goto_split:bottom
-keybind                     = cmd+s>k=goto_split:top
-keybind                     = cmd+s>h=goto_split:left
-keybind                     = cmd+s>l=goto_split:right
-keybind                     = cmd+s>z=toggle_split_zoom
-keybind                     = cmd+s>x=close_surface
-keybind                     = cmd+s>enter=toggle_fullscreen
 keybind                     = cmd+s>r=reload_config
 
