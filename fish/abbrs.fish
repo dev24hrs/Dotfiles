@@ -1,6 +1,5 @@
 # git
-# gs gb gl rewrite by git.fish
-# abbr -a gs 'git status'
+abbr -a gs 'git status'
 abbr -a ga 'git add'
 abbr -a gaa 'git add --all'
 abbr -a gcm 'git commit -m'
@@ -26,12 +25,22 @@ abbr -a gri 'git rebase -i'
 abbr -a grh 'git reset --hard'
 abbr -a grs 'git reset --soft'
 
-# abbr -a gl "git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit -n 20 --date=format:'%Y-%m-%d %H:%M %a'"
+# homebrew
+abbr -a bi 'brew install'
+abbr -a bu 'brew uninstall'
+abbr -a bud 'brew update'
+abbr -a bug 'brew upgrade'
+abbr -a bc 'brew autoremove && brew cleanup --prune=all'
+
+abbr -a bsl 'brew services list'
+abbr -a bst 'brew services start'
+abbr -a bsp 'brew services stop'
+abbr -a bsr 'brew services restart'
 
 # tmux
 abbr -a ts 'tmux source-file ~/.config/tmux/tmux.conf'
 abbr -a tl 'tmux ls'
-abbr -a ta 'tmux attach'
+abbr -a ta 'tmux attach -t'
 abbr -a tn 'tmux new -s'
 abbr -a tk 'tmux kill-session -t'
 

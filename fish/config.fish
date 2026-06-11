@@ -28,10 +28,6 @@ set -gx FZF_CTRL_R_OPTS "--preview-window hidden"
 if test -f $HOME/.config/fish/abbrs.fish
     source $HOME/.config/fish/abbrs.fish
 end
-if test -f $HOME/.config/fish/git.fish
-    source $HOME/.config/fish/git.fish
-end
-
 # yazi
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")
