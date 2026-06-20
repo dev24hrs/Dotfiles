@@ -2,101 +2,103 @@
 
 ![](https://github.com/dev24hrs/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
 
-## Install tmux
+## Install
 
 ```bash
 brew install tmux --HEAD
-
-# config
 mkdir -p ~/.config/tmux
-vim ~/.config/tmux/tmux.conf
-# all settings refer to dotfiles
 ```
 
-## Config tmux
-
-config refer to [dotfiles](https://github.com/dev24hrs/dotfiles/tree/main/tmux)
-
-steps refer to [tmux github](https://github.com/tmux/tmux)
-
-- custom Status bar
-
-- install `tpm`
-  - `prefix` + `I` to installs new plugins
-  - `prefix` + `U` to update plugins
-  - `prefix` + `alt` + `u` to uninstall/remove
+## TPM (Plugin Manager)
 
 ```bash
 git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
-# at the bottom of ~/.config/tmux/tmux.conf
-# List of plugins
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
-# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-run '~/.tmux/plugins/tpm/tpm'
-# type this in terminal if tmux is already running
-tmux source ~/.config/tmux/tmux.conf
 ```
 
-## Use tmux
+| Key              | Desc              |
+| :--------------- | :---------------- |
+| `prefix + I`     | Install plugins   |
+| `prefix + U`     | Update plugins    |
+| `prefix + M-u`   | Uninstall plugins |
 
-tmux中 每个session可以有多个window; 每个window 可以有多个pane;
+## Usage
 
-default keybindings refer to [tmux_cheatsheet](https://tmuxcheatsheet.com/)
+每个 session 可以有多个 window，每个 window 可以有多个 pane。
 
-**Steps**
+1. `tmux new -s <name>` 新建 session
+2. `prefix + r` 重命名当前 window（预填当前名）
+3. `prefix + c` 新建 window
+4. `prefix + p` / `prefix + n` / `prefix + 0-9` 切换 window
+5. `prefix + -` / `prefix + =` 横向/竖向分 pane
+6. `C-h/j/k/l` 在 pane 间跳转（无需 prefix）
+7. `prefix + x` 关闭当前 pane
+8. `prefix + q` 关闭当前 window
+9. `prefix + w` 列出所有 window
+10. `prefix + d` 暂离 session
+11. `tmux a -t <name>` 重连 session
 
-1.  使用`tmux new -s  <name>` 新建session,当前只有1个window
-2.  使用`prefix + r` 重命名当前window为`project-A`,开始代码
-3.  使用中发现需要多个`window` 即 `project` 切换, 可以使用`prefix + c`创建新window
-4.  使用`prefix + p` or `prefix + n` or `prefix + 0-9` 切换不同的window
-5.  在单个window中,可能需要多个pane做不同操作,根据需要使用`prefix + -` `prefix + =`把当前window切换成横向竖向布局`pane`
-6.  使用`ctrl + h j k l` 在不同的pane间切换
-7.  使用`prefix + x`关闭当前的pane
-8.  使用`prefix + w` 列出所有window,使用`prefix + 0-9` 切换到目标window,使用`prefix + q` 关闭不需要的当前window
-9.  使用`prefix + d` 暂离session
-10. 使用`tmux a -t  <name>` 重连session 或 使用`tmux kill-session -t <name>` 结束session
+---
 
-### Session Keymaps
+## Keybindings
 
-| cmd                         | desc              |
-| :-------------------------- | :---------------- |
-| tmux new -s <name>          | new session       |
-| tmux ls                     | show all session  |
-| tmux detach                 | detach session    |
-| tmux a -t <name>            | reconnect session |
-| tmux kill-session -t <name> | kill session      |
+### Session
 
-|   key    | key |       desc        |
-| :------: | :-: | :---------------: |
-| Ctrl + b |  s  | show all sessions |
-| Ctrl + b |  $  |  rename session   |
-| Ctrl + b |  d  |  detach session   |
-|   Ctrl   |  d  |   kill session    |
+| Key         | Desc              |
+| :---------- | :---------------- |
+| `prefix + s` | 列出所有 session   |
+| `prefix + $` | 重命名 session     |
+| `prefix + d` | detach session    |
+| `prefix + N` | 新建 session      |
+| `prefix + ,` | reload 配置文件    |
 
-### Window Keymaps
+### Window
 
-|   key    |  key  |           desc            |
-| :------: | :---: | :-----------------------: |
-| Ctrl + b |   w   |     show all windows      |
-| Ctrl + b |   r   |   rename current window   |
-| Ctrl + b |   c   |       new a window        |
-| Ctrl + b |   q   |   close current window    |
-| Ctrl + b |   -   |  split window vertically  |
-| Ctrl + b |   =   | split window horizontally |
-| Ctrl + b |   p   |      previous window      |
-| Ctrl + b |   n   |        next window        |
-|  Shift   | Left  |      previous window      |
-|  Shift   | Right |        next window        |
-|  Ctrl+b  |  0-9  |     switch to window      |
+| Key               | Desc                  |
+| :---------------- | :-------------------- |
+| `prefix + w`      | 列出所有 window        |
+| `prefix + c`      | 新建 window            |
+| `prefix + r`      | 重命名 window（预填名） |
+| `prefix + q`      | 关闭当前 window        |
+| `prefix + p`      | 上一个 window          |
+| `prefix + n`      | 下一个 window          |
+| `prefix + 0-9`    | 跳到指定 window        |
+| `S-Left / M-h`    | 上一个 window          |
+| `S-Right / M-l`   | 下一个 window          |
 
-### Pane Keymaps
+### Pane
 
-|  key   |  key  |     description     |
-| :----: | :---: | :-----------------: |
-| prefix |   h   |   select pane -L    |
-| prefix |   l   |   select pane -R    |
-| prefix |   k   |   select pane -U    |
-| prefix |   j   |   select pane -D    |
-| prefix |   x   | close current pane  |
-| prefix | space | toggle pane layouts |
+| Key               | Desc                  |
+| :---------------- | :-------------------- |
+| `C-h / C-j / C-k / C-l` | 切换 pane（左/下/上/右） |
+| `prefix + -`      | 横向分 pane            |
+| `prefix + =`      | 竖向分 pane            |
+| `prefix + x`      | 关闭当前 pane          |
+| `prefix + C-l`    | 清屏（透传 C-l 给 shell） |
+
+### Popup
+
+| Key           | Desc                  |
+| :------------ | :-------------------- |
+| `prefix + g`  | lazygit (80% 窗口)    |
+| `prefix + t`  | fish terminal (60% 窗口) |
+
+### Copy Mode (Vi)
+
+| Key               | Desc              |
+| :---------------- | :---------------- |
+| `prefix + v`      | 进入 copy mode     |
+| `v`               | 开始选择           |
+| `V`               | 选择整行           |
+| `C-v`             | 矩形选择           |
+| `y`               | 复制到系统剪贴板    |
+| `Y`               | 复制整行           |
+| `Escape`          | 取消选择           |
+
+### Session CLI
+
+| Cmd                          | Desc          |
+| :--------------------------- | :------------ |
+| `tmux new -s <name>`         | 新建 session   |
+| `tmux ls`                    | 列出所有 session |
+| `tmux a -t <name>`           | 重连 session   |
+| `tmux kill-session -t <name>` | 删除 session   |
