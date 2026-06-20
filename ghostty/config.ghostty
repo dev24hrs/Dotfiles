@@ -5,11 +5,12 @@ font-size                   = 19
 font-thicken                = false
 font-feature                = -calt, -liga, -dlig
 font-family-italic          = true
-# adjust-cell-height          = -1.5%
+# adjust-cell-height          = 0.5%
 window-inherit-font-size    = true
 
 # theme
 theme                       = Gruvbox Dark
+# theme                       = Gruvbox-Material
 term                        = xterm-256color
 
 # background-opacity          = 0.96
@@ -50,3 +51,12 @@ quit-after-last-window-closed   = true
 # Key bindings
 keybind                     = cmd+s>r=reload_config
 
+# split
+keybind                     = cmd+s>\=new_split:right
+keybind                     = cmd+s>-=new_split:down
+keybind                     = cmd+s>j=goto_split:bottom
+keybind                     = cmd+s>k=goto_split:top
+keybind                     = cmd+s>h=goto_split:left
+keybind                     = cmd+s>l=goto_split:right
+keybind                     = cmd+s>z=toggle_split_zoom
+keybind                     = cmd+s>x=close_surface
