@@ -26,7 +26,7 @@ cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
 
 相关使用场景:
 
--   脚本里维护数据集
+- 脚本里维护数据集
 
 ```bash
 # 单一数据源,格式: <dotfiles 内的相对路径>:<目标绝对路径>
@@ -89,26 +89,26 @@ git push
 
 ## Brewfile
 
--   导出当前 mac 已安装的所有包
+- 导出当前 mac 已安装的所有包
 
 ```bash
 brew bundle dump --file=~/Dotfiles/Brewfile --force
 # --force 表示已存在则覆盖
 ```
 
--   在新 mac 上安装 Brewfile 里的所有包
+- 在新 mac 上安装 Brewfile 里的所有包
 
 ```bash
 brew bundle install --file=~/Dotfiles/Brewfile
 ```
 
--   检查哪些包已安装、哪些还没装
+- 检查哪些包已安装、哪些还没装
 
 ```bash
 brew bundle check --file=~/Dotfiles/Brewfile
 ```
 
--   清理本机有但 Brewfile 里没有的包（同步删除）
+- 清理本机有但 Brewfile 里没有的包（同步删除）
 
 ```bash
 brew bundle cleanup --file=~/Dotfiles/Brewfile
@@ -116,19 +116,19 @@ brew bundle cleanup --file=~/Dotfiles/Brewfile
 brew bundle cleanup --file=~/Dotfiles/Brewfile --force
 ```
 
--   装了新包之后同步到 Brewfile
+- 装了新包之后同步到 Brewfile
 
 ```bash
 # 重新导出
 brew bundle dump --file=~/Dotfiles/Brewfile --force
 ```
 
--   [Fish脚本](https://github.com/dev24hrs/Dotfiles/blob/main/fish/functions/brewup.fish)
+- [Fish脚本](https://github.com/dev24hrs/Dotfiles/blob/main/fish/functions/brewup.fish)
 
-~~~bash
+```bash
 # 生成 brewfile, 无vscode 相关依赖
 brewup file
-~~~
+```
 
 ## Enhance terminal
 
