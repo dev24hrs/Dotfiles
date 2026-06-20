@@ -1,6 +1,8 @@
 # basic
 set -g fish_greeting ""
-set -gx TERM xterm-256color
+if not set -q TMUX
+    set -gx TERM xterm-256color
+end
 set -gx EDITOR nvim
 # 禁用less历史记录
 set -gx LESSHISTFILE -
