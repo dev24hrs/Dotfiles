@@ -59,6 +59,8 @@ brew "luv"
 brew "marksman"
 # Unified display of technical and tag data for audio/video
 brew "media-info"
+# Deep clean and optimize your Mac
+brew "mole"
 # Incremental parsing library
 brew "tree-sitter"
 # Ambitious Vim-fork focused on extensibility and agility

@@ -410,6 +410,79 @@ Refer to [vimrc](https://github.com/dev24hrs/Dotfiles/blob/main/vimrc/vimrc)
 
 Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
 
+## Mole
+
+[Mole](https://github.com/tw93/Mole) 是一个开源的 macOS CLI 工具箱，集成了 CleanMyMac + AppCleaner + DaisyDisk + iStat Menus 的核心功能。
+
+### 安装
+
+```bash
+brew install mole
+```
+
+### 只读操作
+
+```bash
+mo status                       # 实时系统仪表盘 — CPU/内存/磁盘/网络/电池健康
+mo status --json                # JSON 输出，可管道给 jq
+mo analyze                      # 交互式磁盘空间分析（方向键/Vim键浏览）
+mo analyze /Volumes             # 分析外接磁盘
+mo history                      # 查看历史操作日志
+```
+
+### 预览（推荐先用 --dry-run 审查）
+
+```bash
+mo clean --dry-run              # 预览垃圾清理
+mo uninstall --dry-run          # 预览卸载结果
+mo purge --dry-run              # 预览构建产物清理
+mo installer --dry-run          # 预览安装包清理
+mo optimize --dry-run           # 预览系统优化操作
+```
+
+### 白名单管理
+
+```bash
+mo clean --whitelist            # 交互式配置清理白名单
+mo optimize --whitelist         # 交互式配置优化白名单
+```
+
+配置文件：`~/.config/mole/whitelist`，支持 glob 模式。
+
+### 执行操作
+
+```bash
+mo clean                        # 深度垃圾清理（缓存/日志/浏览器/Temp）
+mo uninstall                    # 智能卸载 + 12+ 路径残留扫描
+mo optimize                     # 系统优化（重建缓存/刷新DNS/修复Spotlight）
+mo purge                        # 清理 node_modules/target/dist 等构建产物
+mo installer                    # 清理残留 .dmg/.pkg 安装包
+mo touchid                      # 配置 Touch ID for sudo
+mo completion                   # 安装 shell 自动补全
+mo update                       # 更新 Mole
+mo remove                       # 卸载 Mole
+```
+
+### 典型场景
+
+```bash
+# 每周日常维护
+mo clean
+
+# 卸载应用后清残留
+mo uninstall
+
+# 磁盘不够 — 先分析再清理
+mo analyze
+mo installer
+
+# 系统卡顿 — 一键优化
+mo optimize
+
+# 开发者 — 清构建产物（7天内修改的项目自动跳过）
+mo purge
+```
+
 ## Golang
 
 - install
