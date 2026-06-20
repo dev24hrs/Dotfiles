@@ -53,7 +53,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
             },
             signature = { enabled = true },
             sources = {
-                default = { "codeium", "lsp", "snippets", "buffer", "path" },
+                default = { "lsp", "snippets", "buffer", "path", "codeium" },
                 providers = {
                     codeium = { name = "Codeium", module = "codeium.blink", async = true },
                     buffer = {

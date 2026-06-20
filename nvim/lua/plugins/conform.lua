@@ -32,6 +32,7 @@ conform.setup({
         toml = { "taplo" },
         rust = { "rustfmt", lsp_format = "fallback" }, -- comes with Rust installation
         fish = { "fish_indent" }, -- comes with Fish installation
+        ["_"] = { "trim_whitespace" },
     },
     default_format_opts = {
         lsp_format = "fallback",

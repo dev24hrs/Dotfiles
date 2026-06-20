@@ -3,6 +3,7 @@
 --- https://github.com/golang/tools/tree/master/gopls
 ---
 --- Google's lsp server for golang.
+--- [Settings documentation](https://go.dev/gopls/settings)
 
 --- @class go_dir_custom_args
 ---

@@ -36,7 +36,7 @@ require("bufferline").setup({
         end,
         indicator = { style = "none" },
         tab_size = 16,
-        padding = 0,
+        padding = 1,
         left_padding = 1,
         right_padding = 1,
         -- 彻底关闭所有图标占位

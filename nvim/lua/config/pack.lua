@@ -63,7 +63,6 @@ local function render_ui(buf)
     inactive = inactive or {}
 
     -- 顶部装饰与操作提示区
-    table.insert(lines, "  ⚡ Vim Pack Manager")
     table.insert(lines, "")
     table.insert(
         lines,

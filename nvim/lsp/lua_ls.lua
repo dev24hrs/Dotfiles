@@ -18,7 +18,7 @@ return {
         or vim.list_extend(vim.list_extend(root_markers1, root_markers2), { ".git" }),
     settings = {
         Lua = {
-            workspace = { library = { vim.api.nvim_get_runtime_file("", true) }, checkThirdParty = false },
+            workspace = { library = vim.api.nvim_get_runtime_file("", true), checkThirdParty = false },
             runtime = { version = "LuaJIT" },
             diagnostics = { globals = { "vim" } },
             codeLens = { enable = true },
