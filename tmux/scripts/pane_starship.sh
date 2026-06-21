@@ -1,25 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Args: <pane_pid> <pane_tty> <pane_title> <pane_width> <pane_path> <pane_cmd>
+# Args: <pane_pid> <pane_width> <pane_path> <pane_cmd> <pane_id>
 pid="${1:-}"
 width="${2:-80}"
 pane_path="${3:-$PWD}"
 pane_cmd="${4:-}"
-ps_line=""
+pane_id="${5:-}"
 
-# Best-effort: inherit venv/conda from the pane's process env
-if [[ -n "$pid" ]]; then
-  ps_line=$(ps e -p "$pid" -o command= 2>/dev/null || true)
-  if [[ -n "$ps_line" ]]; then
-    venv=$(printf '%s' "$ps_line" | sed -n 's/.*[[:space:]]VIRTUAL_ENV=\([^[:space:]]*\).*/\1/p' | tail -n1)
-    conda_env=$(printf '%s' "$ps_line" | sed -n 's/.*[[:space:]]CONDA_DEFAULT_ENV=\([^[:space:]]*\).*/\1/p' | tail -n1)
-    conda_prefix=$(printf '%s' "$ps_line" | sed -n 's/.*[[:space:]]CONDA_PREFIX=\([^[:space:]]*\).*/\1/p' | tail -n1)
-    [[ -n "$venv" ]] && export VIRTUAL_ENV="$venv"
-    [[ -n "$conda_env" ]] && export CONDA_DEFAULT_ENV="$conda_env"
-    [[ -n "$conda_prefix" ]] && export CONDA_PREFIX="$conda_prefix"
-  fi
-fi
+# Check if a "claude" process exists in the process tree rooted at $1
+is_claude_alive() {
+  local pane_pid=$1 cpid child ppid
+  for cpid in $(ps -eo pid,comm | awk '$2 == "claude" {print $1}'); do
+    child=$cpid
+    while [ "$child" -gt 1 ] 2>/dev/null; do
+      [ "$child" = "$pane_pid" ] && return 0
+      ppid=$(ps -o ppid= -p "$child" 2>/dev/null | tr -d ' ')
+      [ -z "$ppid" ] && break
+      child=$ppid
+    done
+  done
+  return 1
+}
 
 strip_wrappers() {
   # 1) strip ANSI CSI sequences, 2) strip bash \[\] and zsh %{ %} markers
@@ -63,5 +65,20 @@ if command -v starship >/dev/null 2>&1; then
 else
   title=$(fallback)
 fi
+
+# ── Claude status prefix ──────────────────────────────────────────
+if [[ -n "$pane_id" ]] && [[ -n "$pid" ]]; then
+  claude_state=$(tmux display -p -t "$pane_id" '#{@claude_state}' 2>/dev/null || true)
+  if [[ -n "$claude_state" ]]; then
+    if is_claude_alive "$pid"; then
+      title="[${claude_state}] ${title}"
+    else
+      # Claude process gone — clear stale state
+      tmux set-option -p -t "$pane_id" -u @claude_state 2>/dev/null || true
+      tmux set-option -p -t "$pane_id" -u @claude_state_at 2>/dev/null || true
+    fi
+  fi
+fi
+
 title=$(trim_to_width "$title" "$width")
 printf '%s' "$title"
