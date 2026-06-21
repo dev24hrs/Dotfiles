@@ -5,10 +5,12 @@ vim.pack.add({
 require("image").setup({
     backend = "kitty",
     processor = "magick_cli",
+    ignore_download_error = true, -- don't throw on remote image download failures
     integrations = {
         markdown = {
             enabled = true,
             clear_in_insert_mode = true,
+            download_remote_images = true,
         },
     },
 })
