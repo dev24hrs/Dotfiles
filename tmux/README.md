@@ -1,6 +1,6 @@
 # Tmux
 
-![](https://github.com/dev24hrs/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
+![](https://github.com/dev24hrs/Dotfiles/blob/main/img/tmux_with_pane.png?raw=true)
 
 ## Install
 
@@ -70,10 +70,17 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 | Key               | Desc                  |
 | :---------------- | :-------------------- |
 | `C-h / C-j / C-k / C-l` | 切换 pane（左/下/上/右） |
-| `prefix + -`      | 横向分 pane            |
-| `prefix + =`      | 竖向分 pane            |
-| `prefix + x`      | 关闭当前 pane          |
+| `prefix + -`      | 横向分 pane（保持当前目录） |
+| `prefix + =`      | 竖向分 pane（保持当前目录） |
+| `prefix + x`      | 关闭当前 pane（无需确认） |
 | `prefix + C-l`    | 清屏（透传 C-l 给 shell） |
+
+**Pane 标题栏**: 顶部显示，由 `pane_starship.sh` 脚本渲染（显示claude status、路径、git branch 等信息）。
+
+活跃 pane 边框为紫色 (`#b294bb`)，非活跃为灰色。
+
+-   路径、git branch等信息通过`pane_starship.sh` & `starship-tmux.toml` 渲染获取
+-   claude status信息通过`claude-status.sh` & [settings.json中的hooks](https://github.com/dev24hrs/Dotfiles/blob/main/claude/settings.json) 获取
 
 ### Popup
 
@@ -81,6 +88,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 | :------------ | :-------------------- |
 | `prefix + g`  | lazygit (80% 窗口)    |
 | `prefix + t`  | fish terminal (60% 窗口) |
+| `prefix + u`  | Claude 实例选择器 (fzf) |
 
 ### Copy Mode (Vi)
 
