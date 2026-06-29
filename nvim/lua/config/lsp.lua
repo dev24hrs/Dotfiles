@@ -11,6 +11,7 @@ vim.lsp.enable({
     "ts_ls",
     "marksman",
     "taplo",
+    "sourcekit", --swift
 })
 
 vim.api.nvim_create_autocmd("LspAttach", {
