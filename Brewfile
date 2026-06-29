@@ -1,18 +1,18 @@
-tap "go-musicfox/go-musicfox", trusted: true
+tap "go-musicfox/go-musicfox", "https://github.com/go-musicfox/homebrew-go-musicfox.git", trusted: true
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
 # C library of Git core methods that is re-entrant and linkable
 brew "libgit2"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# Get a file from an HTTP, HTTPS or FTP server
+brew "curl"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
-# Play, record, convert, and stream many audio and video codecs
-brew "ffmpeg-full"
 # User-friendly command-line shell for UNIX-like operating systems
 brew "fish"
 # Command-line fuzzy finder written in Go
@@ -35,8 +35,6 @@ brew "gopls"
 brew "httpie"
 # Tools and libraries to manipulate images in select formats
 brew "imagemagick"
-# Tools and libraries to manipulate images in many formats
-brew "imagemagick-full"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Simple terminal UI for git commands
@@ -122,8 +120,6 @@ cask "codex-app"
 cask "font-symbols-only-nerd-font"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Discover, download, and run local LLMs
-cask "lm-studio"
 # Replacement for Docker Desktop
 cask "orbstack"
 # Snip or pin screenshots
