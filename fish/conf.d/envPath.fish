@@ -23,5 +23,7 @@ fish_add_path $JAVA_HOME/bin
 fish_add_path $MAVEN_HOME/bin
 fish_add_path $GRADLE_HOME/bin
 
+fish_add_path /opt/homebrew/opt/curl/bin
+
 fish_add_path /opt/homebrew/opt/imagemagick-full/bin
 fish_add_path /opt/homebrew/opt/ffmpeg-full/bin
