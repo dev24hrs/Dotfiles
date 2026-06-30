@@ -43,15 +43,15 @@ else
 fi
 
 # ── Colors ────────────────────────────────────────────────────────────────────
-R='\033[0m'
-D='\033[2m'
-B='\033[1m'
-GRN='\033[32m'
-YEL='\033[33m'
-RED='\033[31m'
-CYN='\033[36m'
-MAG='\033[35m'
-BLU='\033[34m'
+R=$'\033[0m'
+D=$'\033[2m'
+B=$'\033[1m'
+GRN=$'\033[32m'
+YEL=$'\033[33m'
+RED=$'\033[31m'
+CYN=$'\033[36m'
+MAG=$'\033[35m'
+BLU=$'\033[34m'
 
 if [ "$PCT" -lt 50 ]; then
   PC="$GRN"
@@ -169,4 +169,7 @@ LIMITS_SEG=""
 [ -n "$LIMITS" ] && LIMITS_SEG=" ${D}│${R} ${LIMITS}"
 USER_SEG=""
 [ -n "$USER_NAME" ] && USER_SEG=" ${D}${USER_NAME}${R}"
-echo -e "${B}${MODEL}${R}${USER_SEG} ${D}│${R} ${DIR_SHORT}${GIT}${BADGES} ${D}│${R} ${PC}${PCT}%${R}${D}/${R}${CTX_LABEL}${LIMITS_SEG} ${D}│${R} ${GRN}+${ADDED}${R}${D}/${R}${RED}-${REMOVED}${R} ${D}│${R} ${D}${TIME}${R}"
+
+output="${B}${MODEL}${R}${USER_SEG} ${D}│${R} ${DIR_SHORT}${GIT}${BADGES} ${D}│${R} ${PC}${PCT}%${R}${D}/${R}${CTX_LABEL}${LIMITS_SEG} ${D}│${R} ${GRN}+${ADDED}${R}${D}/${R}${RED}-${REMOVED}${R} ${D}│${R} ${D}${TIME}${R}"
+
+printf '%s\n' "$output"
