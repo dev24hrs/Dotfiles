@@ -4,12 +4,13 @@
 
 ### Applicability
 
-The three-phase reasoning is **mandatory** for:
+The three-phase reasoning is **mandatory** for any code modification, regardless of size or complexity. This includes but is not limited to:
 
 - New feature implementations, multi-file changes, architecture or design changes
 - Performance optimizations, refactoring, security-related changes
+- Single-line fixes, typo corrections, configuration changes, revert/rollback operations
 
-It may be skipped for: pure information queries, code reading/explanation, typo/single-line fixes, answering project configuration questions.
+Pure information queries, code reading/explanation, and spelling errors that do not change code behavior are exempt (no code is being modified).
 
 ### Phase 1: Self-Reflection
 
@@ -45,6 +46,28 @@ Only proceed to code writing after the first two phases are complete and a clear
 ### Output Format
 
 Responses should follow the same three-phase structure: output the reflection and side-effects analysis first, then the code last. If the reasoning flow is skipped, briefly explain why.
+
+## Mandatory Verification Rules
+
+These rules apply unconditionally. No exceptions based on perceived simplicity or familiarity.
+
+### Rule 1: Revert / Rollback Requires Read
+
+Before executing any operation that involves **revert, rollback, undo, restore, or "change back to original"**, you MUST first Read the target file to confirm its current state. Never rely on memory or impression of what the file contained in a prior turn.
+
+- Bad (forbidden): "I remember the original was X, let me write X." (unverified)
+- Good (required): Read the file → confirm current state → then write the correct prior version.
+
+### Rule 2: Post-Edit Verification
+
+After every Edit or Write, immediately verify the result with a targeted Read or grep on the changed lines. Confirm that the final state matches what was intended before moving on.
+
+### Rule 3: Root Cause Before Code Change
+
+When debugging a behavior discrepancy (wrong state, unexpected output, silent failure), you MUST first capture real runtime data with a diagnostic command (e.g., check live output, query logs, inspect actual variable values) to isolate the root cause. Do not modify detection logic, regex patterns, or conditional branches until the actual data responsible for the misbehavior has been identified and shown.
+
+- Bad (forbidden): "Maybe the regex is too broad, let me narrow it." → edit without data.
+- Good (required): Capture the actual values being matched or compared → find the exact data causing the mismatch → then fix based on that evidence.
 
 ## Go Projects
 
