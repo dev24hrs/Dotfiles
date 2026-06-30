@@ -1,10 +1,10 @@
 # wt.fish
-# Git worktree subcommand management:
-#   wt new <name>    create worktree + tmux window + launch claude
-#   wt rm  <name>    remove worktree, branch, and tmux window
-#   wt list          list all worktrees in the current repo
+# Git worktree & tmux session management:
+#   wt new    <name>    create worktree + tmux window + launch claude
+#   wt rm     <name>    remove worktree, branch, and tmux window
+#   wt list             list all worktrees in the current repo
 
-function wt --description 'manage git worktrees: wt new|rm|list <name>'
+function wt --description 'manage worktrees & sessions: wt new|rm|list <name>'
     if test (count $argv) -lt 1
         echo "Usage: wt new <name> | wt rm <name> | wt list"
         return 1
@@ -16,7 +16,7 @@ function wt --description 'manage git worktrees: wt new|rm|list <name>'
     switch $subcmd
         case new
             __wt_new $name
-        case remove
+        case rm
             __wt_remove $name
         case list
             __wt_list
