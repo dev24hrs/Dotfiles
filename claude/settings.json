@@ -42,5 +42,40 @@
     "padding": 2,
     "type": "command"
   },
-  "theme": "auto"
+  "theme": "auto",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-state.sh working"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-state.sh idle"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-state.sh idle"
+          }
+        ]
+      }
+    ]
+  }
 }
