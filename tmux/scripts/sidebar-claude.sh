@@ -78,11 +78,11 @@ build() {
 }
 
 render() {
-  printf '%s%s%s AGENTS%s\n' "$HOME_CUR" "$G" "$B" "$X"
-  printf '%sj/k nav · enter jump · q quit%s\n\n' "$D" "$X"
+  printf '%s%s%s AGENTS%s\033[K\n' "$HOME_CUR" "$G" "$B" "$X"
+  printf '%s j/k nav · enter jump · q quit%s\033[K\n\n' "$D" "$X"
   local n=${#locs[@]} i mark col
   if [ "$n" -eq 0 ]; then
-    printf '%s  (no agents)%s\n' "$D" "$X"
+    printf '%s  (no agents)%s\033[K\n' "$D" "$X"
   else
     for i in $(seq 0 $((n - 1))); do
       case "${states[$i]}" in
@@ -96,11 +96,11 @@ render() {
         ;;
       esac
       if [ "$i" -eq "$cursor" ]; then
-        printf '%s%s%s %s%-7s%s %s\n' "$B" "$col" "$mark" "$X" "${locs[$i]}" "$X" "${projs[$i]}"
+        printf '%s%s%s %s%-7s%s %s\033[K\n' "$B" "$col" "$mark" "$X" "${locs[$i]}" "$X" "${projs[$i]}"
       else
-        printf '%s%s%s %s%-7s%s %s\n' "$col" "$mark" "$X" "$D" "${locs[$i]}" "$X" "${projs[$i]}"
+        printf '%s%s%s %s%-7s%s %s\033[K\n' "$col" "$mark" "$X" "$D" "${locs[$i]}" "$X" "${projs[$i]}"
       fi
-      printf '\n'
+      printf '\033[K\n'
     done
   fi
   printf '%s' "$CLEAR_EOS"

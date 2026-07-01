@@ -48,11 +48,11 @@ build() {
 }
 
 render() {
-  printf '%s%s%s SESSIONS%s\n' "$HOME_CUR" "$G" "$B" "$X"
-  printf '%sj/k nav · enter jump · q quit%s\n\n' "$D" "$X"
+  printf '%s%s%s SESSIONS%s\033[K\n' "$HOME_CUR" "$G" "$B" "$X"
+  printf '%s j/k nav · enter jump · q quit%s\033[K\n\n' "$D" "$X"
   local n=${#names[@]} i mark col
   if [ "$n" -eq 0 ]; then
-    printf '%s  (no sessions)%s\n' "$D" "$X"
+    printf '%s  (no sessions)%s\033[K\n' "$D" "$X"
   else
     for i in $(seq 0 $((n - 1))); do
       if [ "${attached[$i]}" -gt 0 ]; then
@@ -63,11 +63,11 @@ render() {
         col="$Y"
       fi
       if [ "$i" -eq "$cursor" ]; then
-        printf '%s%s%s %s%-7s%s (%s windows)%s\n' "$B" "$col" "$mark" "$X" "${names[$i]}" "$X" "${windows[$i]}" "$X"
+        printf '%s%s%s %s%-7s%s (%s windows)%s\033[K\n' "$B" "$col" "$mark" "$X" "${names[$i]}" "$X" "${windows[$i]}" "$X"
       else
-        printf '%s%s%s %s%-7s%s (%s windows)%s\n' "$col" "$mark" "$X" "$D" "${names[$i]}" "$X" "${windows[$i]}" "$X"
+        printf '%s%s%s %s%-7s%s (%s windows)%s\033[K\n' "$col" "$mark" "$X" "$D" "${names[$i]}" "$X" "${windows[$i]}" "$X"
       fi
-      printf '\n'
+      printf '\033[K\n'
     done
   fi
   printf '%s' "$CLEAR_EOS" # clear trailing lines (no flash)
