@@ -1,6 +1,8 @@
 tap "go-musicfox/go-musicfox", "https://github.com/go-musicfox/homebrew-go-musicfox.git", trusted: true
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
+# Bourne-Again SHell, a UNIX command interpreter
+brew "bash"
 # C library of Git core methods that is re-entrant and linkable
 brew "libgit2"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -31,6 +33,8 @@ brew "go"
 brew "golangci-lint"
 # Language server for the Go language
 brew "gopls"
+# Tool for glamorous shell scripts
+brew "gum"
 # User-friendly cURL replacement (command-line HTTP client)
 brew "httpie"
 # Tools and libraries to manipulate images in select formats
@@ -41,8 +45,6 @@ brew "jq"
 brew "lazygit"
 # Multi-platform support library with a focus on asynchronous I/O
 brew "libuv"
-# LLM inference in C/C++
-brew "llama.cpp"
 # Parsing Expression Grammars For Lua
 brew "lpeg"
 # Powerful, lightweight programming language
@@ -90,7 +92,7 @@ brew "sevenzip"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Terminal multiplexer
-brew "tmux", args: ["HEAD"]
+brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Parser generator tool
