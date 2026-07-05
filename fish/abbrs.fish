@@ -26,11 +26,9 @@ abbr -a grh 'git reset --hard'
 abbr -a grs 'git reset --soft'
 
 # homebrew
-abbr -a bi 'brew install'
-abbr -a bu 'brew uninstall'
-abbr -a bud 'brew update'
-abbr -a bug 'brew upgrade'
+abbr -a bo 'brew outdated $(brew list --installed-on-request --formula) $(brew list --cask)'
 abbr -a bc 'brew autoremove && brew cleanup --prune=all'
+abbr -a bf 'brew bundle dump --file=$HOME/Documents/Dotfiles/Brewfile --force --no-vscode'
 
 abbr -a bsl 'brew services list'
 abbr -a bst 'brew services start'
