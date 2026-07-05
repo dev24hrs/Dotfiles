@@ -5,7 +5,7 @@
 ## Install
 
 ```bash
-brew install tmux --HEAD
+brew install tmux
 mkdir -p ~/.config/tmux
 ```
 
