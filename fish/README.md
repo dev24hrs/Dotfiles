@@ -27,23 +27,20 @@ fish/conf.d/apiKey.fish
 ```
 
 ```bash
-├── completions 		## functions补全提示
-│ ├── brewup.fish
+├── completions 		          ## functions补全提示
 │ ├── proxy.fish
 │ └── tool.fish
 ├── conf.d
-│ ├── envPath.fish 		## env path相关
-│ ├── apiKey.fish 		## deepseek api等
-│ └── lastPwd.fish 		## 上一次目录
+│ ├── envPath.fish 		        ## env path相关
+│ ├── apiKey.fish.example 		## deepseek api等
+│ └── lastPwd.fish 		        ## 上一次目录
 ├── functions
-│ ├── brewup.fish 		## homebrew工具
-│ ├── proxy.fish 		## 开启/关闭/查看git代理
-│ └── tool.fish 		## 自定义工具
+│ ├── proxy.fish 		          ## 开启/关闭/查看git代理
+│ └── tool.fish 		          ## 自定义工具
 ├── README.md
-├── abbrs.fish 			## abbrs相关
-├── config.fish			## 主配置文件
-├── fish_variables
-└── git.fish			## 自定义 gs & gb & gl
+├── abbrs.fish 			          ## abbrs相关
+├── config.fish			          ## 主配置文件
+└── fish_variables
 ```
 
 在 Fish Shell 中，**completions & conf.d & functions & config.fish** 共同构成了一个高效、模块化且支持“延迟加载”的配置系统。
@@ -60,18 +57,21 @@ fish/conf.d/apiKey.fish
 ### conf.d
 
 存放**环境变量**和**启动脚本**
+
 - Fish 在启动时，会**自动遍历并执行**该目录下所有的 `.fish` 文件
 - **在执行 `config.fish` 之前加载**
 
 ### functions
 
 存放**自定义命令（函数）**
+
 - 实现**延迟加载（Autoloading）**。只有当你真正输入命令并按下回车时，Fish 才会去这个目录下寻找同名的 `.fish` 文件并加载
 - 文件名必须与函数名完全一致。例如，函数名为 `proxy`，文件名必须是 `proxy.fish`
 
 ### config.fish
 
 **主配置文件**
+
 - 存放基础设置 , 如隐藏启动欢迎语 `set -g fish_greeting ""`
 - abbr & aliases
   - `abbr`相关的代码被单独抽离成文件`abbrs.fish` , 然后在config.fish中 source 引用, 防止后期过多的abbr
