@@ -21,3 +21,7 @@ keymap({ "n", "v" }, "W", "^", "[Basic]: move cursor to line head")
 keymap({ "n", "v" }, "E", "$", "[Basic]: move cursor to line end")
 
 keymap("n", "wq", "<cmd>wq<CR>", "[Basic]: quit in normal mode")
+
+-- Move between soft-wrapped lines with
+keymap("n", "j", "gj", "[Basic]: move cursor down")
+keymap("n", "k", "gk", "[Basic]: move cursor up")
