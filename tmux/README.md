@@ -80,89 +80,14 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 活跃 pane 边框为紫色 (`#b294bb`)，非活跃为灰色。
 
 - 路径、git branch 等信息通过 `pane_starship.sh` & `starship-tmux.toml` 渲染获取
-- Sidebar pane 自动隐藏标题内容（通过 `@is_sidebar` 条件判断），保留细线边框
-
-### Agent Sidebar
-
-`prefix + \` 在左侧 dock 一个双面板 sidebar（30 列宽），上半部分显示所有 tmux session，下半部分显示所有 AI agent pane。两个面板均 1s 自动刷新。
-
-| 操作      | 功能                            |
-| :-------- | :------------------------------ |
-| `j` / `↓` | 光标下移                        |
-| `k` / `↑` | 光标上移                        |
-| `Enter`   | 跳转到选中 session / agent pane |
-| `q`       | 关闭 sidebar                    |
-
-**上半部分（Sessions）**：列出所有 tmux session，显示名称、window 数和 attach 状态，光标自动跟随当前 attached session。
-
-**下半部分（Agents）**：列出所有 `claude` pane，检测工作状态（优先检索hooks生成对应的状态文件,fallback 通过抓屏匹配 timer 模式），光标自动跟随当前活跃 pane。
-
-每个 agent 条目显示：状态（`idle` / `working`）、session 名与 pane 标题。
-
-| 状态      | 颜色 | 含义     |
-| :-------- | :--- | :------- |
-| `idle`    | 绿色 | 空闲     |
-| `working` | 黄色 | 正在处理 |
-
-**实现文件**:
-
-- `scripts/tmux-sidebar.sh` — 创建/关闭 sidebar（split-window -hbf，上下分两个 pane）
-
-- `scripts/sidebar-sessions.sh` — 上半部分 TUI（session 列表、键盘导航、1s 刷新）
-
-- `scripts/sidebar-claude.sh` — 下半部分 TUI（agent 列表、键盘导航、1s 刷新）
-
-- `claude/hooks/agent-state.sh` — 根据claude hooks生成对应的状态文件用于检索
-
-  ```json
-  {
-    "hooks": {
-      "UserPromptSubmit": [
-        {
-          "matcher": "",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "~/.claude/hooks/agent-state.sh working"
-            }
-          ]
-        }
-      ],
-      "Stop": [
-        {
-          "matcher": "",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "~/.claude/hooks/agent-state.sh idle"
-            }
-          ]
-        }
-      ],
-      "Notification": [
-        {
-          "matcher": "",
-          "hooks": [
-            {
-              "type": "command",
-              "command": "~/.claude/hooks/agent-state.sh idle"
-            }
-          ]
-        }
-      ]
-    }
-  }
-  ```
 
 ### Popup
 
-| Key          | Desc                         |
-| :----------- | :--------------------------- |
-| `prefix + g` | lazygit (80% 窗口)           |
-| `prefix + t` | fish terminal (60% 窗口)     |
-| `prefix + y` | Agent 多选弹出窗 (60% 窗口)  |
-| `prefix + u` | Git worktree 管理 (60% 窗口) |
-| `prefix + \` | Agent sidebar (左侧 dock)    |
+| Key          | Desc                      |
+| :----------- | :------------------------ |
+| `prefix + g` | lazygit (80% 窗口)        |
+| `prefix + t` | fish terminal (60% 窗口)  |
+| `prefix + y` | session 弹出窗 (60% 窗口) |
 
 ### Copy Mode (Vi)
 
