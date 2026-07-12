@@ -1,0 +1,18 @@
+# config.map — Dotfiles 配置映射（单一数据源）
+# 被 cfg.sh / new-setup.sh 共享
+# 格式: "dotfiles 相对路径:目标绝对路径"
+CONFIG_MAP=(
+  "tmux:$HOME/.config/tmux"
+  "fish:$HOME/.config/fish"
+  "nvim:$HOME/.config/nvim"
+  "git/.gitconfig:$HOME/.gitconfig"
+  "git/.gitignore_global:$HOME/.gitignore_global"
+  "ghostty:$HOME/.config/ghostty"
+  "bat:$HOME/.config/bat"
+  "starship:$HOME/.config/starship"
+  "lazygit:$HOME/.config/lazygit"
+  "wezterm:$HOME/.config/wezterm"
+  "yazi:$HOME/.config/yazi"
+  "go-musicfox:$HOME/.config/go-musicfox"
+  "hunk:$HOME/.config/hunk"
+)

@@ -1,26 +1,9 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 DOTFILES_DIR="$HOME/Documents/Dotfiles"
 
-# ── 配置映射 ──────────────────────────────────────────────────────────────────
-# 单一数据源,格式: <dotfiles 内的相对路径>:<目标绝对路径>
-# setup_symlinks 和 migrate_to_dotfiles 都基于这个清单工作
-
-CONFIG_MAP=(
-  "tmux:$HOME/.config/tmux"
-  "fish:$HOME/.config/fish"
-  "nvim:$HOME/.config/nvim"
-  "git/.gitconfig:$HOME/.gitconfig"
-  "git/.gitignore_global:$HOME/.gitignore_global"
-  "ghostty:$HOME/.config/ghostty"
-  "bat:$HOME/.config/bat"
-  "starship:$HOME/.config/starship"
-  "lazygit:$HOME/.config/lazygit"
-  "wezterm:$HOME/.config/wezterm"
-  "yazi:$HOME/.config/yazi"
-  "go-musicfox:$HOME/.config/go-musicfox"
-)
+source "$DOTFILES_DIR/config.map"
 
 # ── 工具函数 ──────────────────────────────────────────────────────────────────
 
@@ -41,9 +24,14 @@ make_link() {
   fi
 
   # 已经是正确的 symlink，跳过(用 readlink -f 比较规范化路径,容忍尾斜杠等差异)
-  if [ -L "$dest" ] && [ "$(readlink -f "$dest" 2>/dev/null)" = "$(readlink -f "$src" 2>/dev/null)" ]; then
-    ok "already linked: $dest"
-    return 0
+  if [ -L "$dest" ]; then
+    local dest_real src_real
+    dest_real="$(readlink -f "$dest" 2>/dev/null)" || true
+    src_real="$(readlink -f "$src" 2>/dev/null)" || true
+    if [ -n "$dest_real" ] && [ -n "$src_real" ] && [ "$dest_real" = "$src_real" ]; then
+      ok "already linked: $dest"
+      return 0
+    fi
   fi
 
   # 目标存在但不是 symlink（真实文件/目录），带时间戳备份
@@ -51,7 +39,7 @@ make_link() {
     local backup
     backup="$(backup_path "$dest")"
     warn "backing up existing: $dest -> $backup"
-    mv "$dest" "$backup"
+    mv "$dest" "$backup" || { err "failed to backup: $dest"; return 1; }
   fi
 
   # 删掉旧的错误 symlink(给出当前指向以便排障)
@@ -65,7 +53,7 @@ make_link() {
   parent="$(dirname "$dest")"
   [ -d "$parent" ] || mkdir -p "$parent"
 
-  ln -s "$src" "$dest"
+  ln -s "$src" "$dest" || { err "failed to link: $dest -> $src"; return 1; }
   ok "linked: $dest -> $src"
 }
 
@@ -113,7 +101,7 @@ migrate_to_dotfiles() {
       local backup
       backup="$(backup_path "$src")"
       warn "dotfiles already has: $src -> backup to $backup"
-      mv "$src" "$backup"
+      mv "$src" "$backup" || { err "failed to backup dotfiles entry: $src"; return 1; }
     fi
 
     # 确保 Dotfiles 里父目录存在(如 git/.gitconfig 需要 git/ 已存在)
@@ -150,56 +138,23 @@ migrate_to_dotfiles() {
 # ── 增量添加 ──────────────────────────────────────────────────────────────────
 
 # 把 Dotfiles 里的某个目录/文件软链到合适的位置
-# 用法: add_config <name|path>
-#   短名 (如 yazi / .gitconfig)        -> 拼接成 $DOTFILES_DIR/<name>
-#   ~ 或 / 开头的完整路径               -> 规范化后必须落在 $DOTFILES_DIR 下
-#   不支持 ./xxx 或 ../xxx 这类显式相对路径
-#   .* 开头的最终链到 $HOME (如 .gitconfig),其它链到 ~/.config/<name>
+# 用法: add_config <name>
+#   例: add_config yazi       -> $DOTFILES_DIR/yazi → $HOME/.config/yazi
+#   例: add_config .gitconfig -> $DOTFILES_DIR/.gitconfig → $HOME/.gitconfig
 add_config() {
   local input="$1"
 
   if [ -z "$input" ]; then
-    err "usage: $0 add <name|path>"
+    err "usage: $0 add <name>"
     err "example: $0 add yazi"
     err "example: $0 add .gitconfig"
-    err "example: $0 add ~/Documents/Dotfiles/yazi"
     exit 1
   fi
 
-  # 显式相对路径前缀:直接拒绝
-  case "$input" in
-  ./* | ../* | . | ..)
-    err "explicit relative paths not supported: $input"
+  local src="$DOTFILES_DIR/$input"
+  if [ ! -e "$src" ]; then
+    err "source not found: $src"
     exit 1
-    ;;
-  esac
-
-  # 展开 ~
-  input="${input/#\~/$HOME}"
-
-  local src
-  if [[ "$input" == */* ]]; then
-    # 路径形态:此时一定是绝对路径 (./ 和 ../ 已拒,~ 已展开)
-    # 规范化以容忍 .. 段,避免后续字符串前缀比较误判
-    if [ -d "$input" ]; then
-      src="$(cd "$input" && pwd)"
-    elif [ -e "$input" ]; then
-      src="$(cd "$(dirname "$input")" && pwd)/$(basename "$input")"
-    else
-      err "source not found: $input"
-      exit 1
-    fi
-    if [[ "$src" != "$DOTFILES_DIR"/* ]]; then
-      err "source must live under $DOTFILES_DIR: $src"
-      exit 1
-    fi
-  else
-    # 短名:直接拼
-    src="$DOTFILES_DIR/$input"
-    if [ ! -e "$src" ]; then
-      err "source not found: $src"
-      exit 1
-    fi
   fi
 
   local name
@@ -213,12 +168,74 @@ add_config() {
 
   echo "→ Adding new symlink..."
   make_link "$src" "$dest"
+
+  local relative_src="${src#"$DOTFILES_DIR"/}"
+  local entry_str="${relative_src}:$dest"
+
+  local already_in_map=false
+  local map_entry
+  for map_entry in "${CONFIG_MAP[@]}"; do
+    if [ "$map_entry" = "$entry_str" ]; then
+      already_in_map=true
+      break
+    fi
+  done
+
+  if $already_in_map; then
+    echo ""
+    ok "entry already in CONFIG_MAP: $entry_str"
+  else
+    echo ""
+    echo "  记得在 cfg.sh 的 CONFIG_MAP 里新增一行："
+    echo "  \"$entry_str\""
+    echo ""
+    echo "  然后提交："
+    echo "  cd $DOTFILES_DIR && git add $name && git commit -m 'feat: add $name config'"
+  fi
+}
+
+# ── 移除 ──────────────────────────────────────────────────────────────────
+
+# 删除 ~/.config/ (或 ~/) 中的软链接,不动 Dotfiles 目录中的真实文件
+# 用法: remove_config <name>
+#   例: remove_config yazi       -> 删除 $HOME/.config/yazi
+#   例: remove_config .gitconfig -> 删除 $HOME/.gitconfig
+remove_config() {
+  local input="$1"
+
+  if [ -z "$input" ]; then
+    err "usage: $0 remove <name>"
+    err "example: $0 remove yazi"
+    err "example: $0 remove .gitconfig"
+    exit 1
+  fi
+
+  local name
+  name="$(basename "$input")"
+
+  local dest
+  case "$name" in
+    .*) dest="$HOME/$name" ;;
+    *) dest="$HOME/.config/$name" ;;
+  esac
+
+  # 安全检查:仅删除软链接,不碰真实文件/目录
+  if [ ! -L "$dest" ]; then
+    if [ -e "$dest" ]; then
+      err "not a symlink, refusing to remove real file/directory: $dest"
+    else
+      warn "symlink not found: $dest"
+    fi
+    return 1
+  fi
+
+  echo "→ Removing symlink: $dest -> $(readlink "$dest")"
+  rm "$dest" || { err "failed to remove: $dest"; return 1; }
+  ok "removed: $dest"
+
   echo ""
-  echo "  记得在 cfg.sh 的 CONFIG_MAP 里新增一行："
-  echo "  \"${src#"$DOTFILES_DIR"/}:$dest\""
-  echo ""
-  echo "  然后提交："
-  echo "  cd $DOTFILES_DIR && git add $name && git commit -m 'feat: add $name config'"
+  echo "  记得在 cfg.sh 的 CONFIG_MAP 里删除对应行"
+  echo "  Dotfiles 中的原始文件未被删除"
 }
 
 # ── 入口 ──────────────────────────────────────────────────────────────────────
@@ -227,7 +244,8 @@ usage() {
   echo "Usage: $0 <command> [args]"
   echo "  symlinks         - symlinks existing Dotfiles to new ~/.config"
   echo "  migrate          - migrate existing ~/.config to new Dotfiles"
-  echo "  add <src>        - add new Dotfiles symlink to ~/.config (or \$HOME for dotfiles)"
+  echo "  add <name>        - add new Dotfiles symlink to ~/.config (or \$HOME for dotfiles)"
+  echo "  remove <name>    - remove symlink from ~/.config (or \$HOME), keeps Dotfiles files"
   exit 1
 }
 
@@ -236,7 +254,11 @@ symlinks) setup_symlinks ;; # ./cfg.sh symlinks
 add)
   shift
   add_config "$1"
-  ;;                            # ./cfg.sh add yazi  /  add .gitconfig  /  add ~/Documents/Dotfiles/yazi
+  ;;                            # ./cfg.sh add yazi  /  add .gitconfig
 migrate) migrate_to_dotfiles ;; # ./cfg.sh migrate
+remove)
+  shift
+  remove_config "$1"
+  ;;                            # ./cfg.sh remove yazi  /  remove .gitconfig
 *) usage ;;
 esac
