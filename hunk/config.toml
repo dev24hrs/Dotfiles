@@ -1,0 +1,24 @@
+mode = "stack"
+vcs = "git"
+watch = true
+exclude_untracked = true
+line_numbers = true
+wrap_lines = false
+menu_bar = false
+agent_notes = false
+transparent_background = true
+theme = "custom"
+
+[custom_theme]
+base = "github-dark"
+label = "Gruvbox Dark"
+accent = "#d65d0e"
+panel = "#282828"
+noteBorder = "#b16286"
+
+[custom_theme.syntax]
+keyword = "#cc241d"
+string = "#98971a"
+comment = "#928374"
+operator = "#458588"
+variable = "#d79921"
