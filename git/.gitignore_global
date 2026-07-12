@@ -30,3 +30,5 @@ __pycache__
 *.log
 .env.local
 .env.*.local
+
+**/.claude/settings.local.json

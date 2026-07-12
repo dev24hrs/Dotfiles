@@ -66,7 +66,7 @@
     indentHeuristic = true
 
 [merge]
-    conflictstyle = diff3
+    conflictstyle = zdiff3
 
 [fetch]
     # 拉取时自动清理远程已删除的分支（保持本地分支列表干净）
@@ -91,7 +91,3 @@
     autoStash = true
     # 自动将 fixup! 和 squash! 的提交在 rebase -i 时合并
     autoSquash = true
-[http]
-	proxy = 127.0.0.1:12334
-[https]
-	proxy = 127.0.0.1:12334
