@@ -33,10 +33,10 @@ brew "go"
 brew "golangci-lint"
 # Language server for the Go language
 brew "gopls"
-# Tool for glamorous shell scripts
-brew "gum"
 # User-friendly cURL replacement (command-line HTTP client)
 brew "httpie"
+# Review-first terminal diff viewer for agent-authored changesets
+brew "hunk"
 # Tools and libraries to manipulate images in select formats
 brew "imagemagick"
 # Lightweight and flexible command-line JSON processor
