@@ -1,6 +1,6 @@
 # font
-font-family                 = Source Han Sans SC VF
 font-family                 = RecMonoCasual Nerd Font Mono
+font-family                 = Source Han Sans SC VF
 font-size                   = 19
 font-thicken                = false
 font-feature                = -calt, -liga, -dlig
