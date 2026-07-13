@@ -15,4 +15,5 @@ CONFIG_MAP=(
   "yazi:$HOME/.config/yazi"
   "go-musicfox:$HOME/.config/go-musicfox"
   "hunk:$HOME/.config/hunk"
+  "fastfetch:$HOME/.config/fastfetch"
 )

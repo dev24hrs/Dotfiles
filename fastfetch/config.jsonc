@@ -1,0 +1,136 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "auto",
+    "source": "~/.config/fastfetch/logo/logo.txt",
+    "width": 20,
+    "height": 14,
+    "padding": {
+      "top": 1,
+      "left": 1,
+    },
+    "color": {
+      "1": "default",
+      "2": "red",
+      "3": "green",
+      "4": "yellow",
+      "5": "blue",
+      "6": "magenta",
+      "7": "cyan",
+      "8": "black",
+      "9": "default",
+    },
+  },
+  "display": {
+    "separator": ": ",
+    "constants": ["──────────────────────────────"],
+  },
+  "modules": [
+    {
+      "type": "custom",
+      "format": " {#90}  {#31}  {#32}  {#33}  {#34}  {#35}  {#36}  {#37}  {#38}  {#39}       {#38}  {#37}  {#36}  {#35}  {#34}  {#33}  {#32}  {#31}  {#90}",
+    },
+    {
+      "type": "custom",
+      "format": "┌{$1}{$1}─",
+      "outputColor": "90",
+    },
+    {
+      "type": "custom",
+      "key": "󰇅 Hardware",
+      "keyColor": "yellow",
+    },
+    {
+      "type": "host",
+      "key": "│ ├╴   Host",
+      "keyColor": "yellow",
+    },
+    {
+      "type": "cpu",
+      "key": "│ ├╴   CPU",
+      "showPeCoreCount": true,
+      "format": "{1}",
+      "keyColor": "yellow",
+    },
+    {
+      "type": "gpu",
+      "key": "│ ├╴ 󰢮  GPU",
+      "keyColor": "yellow",
+      "format": "{name} ({core-count}) @ {frequency}",
+    },
+    {
+      "type": "disk",
+      "key": "│ ├╴   Disk",
+      "keyColor": "yellow",
+      "format": "{size-used} / {size-total} ({size-percentage})",
+    },
+    {
+      "type": "memory",
+      "key": "│ ├╴   Memory",
+      "keyColor": "yellow",
+      "format": "{used} / {total} ({percentage})",
+    },
+    {
+      "type": "display",
+      "key": "└ └╴ 󰍹  Display",
+      "keyColor": "yellow",
+    },
+    {
+      "type": "custom",
+      "key": " Software",
+      "keyColor": "blue",
+    },
+    {
+      "type": "os",
+      "key": "│ ├╴   OS",
+      "keyColor": "blue",
+      "format": "{name} {codename} {version}",
+    },
+    {
+      "type": "kernel",
+      "key": "│ ├╴   Kernel",
+      "keyColor": "blue",
+    },
+    {
+      "type": "packages",
+      "key": "└ └╴ 󰏖  Packages",
+      "keyColor": "blue",
+    },
+    {
+      "type": "custom",
+      "key": " Terminal",
+      "keyColor": "green",
+    },
+    {
+      "type": "terminal",
+      "key": "│ ├╴   App",
+      "keyColor": "green",
+    },
+    {
+      "type": "shell",
+      "key": "│ ├╴   Shell",
+      "keyColor": "green",
+    },
+    {
+      "type": "command",
+      "shell": "/bin/sh",
+      "text": "echo 'Starship'",
+      "key": "│ ├╴ 󰉼  Prompt",
+      "keyColor": "green",
+    },
+    {
+      "type": "terminalfont",
+      "key": "└ └╴ 󰛖  Font",
+      "keyColor": "green",
+    },
+    {
+      "type": "custom",
+      "format": "└{$1}{$1}─",
+      "outputColor": "90",
+    },
+    {
+      "type": "custom",
+      "format": " {#90}  {#31}  {#32}  {#33}  {#34}  {#35}  {#36}  {#37}  {#38}  {#39}       {#38}  {#37}  {#36}  {#35}  {#34}  {#33}  {#32}  {#31}  {#90}",
+    },
+  ],
+}

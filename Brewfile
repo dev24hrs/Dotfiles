@@ -11,6 +11,8 @@ brew "bat"
 brew "curl"
 # Modern, maintained replacement for ls
 brew "eza"
+# Like neofetch, but much faster because written mostly in C
+brew "fastfetch"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Play, record, convert, and stream select audio and video codecs
@@ -115,6 +117,8 @@ brew "zsh"
 brew "go-musicfox/go-musicfox/go-musicfox", trusted: true
 # Application uninstaller
 cask "appcleaner"
+# Open source IDE for exploring and testing APIs
+cask "bruno"
 # Terminal-based AI coding assistant
 cask "claude-code"
 # OpenAI's Codex desktop app for managing coding agents
