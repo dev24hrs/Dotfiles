@@ -1,5 +1,15 @@
+---@type vim.lsp.Config
 return {
-    cmd = { "vscode-json-language-server", "--stdio" },
+    cmd = function(dispatchers, config)
+        local cmd = "vscode-json-language-server"
+        if (config or {}).root_dir then
+            local local_cmd = vim.fs.joinpath(config.root_dir, "node_modules/.bin", cmd)
+            if vim.fn.executable(local_cmd) == 1 then
+                cmd = local_cmd
+            end
+        end
+        return vim.lsp.rpc.start({ cmd, "--stdio" }, dispatchers)
+    end,
     filetypes = { "json", "jsonc" },
     init_options = {
         provideFormatter = true,
@@ -8,24 +18,6 @@ return {
     settings = {
         json = {
             validate = { enable = true },
-            schemas = {
-                {
-                    fileMatch = { "package.json" },
-                    url = "https://json.schemastore.org/package.json",
-                },
-                {
-                    fileMatch = { "tsconfig.json", "tsconfig.*.json" },
-                    url = "https://json.schemastore.org/tsconfig.json",
-                },
-                {
-                    fileMatch = { ".eslintrc.json", ".eslintrc" },
-                    url = "https://json.schemastore.org/eslintrc.json",
-                },
-                {
-                    fileMatch = { ".prettierrc.json", ".prettierrc" },
-                    url = "https://json.schemastore.org/prettierrc.json",
-                },
-            },
         },
     },
 }

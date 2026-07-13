@@ -6,10 +6,6 @@
 --- [Settings documentation](https://go.dev/gopls/settings)
 
 --- @class go_dir_custom_args
----
---- @field envvar_id string
----
---- @field custom_subdir string?
 
 local mod_cache = nil
 local std_lib = nil

@@ -16,10 +16,10 @@
       }
     },
     {
-      "files": ["tsconfig.json", ".vscode/*.json", "settings.json"],
+      "files": ["tsconfig.json", ".vscode/*.json", "*.jsonc"],
       "options": {
         "parser": "jsonc",
-        "trailingComma": "none"
+        "trailingComma": "es5"
       }
     },
     {
