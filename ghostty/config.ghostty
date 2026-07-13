@@ -1,6 +1,6 @@
 # font
-font-family                 = RecMonoCasual Nerd Font Mono
 font-family                 = Source Han Sans SC VF
+font-family                 = RecMonoCasual Nerd Font Mono
 font-size                   = 19
 font-thicken                = false
 font-feature                = -calt, -liga, -dlig
@@ -10,7 +10,6 @@ window-inherit-font-size    = true
 
 # theme
 theme                       = Gruvbox Dark
-# theme                       = Gruvbox-Material
 term                        = xterm-256color
 
 # background-opacity          = 0.96
