@@ -15,8 +15,8 @@ config.line_height = 1.0
 -- --- 界面显示 ---
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = "RESIZE"
-config.initial_cols = 155
-config.initial_rows = 50
+config.initial_cols = 116
+config.initial_rows = 40
 config.default_cursor_style = "SteadyBar"
 config.window_close_confirmation = "NeverPrompt"
 config.adjust_window_size_when_changing_font_size = false
