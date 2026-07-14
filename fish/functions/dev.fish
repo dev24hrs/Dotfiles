@@ -1,16 +1,20 @@
 # dev.fish
 # Git worktree & tmux session management:
-#   dev worktree new    <name>    create worktree in current repo + tmux window + claude & neovim
-#   dev worktree remove <name>    remove worktree, branch, and tmux window (current repo only)
-#   dev worktree list             list all worktrees in the current repo
-#   dev layout          [path]    create tmux session with standard project layout
+#   dev worktree new    <name>               create worktree in current repo + tmux window + claude & neovim
+#   dev worktree remove <name>               remove worktree, branch, and tmux window (current repo only)
+#   dev worktree list                        list all worktrees in the current repo
+#   dev worktree merge  <name> [target] [opts]  squash + rebase + fast-forward (local-only)
+#       --no-squash  skip squash, rebase & ff each commit
+#       --push       push target to remote after merge
+#       --no-remove  keep worktree + branch after merge
+#   dev layout          [path]               create tmux session with standard project layout
 
 # dev — top-level dispatcher
 # Routes to worktree subcommands (new/remove/list) or layout.
-# Usage: dev worktree new|remove|list [name] | dev layout [path]
+# Usage: dev worktree new|remove|list|merge [name] | dev layout [path]
 function dev --description 'manage worktrees & sessions'
     if test (count $argv) -lt 1
-        echo "Usage: dev worktree new|remove|list <name> | dev layout [path]"
+        echo "Usage: dev worktree new|remove|list|merge <name> | dev layout [path]"
         return 1
     end
 
@@ -27,16 +31,18 @@ function dev --description 'manage worktrees & sessions'
                     __dev_worktree_remove $name
                 case list
                     __dev_worktree_list
+                case merge mg
+                    __dev_worktree_merge $name $argv[4..-1]
                 case '*'
                     echo "Unknown: dev worktree $action"
-                    echo "Usage: dev worktree new <name> | dev worktree remove <name> | dev worktree list"
+                    echo "Usage: dev worktree new|remove|list|merge <name>"
                     return 1
             end
         case layout
             __dev_layout $argv[2]
         case '*'
             echo "Unknown subcommand: $subcmd"
-            echo "Usage: dev worktree new|remove|list <name> | dev layout [path]"
+            echo "Usage: dev worktree new|remove|list|merge <name> | dev layout [path]"
             return 1
     end
 end
@@ -150,8 +156,188 @@ function __dev_worktree_remove --description 'remove worktree + branch + tmux wi
     echo "Cleaned up: worktree, branch $name, and tmux window"
 end
 
+# __dev_worktree_merge — squash, rebase, and fast-forward target (worktrunk-style, local-only)
+# Steps:
+#   1. Validate worktree & branch exist, detect target branch
+#   2. Block on uncommitted changes in the worktree
+#   3. Create safety backup: git branch wt-backup/<name> <name>
+#   4. Squash (default): soft-reset to merge-base, commit all changes as one
+#   5. Rebase onto target (conflict → abort with recovery instructions)
+#   6. Fast-forward target: git checkout <target> && git merge --ff-only <name>
+#   7. Remove worktree & branch (default; --no-remove to keep)
+#   8. Push to remote (opt-in: --push)
+function __dev_worktree_merge --description 'squash + rebase + fast-forward (local-only)'
+    set -l name $argv[1]
+    if test -z "$name"
+        echo "Usage: dev worktree merge <name> [target-branch] [--no-squash] [--push] [--no-remove]"
+        return 1
+    end
+
+    # Parse flags and target from remaining args
+    set -l target ""
+    set -l no_squash false
+    set -l do_push false
+    set -l no_remove false
+
+    for arg in $argv[2..-1]
+        switch $arg
+            case --no-squash
+                set no_squash true
+            case --push
+                set do_push true
+            case --no-remove
+                set no_remove true
+            case '-*'
+                echo "Unknown flag: $arg"
+                return 1
+            case '*'
+                if test -z "$target"
+                    set target $arg
+                else
+                    echo "Error: unexpected argument '$arg'"
+                    return 1
+                end
+        end
+    end
+
+    set -l repo_root (git rev-parse --show-toplevel 2>/dev/null)
+    if test -z "$repo_root"
+        echo "Error: not a git repository"
+        return 1
+    end
+
+    set -l dev_dir "$repo_root/.worktrees/$name"
+
+    if not test -d $dev_dir
+        echo "Error: worktree '$name' not found at $dev_dir"
+        return 1
+    end
+
+    if not git show-ref --verify --quiet "refs/heads/$name"
+        echo "Error: branch '$name' does not exist"
+        return 1
+    end
+
+    # Detect default target branch from remote HEAD
+    if test -z "$target"
+        set target (git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|.*/||')
+        if test -z "$target"
+            echo "Error: could not detect default branch. Specify target explicitly."
+            return 1
+        end
+    end
+
+    # Block if worktree has uncommitted changes
+    set -l dirty (git -C $dev_dir status --porcelain 2>/dev/null)
+    if test -n "$dirty"
+        echo "Error: worktree has uncommitted changes:"
+        git -C $dev_dir status --short
+        echo "Commit or stash them first, then retry."
+        return 1
+    end
+
+    # Count commits on this branch (for display)
+    set -l merge_base (git -C $dev_dir merge-base HEAD $target 2>/dev/null)
+    if test -z "$merge_base"
+        echo "Error: no common ancestor with '$target'"
+        return 1
+    end
+    set -l commit_count (git -C $dev_dir rev-list --count $merge_base..HEAD 2>/dev/null)
+
+    echo "→ Merging '$name' into '$target' ($commit_count commit(s))"
+
+    # --- Step 1: Safety backup ---
+    set -l backup_ref "wt-backup/$name"
+    if git show-ref --verify --quiet "refs/heads/$backup_ref"
+        git branch -D $backup_ref 2>/dev/null
+    end
+    git branch $backup_ref $name
+    or begin
+        echo "Error: failed to create backup branch '$backup_ref'"
+        return 1
+    end
+    echo "→ Backup: $backup_ref"
+
+    # --- Step 2: Squash (default) ---
+    set -l squashed false
+    if not $no_squash; and test $commit_count -gt 1
+        echo "→ Squashing $commit_count commits..."
+        # Build squash message from original commit subjects
+        set -l squash_msg (git -C $dev_dir log --reverse --format='%s' $merge_base..HEAD | string collect)
+        git -C $dev_dir reset --soft $merge_base
+        or begin
+            echo "Error: soft-reset failed"
+            return 1
+        end
+        git -C $dev_dir commit -m "$squash_msg" --no-verify
+        or begin
+            echo "Error: squash commit failed"
+            echo "To recover: git -C $dev_dir reset --soft HEAD@{1} && git -C $dev_dir commit -m 'recovery'"
+            return 1
+        end
+        set squashed true
+        echo "→ Squashed to 1 commit"
+    else if not $no_squash
+        echo "→ (single commit, skipping squash)"
+    end
+
+    # --- Step 3: Rebase onto target ---
+    echo "→ Rebasing onto $target..."
+    git -C $dev_dir rebase $target
+    or begin
+        echo "Rebase conflict! Aborting rebase..."
+        git -C $dev_dir rebase --abort 2>/dev/null
+        if $squashed
+            echo "Squash was applied — resetting to backup to restore original commits..."
+            git -C $dev_dir reset --hard $backup_ref 2>/dev/null
+        end
+        echo "Recovery: branch is back at backup '$backup_ref'"
+        return 1
+    end
+
+    # --- Step 4: Fast-forward target ---
+    set -l prev_branch (git branch --show-current)
+    echo "→ Fast-forwarding $target to $name..."
+    git checkout $target
+    or begin
+        echo "Error: checkout $target failed"
+        return 1
+    end
+    git merge --ff-only $name
+    or begin
+        echo "Error: fast-forward failed (unexpected after rebase)"
+        echo "This shouldn't happen — check git log for divergence."
+        git checkout $prev_branch 2>/dev/null
+        return 1
+    end
+
+    # --- Step 5: Push (opt-in) ---
+    if $do_push
+        echo "→ Pushing $target..."
+        git push origin $target
+        or begin
+            echo "Error: push failed. Push manually when ready."
+            return 1
+        end
+    end
+
+    # --- Step 6: Cleanup ---
+    if not $no_remove
+        echo "→ Removing worktree, branch, and backup..."
+        __dev_worktree_remove $name
+        git branch -D $backup_ref 2>/dev/null
+    else
+        echo "→ Deleting backup branch '$backup_ref'..."
+        git branch -D $backup_ref 2>/dev/null
+        echo "✓ Merge complete. Clean up with: dev worktree remove $name"
+    end
+
+    if test -n "$prev_branch"; and test "$prev_branch" != "$target"
+        echo "  (you are now on '$target'; was on '$prev_branch')"
+    end
+end
+
 # __dev_worktree_list — list worktrees under .worktrees/ in the current repo
-# Runs git worktree list and filters to repo_root/.worktrees/.
 function __dev_worktree_list --description 'list active worktrees in this repo'
     set -l repo_root (git rev-parse --show-toplevel 2>/dev/null)
     if test -z "$repo_root"
