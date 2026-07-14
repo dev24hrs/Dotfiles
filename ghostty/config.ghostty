@@ -40,22 +40,30 @@ macos-custom-icon           = ~/.config/ghostty/Ghostty.icns
 shell-integration           = detect
 shell-integration-features  = true
 
+# clipboard
+copy-on-select                 = true
+clipboard-trim-trailing-spaces = true
+
 # other
 bell-features                   = no-audio
 bell-audio-volume               = 0
 scrollback-limit                = 100000
-copy-on-select                  = clipboard
 quit-after-last-window-closed   = true
 
 # Key bindings
-keybind                     = cmd+s>r=reload_config
+keybind                     = ctrl+a>r=reload_config
 
-# split
-keybind                     = cmd+s>\=new_split:right
-keybind                     = cmd+s>-=new_split:down
-keybind                     = cmd+s>j=goto_split:bottom
-keybind                     = cmd+s>k=goto_split:top
-keybind                     = cmd+s>h=goto_split:left
-keybind                     = cmd+s>l=goto_split:right
-keybind                     = cmd+s>z=toggle_split_zoom
-keybind                     = cmd+s>x=close_surface
+# Leader key 风格快捷键
+keybind                     = ctrl+a>\=new_split:right
+keybind                     = ctrl+a>-=new_split:down
+keybind                     = ctrl+a>h=goto_split:left
+keybind                     = ctrl+a>j=goto_split:bottom
+keybind                     = ctrl+a>k=goto_split:top
+keybind                     = ctrl+a>l=goto_split:right
+keybind                     = ctrl+a>x=close_surface
+
+# 禁用可能与 Vim 冲突的快捷键
+keybind                     = ctrl+h=unbind
+keybind                     = ctrl+j=unbind
+keybind                     = ctrl+k=unbind
+keybind                     = ctrl+l=unbind
