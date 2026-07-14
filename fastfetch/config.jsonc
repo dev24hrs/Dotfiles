@@ -42,37 +42,37 @@
     },
     {
       "type": "host",
-      "key": "│ ├╴   Host",
+      "key": "│ ├╴ Machine",
       "keyColor": "yellow",
     },
     {
       "type": "cpu",
-      "key": "│ ├╴   CPU",
+      "key": "│ ├╴ CPU",
       "showPeCoreCount": true,
       "format": "{1}",
       "keyColor": "yellow",
     },
     {
       "type": "gpu",
-      "key": "│ ├╴ 󰢮  GPU",
+      "key": "│ ├╴󰢮 GPU",
       "keyColor": "yellow",
       "format": "{name} ({core-count}) @ {frequency}",
     },
     {
       "type": "disk",
-      "key": "│ ├╴   Disk",
+      "key": "│ ├╴ Disk",
       "keyColor": "yellow",
       "format": "{size-used} / {size-total} ({size-percentage})",
     },
     {
       "type": "memory",
-      "key": "│ ├╴   Memory",
+      "key": "│ ├╴ Memory",
       "keyColor": "yellow",
       "format": "{used} / {total} ({percentage})",
     },
     {
       "type": "display",
-      "key": "└ └╴ 󰍹  Display",
+      "key": "└ └╴󰍹 Display",
       "keyColor": "yellow",
     },
     {
@@ -82,18 +82,18 @@
     },
     {
       "type": "os",
-      "key": "│ ├╴   OS",
+      "key": "│ ├╴ OS",
       "keyColor": "blue",
       "format": "{name} {codename} {version}",
     },
     {
       "type": "kernel",
-      "key": "│ ├╴   Kernel",
+      "key": "│ ├╴ Kernel",
       "keyColor": "blue",
     },
     {
       "type": "packages",
-      "key": "└ └╴ 󰏖  Packages",
+      "key": "└ └╴󰏖 Packages",
       "keyColor": "blue",
     },
     {
@@ -103,24 +103,24 @@
     },
     {
       "type": "terminal",
-      "key": "│ ├╴   App",
+      "key": "│ ├╴ App",
       "keyColor": "green",
     },
     {
       "type": "shell",
-      "key": "│ ├╴   Shell",
+      "key": "│ ├╴ Shell",
       "keyColor": "green",
     },
     {
       "type": "command",
       "shell": "/bin/sh",
       "text": "echo 'Starship'",
-      "key": "│ ├╴ 󰉼  Prompt",
+      "key": "│ ├╴󰉼 Prompt",
       "keyColor": "green",
     },
     {
       "type": "terminalfont",
-      "key": "└ └╴ 󰛖  Font",
+      "key": "└ └╴󰛖 Font",
       "keyColor": "green",
     },
     {
