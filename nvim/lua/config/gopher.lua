@@ -31,6 +31,6 @@ require("gopher").setup({
     },
 })
 
-vim.keymap.set("n",  "<leader>gj", "<cmd>GoTagAdd json<cr>", { desc = "[Gopher]: Add JSON tags" })
-vim.keymap.set("n", "<leader>gy", "<cmd>GoTagAdd yaml<cr>", {desc = "[Gopher]: Add YAML tags" })
-vim.keymap.set("n", "<leader>gr", "<cmd>GoTagRm json<cr>", {desc = "[Gopher]: Remove JSON tags" })
+vim.keymap.set("n", "<leader>gj", "<cmd>GoTagAdd json<cr>", { desc = "[Gopher]: Add JSON tags" })
+vim.keymap.set("n", "<leader>gy", "<cmd>GoTagAdd yaml<cr>", { desc = "[Gopher]: Add YAML tags" })
+vim.keymap.set("n", "<leader>gr", "<cmd>GoTagRm json<cr>", { desc = "[Gopher]: Remove JSON tags" })
