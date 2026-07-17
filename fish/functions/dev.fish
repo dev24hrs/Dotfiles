@@ -1,48 +1,50 @@
 # dev.fish
 # Git worktree & tmux session management:
-#   dev worktree new    <name>               create worktree in current repo + tmux window + claude & neovim
-#   dev worktree remove <name>               remove worktree, branch, and tmux window (current repo only)
-#   dev worktree list                        list all worktrees in the current repo
-#   dev worktree merge  <name> [target] [opts]  squash + rebase + fast-forward (local-only)
+#   dev wt new    <name>               create worktree in current repo + tmux window (claude | empty)
+#   dev wt remove <name>               remove worktree, branch, and tmux window (current repo only)
+#   dev wt list                        list all worktrees in the current repo
+#   dev wt merge  <name> [target] [opts]  squash + rebase + fast-forward (local-only)
 #       --no-squash  skip squash, rebase & ff each commit
 #       --push       push target to remote after merge
 #       --no-remove  keep worktree + branch after merge
+#   dev wt clean                         prune stale worktree metadata (orphaned dirs)
 #   dev layout          [path]               create tmux session with standard project layout
 
-# dev — top-level dispatcher
-# Routes to worktree subcommands (new/remove/list) or layout.
-# Usage: dev worktree new|remove|list|merge [name] | dev layout [path]
+# Routes to worktree subcommands (new/remove/list/merge/clean) or layout.
+# Usage: dev wt new|remove|merge <name> | dev wt list|clean | dev layout [path]
 function dev --description 'manage worktrees & sessions'
     if test (count $argv) -lt 1
-        echo "Usage: dev worktree new|remove|list|merge <name> | dev layout [path]"
+        echo "Usage: dev wt new|remove|merge <name> | dev wt list|clean | dev layout [path]"
         return 1
     end
 
     set -l subcmd $argv[1]
 
     switch $subcmd
-        case worktree
+        case wt
             set -l action $argv[2]
             set -l name $argv[3]
             switch $action
                 case new
                     __dev_worktree_new $name
-                case remove rm
+                case remove
                     __dev_worktree_remove $name
                 case list
                     __dev_worktree_list
-                case merge mg
+                case merge
                     __dev_worktree_merge $name $argv[4..-1]
+                case clean
+                    __dev_worktree_clean
                 case '*'
-                    echo "Unknown: dev worktree $action"
-                    echo "Usage: dev worktree new|remove|list|merge <name>"
+                    echo "Unknown: dev wt $action"
+                    echo "Usage: dev wt new|remove|merge <name> | dev wt list|clean"
                     return 1
             end
         case layout
             __dev_layout $argv[2]
         case '*'
             echo "Unknown subcommand: $subcmd"
-            echo "Usage: dev worktree new|remove|list|merge <name> | dev layout [path]"
+            echo "Usage: dev wt new|remove|merge <name> | dev wt list|clean | dev layout [path]"
             return 1
     end
 end
@@ -52,14 +54,14 @@ end
 #   1. Validate branch name, locate repo root
 #   2. Ensure .worktrees/ is in .gitignore (append if missing)
 #   3. Create worktree: reuse existing branch, or git worktree add -b
-#   4. Open tmux window (claude | nvim split) in the repo's session:
+#   4. Open tmux window (claude | empty split) in the repo's session:
 #      - Session exists → new-window in that session
 #      - No session, inside tmux → new-session -d + switch-client
 #      - No session, outside tmux → new-session (attach directly)
 function __dev_worktree_new --description 'create worktree + tmux window + claude'
     set -l name $argv[1]
     if test -z "$name"
-        echo "Usage: dev worktree new <name>"
+        echo "Usage: dev wt new <name>"
         return 1
     end
 
@@ -68,11 +70,14 @@ function __dev_worktree_new --description 'create worktree + tmux window + claud
         return 1
     end
 
-    set -l repo_root (git rev-parse --show-toplevel 2>/dev/null)
-    if test -z "$repo_root"
+    # --git-common-dir always points to the main repo's .git, even inside
+    # a linked worktree (where --show-toplevel would return the worktree path).
+    set -l git_common (git rev-parse --git-common-dir 2>/dev/null)
+    if test -z "$git_common"
         echo "Error: not a git repository"
         return 1
     end
+    set -l repo_root (path dirname (realpath "$git_common"))
 
     # Ensure .worktrees/ is in .gitignore so the main repo doesn't
     # show untracked files after the first worktree is created.
@@ -101,57 +106,64 @@ function __dev_worktree_new --description 'create worktree + tmux window + claud
 
     set -l session_name (path basename $repo_root)
     if tmux has-session -t $session_name 2>/dev/null
-        tmux new-window -t $session_name -n $name -c $dev_dir "claude; exec fish"
-        tmux split-window -h -t $session_name:$name -c $dev_dir "nvim; exec fish"
-        tmux select-pane -L
+        tmux new-window -t $session_name -n $name -c $dev_dir "cd $dev_dir; claude; exec fish"
+        tmux split-window -h -t $session_name:$name -c $dev_dir "cd $dev_dir; exec fish"
         echo "Launched claude in tmux window '$name' (session: $session_name, worktree: $dev_dir)"
     else if set -q TMUX
-        tmux new-session -d -s $session_name -n $name -c $dev_dir "claude; exec fish"
-        tmux split-window -h -t $session_name:$name -c $dev_dir "nvim; exec fish"
-        tmux select-pane -L
+        tmux new-session -d -s $session_name -n $name -c $dev_dir "cd $dev_dir; claude; exec fish"
+        tmux split-window -h -t $session_name:$name -c $dev_dir "cd $dev_dir; exec fish"
         tmux switch-client -t $session_name
         echo "Launched claude in new session '$session_name' (worktree: $dev_dir)"
     else
-        tmux new-session -s $session_name -n $name -c $dev_dir "claude; exec fish"
-        tmux split-window -h -t $session_name:$name -c $dev_dir "nvim; exec fish"
-        tmux select-pane -L
+        tmux new-session -s $session_name -n $name -c $dev_dir "cd $dev_dir; claude; exec fish"
+        tmux split-window -h -t $session_name:$name -c $dev_dir "cd $dev_dir; exec fish"
     end
 end
 
 # __dev_worktree_remove — clean up a worktree and its tmux window (current repo only)
 # Steps:
-#   1. Send C-c to the tmux window (best-effort graceful), then kill-window immediately
-#   2. git worktree remove --force and git branch -D run in parallel via &
-#   3. wait for both background jobs
+#   1. cd to repo root (avoid "directory busy" when running from inside the worktree)
+#   2. Remove worktree, then delete branch (sequential — branch -D fails while checked out)
+#   3. Kill tmux window last (doing this last ensures the cleanup steps above actually run)
 function __dev_worktree_remove --description 'remove worktree + branch + tmux window'
     set -l name $argv[1]
     if test -z "$name"
-        echo "Usage: dev worktree remove <name>"
+        echo "Usage: dev wt remove <name>"
         return 1
     end
 
-    set -l repo_root (git rev-parse --show-toplevel 2>/dev/null)
-    if test -z "$repo_root"
+    # --git-common-dir always points to the main repo's .git, even inside
+    # a linked worktree (where --show-toplevel would return the worktree path).
+    set -l git_common (git rev-parse --git-common-dir 2>/dev/null)
+    if test -z "$git_common"
         echo "Error: not a git repository"
         return 1
     end
+    set -l repo_root (path dirname (realpath "$git_common"))
 
     set -l dev_dir "$repo_root/.worktrees/$name"
     set -l session_name (path basename $repo_root)
 
-    # Kill tmux window (best-effort graceful then immediate kill)
+    # Step 1: cd out of the worktree so the OS doesn't block removal.
+    # Critical when running this command from inside the worktree's own tmux window.
+    builtin cd "$repo_root"
+
+    # Step 2: Clean up git state BEFORE killing the window.
+    # If kill-window ran first from inside the target window, SIGHUP could
+    # terminate this script before it reaches the git commands.
+    if test -d $dev_dir
+        git worktree remove $dev_dir --force
+        or begin
+            echo "Error: failed to remove worktree at $dev_dir"
+            return 1
+        end
+    end
+    git branch -D $name 2>/dev/null
+
+    # Step 3: Kill tmux window last (if we're inside it, this ends the script).
     if tmux list-windows -t $session_name -F '#{window_name}' 2>/dev/null | string match --entire --quiet -- $name
-        tmux send-keys -t $session_name:$name C-c 2>/dev/null
         tmux kill-window -t $session_name:$name 2>/dev/null
     end
-
-    # Remove worktree and branch in parallel with tmux cleanup
-    if test -d $dev_dir
-        git worktree remove $dev_dir --force &
-    end
-
-    git branch -D $name 2>/dev/null &
-    wait
 
     echo "Cleaned up: worktree, branch $name, and tmux window"
 end
@@ -169,7 +181,7 @@ end
 function __dev_worktree_merge --description 'squash + rebase + fast-forward (local-only)'
     set -l name $argv[1]
     if test -z "$name"
-        echo "Usage: dev worktree merge <name> [target-branch] [--no-squash] [--push] [--no-remove]"
+        echo "Usage: dev wt merge <name> [target-branch] [--no-squash] [--push] [--no-remove]"
         return 1
     end
 
@@ -200,11 +212,14 @@ function __dev_worktree_merge --description 'squash + rebase + fast-forward (loc
         end
     end
 
-    set -l repo_root (git rev-parse --show-toplevel 2>/dev/null)
-    if test -z "$repo_root"
+    # --git-common-dir always points to the main repo's .git, even inside
+    # a linked worktree (where --show-toplevel would return the worktree path).
+    set -l git_common (git rev-parse --git-common-dir 2>/dev/null)
+    if test -z "$git_common"
         echo "Error: not a git repository"
         return 1
     end
+    set -l repo_root (path dirname (realpath "$git_common"))
 
     set -l dev_dir "$repo_root/.worktrees/$name"
 
@@ -296,6 +311,9 @@ function __dev_worktree_merge --description 'squash + rebase + fast-forward (loc
     end
 
     # --- Step 4: Fast-forward target ---
+    # cd to main repo — git checkout would fail from a linked worktree
+    # if $target is already checked out in the main worktree.
+    cd "$repo_root"
     set -l prev_branch (git branch --show-current)
     echo "→ Fast-forwarding $target to $name..."
     git checkout $target
@@ -339,14 +357,38 @@ end
 
 # __dev_worktree_list — list worktrees under .worktrees/ in the current repo
 function __dev_worktree_list --description 'list active worktrees in this repo'
-    set -l repo_root (git rev-parse --show-toplevel 2>/dev/null)
-    if test -z "$repo_root"
+    set -l git_common (git rev-parse --git-common-dir 2>/dev/null)
+    if test -z "$git_common"
         echo "Error: not a git repository"
         return 1
     end
+    set -l repo_root (path dirname (realpath "$git_common"))
 
     git worktree list | grep "$repo_root/.worktrees/"
     or echo "No active worktrees"
+end
+
+# __dev_worktree_clean — prune stale worktree metadata
+# Runs `git worktree prune` to remove entries for worktrees whose directories
+# no longer exist (e.g. manually deleted or lost after a disk cleanup).
+function __dev_worktree_clean --description 'prune stale worktree metadata'
+    set -l git_common (git rev-parse --git-common-dir 2>/dev/null)
+    if test -z "$git_common"
+        echo "Error: not a git repository"
+        return 1
+    end
+    # repo_root not used by prune, but validated for "in a repo" check above.
+
+    set -l pruned (git worktree prune --verbose 2>&1)
+    or begin
+        echo "Error: prune failed"
+        return 1
+    end
+    if test -n "$pruned"
+        printf '%s\n' $pruned
+    else
+        echo "No stale worktrees to prune"
+    end
 end
 
 # __dev_layout — create a tmux session with a standard 4-window project layout
@@ -370,11 +412,12 @@ function __dev_layout --description 'create tmux session with standard project l
         set target $PWD
     end
 
-    set -l repo_root (git -C "$target" rev-parse --show-toplevel 2>/dev/null)
-    if test -z "$repo_root"
+    set -l git_common (git -C "$target" rev-parse --git-common-dir 2>/dev/null)
+    if test -z "$git_common"
         echo "Error: not a git repository"
         return 1
     end
+    set -l repo_root (path dirname (realpath "$git_common"))
 
     set -l session_name (path basename $repo_root)
     set -l work_dir $repo_root
@@ -382,7 +425,7 @@ function __dev_layout --description 'create tmux session with standard project l
     # Window 1: code — vertical 50/50 (claude | nvim)
     tmux new-session -d -s $session_name -n code -c $work_dir "claude; exec fish"
     or return 1
-    tmux split-window -h -t $session_name:code -c $work_dir "nvim; exec fish"
+    tmux split-window -h -t $session_name:code -c $work_dir
 
     # Window 2: git — lazygit
     tmux new-window -t $session_name -n git -c $work_dir "lazygit; exec fish"
@@ -390,9 +433,6 @@ function __dev_layout --description 'create tmux session with standard project l
     # Window 3: chore — vertical 50/50, empty
     tmux new-window -t $session_name -n chore -c $work_dir
     tmux split-window -h -t $session_name:chore -c $work_dir
-
-    # Window 4: log — empty
-    tmux new-window -t $session_name -n log -c $work_dir
 
     # Focus code window (defaults to pane 0 = claude)
     tmux select-window -t $session_name:code

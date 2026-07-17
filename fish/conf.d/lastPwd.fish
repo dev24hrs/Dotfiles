@@ -9,7 +9,9 @@ end
 
 if status is-interactive
     if not set -q __fish_last_pwd_initialized
-        if test -f $LAST_PWD_FILE
+        # Skip restore inside tmux — the window/pane creator sets the directory
+        # explicitly via -c, and restoring would overwrite it.
+        if not set -q TMUX; and test -f $LAST_PWD_FILE
             set -l last_dir (cat $LAST_PWD_FILE)
             if test -d "$last_dir"
                 cd "$last_dir"
