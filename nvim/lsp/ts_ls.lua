@@ -32,7 +32,7 @@ return {
             },
         },
     },
-    cmd = { "/opt/homebrew/bin/tsc", "--lsp", "--stdio" },
+    cmd = { "tsc", "--lsp", "--stdio" },
     filetypes = {
         "javascript",
         "javascript.jsx",
