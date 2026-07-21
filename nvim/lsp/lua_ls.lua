@@ -20,10 +20,10 @@ return {
         Lua = {
             workspace = { library = vim.api.nvim_get_runtime_file("", true), checkThirdParty = false },
             runtime = { version = "LuaJIT" },
-            diagnostics = { globals = { "vim" } },
+            diagnostics = { globals = { "vim", "bit", "jit" } },
             codeLens = { enable = true },
-            completion = { callSnippet = "Replace" },
-            hint = { enable = true, semicolon = "Disable" },
+            completion = { callSnippet = "Replace", keywordSnippet = "Replace" },
+            hint = { enable = true, setType = true, paramName = "All", paramType = true, semicolon = "Disable" },
             telemetry = { enable = false },
         },
     },

@@ -39,7 +39,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         local function edit_or_open()
             local node = api.tree.get_node_under_cursor()
 
-            if node.nodes ~= nil then
+            if node ~= nil then
                 -- expand or collapse folder
                 api.node.open.edit()
             else
@@ -115,7 +115,8 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                 local function opts(desc)
                     return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
                 end
-                api.config.mappings.default_on_attach(bufnr)
+                -- api.config.mappings.default_on_attach(bufnr)
+                api.map.on_attach.default(bufnr)
 
                 vim.keymap.set("n", "l", edit_or_open, opts("[NvimTree]: Edit Or Open"))
                 vim.keymap.set("n", "e", edit_or_open, opts("[NvimTree]: Edit Or Open"))

@@ -28,12 +28,8 @@ require("aerial").setup({
         ["{"] = "actions.prev",
         ["}"] = "actions.next",
         ["q"] = "actions.close",
-        ["l"] = "actions.tree_toggle",
-        ["h"] = "actions.tree_toggle",
+        ["l"] = "actions.tree_open",
+        ["h"] = "actions.tree_close",
     },
-    on_attach = function(bufnr)
-        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Aerial Prev" })
-        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Aerial Next" })
-    end,
 })
 vim.keymap.set("n", "<leader>ll", "<cmd>AerialToggle<CR>", { desc = "[Aerial]: Toggle Outline" })

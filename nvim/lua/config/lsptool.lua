@@ -8,7 +8,7 @@ vim.api.nvim_create_user_command("LspInfo", function()
     print("═══════════════════════════════════")
     print("")
 
-    print("󰈙 Language client log: " .. vim.lsp.get_log_path())
+    print("󰈙 Language client log: " .. vim.lsp.log.get_filename())
     print("󰈔 Detected filetype: " .. vim.bo.filetype)
     print("󰈮 Buffer: " .. bufnr)
     print("󰈔 Root directory: " .. (vim.fn.getcwd() or "N/A"))
@@ -33,9 +33,10 @@ vim.api.nvim_create_user_command("LspInfo", function()
         print("  ID: " .. client.id)
         print("  Root dir: " .. (client.config.root_dir or "Not set"))
         -- print('  Command: ' .. table.concat(client.config.cmd or {}, ' '))
+        ---@diagnostic disable-next-line: undefined-field
         print("  Filetypes: " .. table.concat(client.config.filetypes or {}, ", "))
 
-        if client.is_stopped() then
+        if client:is_stopped() then
             print("  Status: 󰅚 Stopped")
         else
             print("  Status: 󰄬 Running")
@@ -114,7 +115,8 @@ vim.api.nvim_create_user_command("LspRestart", function()
 
     for _, client in ipairs(clients) do
         vim.notify("Restarting " .. client.name, vim.log.levels.INFO)
-        vim.lsp.stop_client(client.id)
+        vim.lsp.Client:stop(client.id)
+        -- vim.lsp.stop_client(client.id)
     end
 
     vim.defer_fn(function()
@@ -138,6 +140,7 @@ vim.api.nvim_create_user_command("LspStatus", function()
     for i, client in ipairs(clients) do
         print(string.format("󰌘 Client %d: %s (ID: %d)", i, client.name, client.id))
         print("  Root: " .. (client.config.root_dir or "N/A"))
+        ---@diagnostic disable-next-line: undefined-field
         print("  Filetypes: " .. table.concat(client.config.filetypes or {}, ", "))
 
         local caps = client.server_capabilities
@@ -172,7 +175,7 @@ end, { desc = "Show brief LSP status" })
 -- lsp
 local api, lsp = vim.api, vim.lsp
 api.nvim_create_user_command("LspLog", function()
-    vim.cmd(string.format("tabnew %s", lsp.get_log_path()))
+    vim.cmd(string.format("tabnew %s", lsp.log.get_filename()))
 end, {
     desc = "Opens the Nvim LSP client log.",
 })

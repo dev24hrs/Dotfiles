@@ -1,3 +1,4 @@
+---@type vim.lsp.Config
 return {
     cmd = function(dispatchers, config)
         local cmd = "yaml-language-server"
@@ -19,10 +20,11 @@ return {
             validate = true,
             hover = true,
             completion = true,
-            schemaStore = { enable = false, url = "" },
+            -- Schema Store auto-detects schemas by filename. Manual schemas below take priority.
+            schemaStore = { enable = true },
             schemas = {
-                -- Kubernetes
-                ["https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.31.0-standalone-strict/all.json"] = {
+                -- Kubernetes: use built-in keyword for auto version matching
+                kubernetes = {
                     "k8s/**/*.yaml",
                     "kubernetes/**/*.yaml",
                 },
@@ -41,7 +43,4 @@ return {
             },
         },
     },
-    on_init = function(client)
-        client.server_capabilities.documentFormattingProvider = true
-    end,
 }

@@ -1,3 +1,4 @@
+require("plugins.lazydev")
 require("plugins.theme")
 require("plugins.aerial")
 require("plugins.alpha")

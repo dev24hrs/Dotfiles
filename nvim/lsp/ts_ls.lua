@@ -1,19 +1,44 @@
 return {
     init_options = { hostInfo = "neovim" },
-    cmd = function(dispatchers, config)
-        local cmd = "typescript-language-server"
-        if (config or {}).root_dir then
-            local local_cmd = vim.fs.joinpath(config.root_dir, "node_modules/.bin", cmd)
-            if vim.fn.executable(local_cmd) == 1 then
-                cmd = local_cmd
-            end
-        end
-        return vim.lsp.rpc.start({ cmd, "--stdio" }, dispatchers)
-    end,
+    settings = {
+        typescript = {
+            inlayHints = {
+                -- 调用处显示参数名提示，如 `foo(name, age)`
+                -- "none" = 关闭, "literals" = 仅字面量参数, "all" = 全部参数
+                includeInlayParameterNameHints = "literals",
+                -- 实参名与形参相同时隐藏提示
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                -- 推断的函数参数类型提示，如 `x: number`
+                includeInlayFunctionParameterTypeHints = true,
+                -- 推断的变量声明类型提示
+                includeInlayVariableTypeHints = true,
+                -- 推断的对象/类属性声明类型提示
+                includeInlayPropertyDeclarationTypeHints = true,
+                -- 推断的函数/方法返回类型提示
+                includeInlayFunctionLikeReturnTypeHints = true,
+                -- 枚举成员值内联提示，如 `Color.Red = 0`
+                includeInlayEnumMemberValueHints = true,
+            },
+        },
+        javascript = {
+            inlayHints = {
+                includeInlayParameterNameHints = "literals",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+            },
+        },
+    },
+    cmd = { "/opt/homebrew/bin/tsc", "--lsp", "--stdio" },
     filetypes = {
         "javascript",
+        "javascript.jsx",
         "javascriptreact",
         "typescript",
+        "typescript.tsx",
         "typescriptreact",
     },
     root_dir = function(bufnr, on_dir)
@@ -22,17 +47,35 @@ return {
         -- We select then from the project root, which is identified by the presence of a package
         -- manager lock file.
         local root_markers = { "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb", "bun.lock" }
-        -- Give the root markers equal priority by wrapping them in a table
-        root_markers = vim.fn.has("nvim-0.11.3") == 1 and { root_markers, { ".git" } } or vim.list_extend(root_markers, { ".git" })
-        -- exclude deno
+        -- Give the root markers equal priority by wrapping them in a table.
+        -- Use feature detection instead of exact version check: vim.fs.root supports nested marker tables since 0.10.
+        -- tsconfig.json / jsconfig.json take highest priority to match the project boundary (official tsgo behavior).
+        local ok, _ = pcall(vim.fs.root, bufnr, { { "package.json" }, { ".git" } })
+        if ok then
+            root_markers = { { "tsconfig.json", "jsconfig.json" }, root_markers, { ".git" } }
+        else
+            root_markers = vim.list_extend({ "tsconfig.json", "jsconfig.json" }, root_markers)
+            vim.list_extend(root_markers, { ".git" })
+        end
+        -- exclude deno: compare by directory depth, not string length
+        local function path_depth(p)
+            if not p then
+                return 0
+            end
+            local count = 0
+            for _ in p:gmatch("/") do
+                count = count + 1
+            end
+            return count
+        end
         local deno_root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc" })
         local deno_lock_root = vim.fs.root(bufnr, { "deno.lock" })
         local project_root = vim.fs.root(bufnr, root_markers)
-        if deno_lock_root and (not project_root or #deno_lock_root > #project_root) then
+        if deno_lock_root and (not project_root or path_depth(deno_lock_root) > path_depth(project_root)) then
             -- deno lock is closer than package manager lock, abort
             return
         end
-        if deno_root and (not project_root or #deno_root >= #project_root) then
+        if deno_root and (not project_root or path_depth(deno_root) >= path_depth(project_root)) then
             -- deno config is closer than or equal to package manager lock, abort
             return
         end
@@ -83,9 +126,15 @@ return {
         end,
     },
     on_attach = function(client, bufnr)
+        -- Helper: create buffer command, handling re-attach by silently replacing existing command
+        local function buf_create_cmd(name, opts, fn)
+            pcall(vim.api.nvim_buf_del_user_command, bufnr, name)
+            vim.api.nvim_buf_create_user_command(bufnr, name, fn, opts)
+        end
+
         -- ts_ls provides `source.*` code actions that apply to the whole file. These only appear in
         -- `vim.lsp.buf.code_action()` if specified in `context.only`.
-        vim.api.nvim_buf_create_user_command(bufnr, "LspTypescriptSourceAction", function()
+        buf_create_cmd("LspTypescriptSourceAction", {}, function()
             local source_actions = vim.tbl_filter(function(action)
                 return vim.startswith(action, "source.")
             end, client.server_capabilities.codeActionProvider.codeActionKinds)
@@ -96,10 +145,10 @@ return {
                     diagnostics = {},
                 },
             })
-        end, {})
+        end)
 
         -- Go to source definition command
-        vim.api.nvim_buf_create_user_command(bufnr, "LspTypescriptGoToSourceDefinition", function()
+        buf_create_cmd("LspTypescriptGoToSourceDefinition", { desc = "Go to source definition" }, function()
             local win = vim.api.nvim_get_current_win()
             local params = vim.lsp.util.make_position_params(win, client.offset_encoding)
             client:exec_cmd({
@@ -117,6 +166,6 @@ return {
                 end
                 vim.lsp.util.show_document(result[1], client.offset_encoding, { focus = true })
             end)
-        end, { desc = "Go to source definition" })
+        end)
     end,
 }

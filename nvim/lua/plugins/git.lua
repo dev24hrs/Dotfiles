@@ -25,7 +25,7 @@ require("gitsigns").setup({
     },
     signcolumn = true,
     current_line_blame = true,
-    current_line_blame_formatter = "		 <author_mail>, <author_time:%Y-%m-%d> • <summary> • <abbrev_sha>",
+    current_line_blame_formatter = "     <author_mail>, <author_time:%Y-%m-%d> • <summary> • <abbrev_sha>",
     on_attach = function(bufnr)
         local gitsigns = require("gitsigns")
         local function map(mode, l, r, opts)
@@ -35,21 +35,13 @@ require("gitsigns").setup({
         end
         -- Navigation
         map("n", "]h", function()
-            if vim.wo.diff then
-                vim.cmd.normal({ "]c", bang = true })
-            else
-                gitsigns.nav_hunk("next")
-            end
+            gitsigns.nav_hunk("next")
         end, { desc = "[Gitsigns]: Next Hunk" })
-
         map("n", "[h", function()
-            if vim.wo.diff then
-                vim.cmd.normal({ "[c", bang = true })
-            else
-                gitsigns.nav_hunk("prev")
-            end
+            gitsigns.nav_hunk("prev")
         end, { desc = "[Gitsigns]: Previous Hunk" })
 
+        map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "[Gitsigns]: Preview Hunk" })
         map("n", "<leader>hb", function()
             gitsigns.blame_line({ full = true })
         end, { desc = "[Gitsigns]: Show Blame Line" })

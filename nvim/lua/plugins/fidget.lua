@@ -5,15 +5,23 @@ vim.pack.add({
     { src = "https://github.com/MunifTanjim/nui.nvim" },
 })
 
-vim.api.nvim_set_hl(0, "NotifyBackground", { bg = "#000000" })
+-- vim.api.nvim_set_hl(0, "NotifyBackground", { bg = "#000000" })
 require("notify").setup({
     stages = "fade_in_slide_out",
     render = "wrapped-compact",
     timeout = 3000,
-    -- background_colour = "#000000",
+    background_colour = "#000000",
+    merge_duplicates = true,
 })
+-- Route all vim.notify() calls through nvim-notify for styled notifications
+vim.notify = require("notify")
+
 vim.keymap.set("n", "<leader>fn", function()
-    require("notify.integrations").pick()
+    -- Try Telescope/fzf-lua picker first, fall back to plain history command
+    local ok = pcall(require("notify.integrations").pick)
+    if not ok then
+        vim.cmd("Notifications")
+    end
 end, { desc = "[Notify]: Show Notification History" })
 
 require("noice").setup({
