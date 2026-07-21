@@ -2,6 +2,7 @@
 abbr -a gs 'git status'
 abbr -a ga 'git add'
 abbr -a gaa 'git add --all'
+abbr -a gc 'git commit '
 abbr -a gcm 'git commit -m'
 abbr -a gca 'git commit --amend'
 
