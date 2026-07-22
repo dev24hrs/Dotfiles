@@ -50,7 +50,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
             end
         end
         local HEIGHT_RATIO = 0.6
-        local WIDTH_RATIO = 0.4
+        local WIDTH_RATIO = 0.3
 
         -- float window config
         local function open_win_config_func()
@@ -75,7 +75,10 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         nvim_tree.setup({
             update_focused_file = {
                 enable = true, -- 开启聚焦当前文件功能
-                update_root = false, -- 是否同步根目录（按需开启）
+                update_root = {
+                    enable = false,
+                    ignore_list = {},
+                },
                 ignore_list = {},
             },
             actions = {
@@ -86,6 +89,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
             view = {
                 float = {
                     enable = true,
+                    quit_on_focus_loss = true,
                     open_win_config = open_win_config_func(),
                 },
                 signcolumn = "yes",
@@ -106,9 +110,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                 },
             },
             filters = {
+                enable = true,
                 git_ignored = true,
             },
             git = {
+                enable = true,
+                show_on_dirs = true,
+                show_on_open_dirs = true,
                 timeout = 1200,
             },
             on_attach = function(bufnr)
