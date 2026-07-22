@@ -1,6 +1,7 @@
 vim.pack.add({
     { src = "https://github.com/olexsmir/gopher.nvim" },
 })
+---@diagnostic disable-next-line: missing-fields
 require("gopher").setup({
     log_level = vim.log.levels.INFO,
     timeout = 2000,
