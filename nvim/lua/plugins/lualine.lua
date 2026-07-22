@@ -19,11 +19,12 @@ vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
 local colors = {
     MAGENTA = "#A89984",
     RED = "#FB4934",
+    CYAN = "#8EC07C",
 }
 local custom_gruvbox = {
     normal = {
         a = { fg = colors.RED },
-        b = { fg = colors.MAGENTA },
+        b = { fg = colors.CYAN },
         c = { fg = colors.MAGENTA },
         x = { fg = colors.MAGENTA },
         y = { fg = colors.MAGENTA },
@@ -38,7 +39,7 @@ require("lualine").setup({
         always_divide_middle = false,
         always_show_tabline = false,
         globalstatus = true,
-        disabled_filetypes = { statusline = { "alpha" } }, -- 重点
+        disabled_filetypes = { statusline = { "alpha" } },
     },
     sections = {
         lualine_a = { "mode" },

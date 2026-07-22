@@ -1,45 +1,41 @@
 vim.pack.add({
-    { src = "https://github.com/akinsho/bufferline.nvim" },
+    { src = "https://github.com/akinsho/bufferline.nvim", version = "*" },
 })
 
 -- 使bufferline的背景色与终端保持一致,无论是否终端透明
 vim.api.nvim_set_hl(0, "TabLineFill", { bg = "none" })
 
 local RED = "#FB4934"
+
+-- 关闭 buffer 的通用逻辑：只剩最后一个普通 buffer 时先 enew，避免关闭窗口
+local function close_buffer(bufnr)
+    local has_other = false
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+        if b ~= bufnr and vim.bo[b].buflisted and vim.bo[b].buftype == "" then
+            has_other = true
+            break
+        end
+    end
+    if has_other then
+        vim.cmd("bdelete! " .. bufnr)
+    else
+        vim.cmd("enew")
+        vim.cmd("bdelete! " .. bufnr)
+    end
+end
+
 require("bufferline").setup({
     options = {
-        -- 数字显示：none（简洁）或 ordinal（1,2,3）
+        mode = "buffers",
         numbers = "ordinal",
         themable = true,
-        close_command = function(bufnr)
-            local listed_bufs = vim.tbl_filter(function(b)
-                return vim.bo[b].buflisted and vim.bo[b].buftype == ""
-            end, vim.api.nvim_list_bufs())
-            if #listed_bufs > 1 then
-                vim.cmd("bdelete! " .. bufnr)
-            else
-                vim.cmd("enew")
-                vim.cmd("bdelete! " .. bufnr)
-            end
-        end,
-
-        right_mouse_command = function(bufnr)
-            local listed_bufs = vim.tbl_filter(function(b)
-                return vim.bo[b].buflisted and vim.bo[b].buftype == ""
-            end, vim.api.nvim_list_bufs())
-            if #listed_bufs > 1 then
-                vim.cmd("bdelete! " .. bufnr)
-            else
-                vim.cmd("enew")
-                vim.cmd("bdelete! " .. bufnr)
-            end
-        end,
+        close_command = close_buffer,
+        right_mouse_command = close_buffer,
         indicator = { style = "none" },
-        tab_size = 16,
+        tab_size = 10,
         padding = 1,
         left_padding = 1,
         right_padding = 1,
-        -- 彻底关闭所有图标占位
         show_buffer_icons = false,
         show_buffer_close_icons = false,
         show_close_icon = false,
@@ -48,7 +44,6 @@ require("bufferline").setup({
         always_show_bufferline = true,
         modified_icon = "",
         left_mouse_command = "buffer %d",
-        middle_mouse_command = nil,
         diagnostics = "nvim_lsp",
     },
     highlights = {
