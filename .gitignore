@@ -9,3 +9,5 @@ yazi/flavors/
 
 tmux/plugins/
 .worktrees/
+
+hunk/state.json
