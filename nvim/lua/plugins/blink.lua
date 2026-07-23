@@ -10,7 +10,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
     callback = function()
         local blink = require("blink.cmp")
         blink.setup({
-            appearance = { nerd_font_variant = "normal" },
+            appearance = { nerd_font_variant = "mono" },
             keymap = {
                 preset = "none",
                 ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
@@ -56,6 +56,12 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                 default = { "lsp", "snippets", "buffer", "path", "codeium" },
                 providers = {
                     codeium = { name = "Codeium", module = "codeium.blink", async = true },
+                    lsp = {
+                        name = "LSP",
+                        module = "blink.cmp.sources.lsp",
+                        fallbacks = { "buffer" },
+                        opts = { tailwind_color_icon = "██" },
+                    },
                     buffer = {
                         module = "blink.cmp.sources.buffer",
                         score_offset = -3,
@@ -69,12 +75,12 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                     },
                     snippets = {
                         module = "blink.cmp.sources.snippets",
-                        score_offset = -3,
-                        -- For `snippets.preset == 'luasnip'`
+                        score_offset = 3,
                         opts = {
-                            use_show_condition = true,
-                            show_autosnippets = true,
-                            prefer_doc_trig = false,
+                            friendly_snippets = true,
+                            search_paths = { vim.fn.stdpath("config") .. "/snippets" },
+                            global_snippets = { "all" },
+                            clipboard_register = "+",
                             use_label_description = false,
                         },
                     },

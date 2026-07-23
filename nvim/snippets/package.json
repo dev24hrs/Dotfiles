@@ -23,12 +23,24 @@
         "path": "./lua/lua.json"
       },
       {
+        "language": "luadoc",
+        "path": "./lua/luadoc.json"
+      },
+      {
         "language": "dockerfile",
         "path": "./docker/docker_file.json"
       },
       {
         "language": "yaml",
         "path": "./docker/docker-compose.json"
+      },
+      {
+        "language": "license",
+        "path": "./license.json"
+      },
+      {
+        "language": "sql",
+        "path": "./sql.json"
       }
     ]
   }

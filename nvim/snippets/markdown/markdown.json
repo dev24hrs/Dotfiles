@@ -16,7 +16,7 @@
     "description": "Insert table with 3 rows and 3 columns. First row is heading."
   },
   "Insert 4x4 table": {
-    "prefix": "table4",
+    "prefix": "table_4",
     "body": [
       "| ${1:Column1} | ${2:Column2} | ${3:Column3} | ${4:Column4} |",
       "| --------------- | --------------- | --------------- | --------------- |",
@@ -28,7 +28,7 @@
     "description": "Insert table with 4 rows and 4 columns. First row is heading."
   },
   "Insert 5x5 table": {
-    "prefix": "table5",
+    "prefix": "table_5",
     "body": [
       "| ${1:Column1} | ${2:Column2} | ${3:Column3} | ${4:Column4} | ${5:Column5} |",
       "| --------------- | --------------- | --------------- | --------------- | --------------- |",
@@ -39,5 +39,45 @@
       "${0}"
     ],
     "description": "Insert table with 5 rows and 5 columns. First row is heading."
+  },
+  "Insert task list": {
+    "prefix": "task",
+    "body": ["- [${1| ,x|}] ${2:text}", "- [${3| ,x|}] ${4:text}", "- [${5| ,x|}] ${6:text}", "${0}"],
+    "description": "Insert task list with 3 tasks"
+  },
+  "Insert Note": {
+    "prefix": "note",
+    "body": "> [!NOTE]\n> ",
+    "description": "Insert Note"
+  },
+  "Insert Tip": {
+    "prefix": "tip",
+    "body": "> [!TIP]\n> ",
+    "description": "Insert Tip"
+  },
+  "Insert Important": {
+    "prefix": ["important", "imp"],
+    "body": "> [!IMPORTANT]\n> ",
+    "description": "Insert Important"
+  },
+  "Insert Warning": {
+    "prefix": ["warn", "w"],
+    "body": "> [!WARNING]\n> ",
+    "description": "Insert Warning"
+  },
+  "Insert Caution": {
+    "prefix": ["caution", "c"],
+    "body": "> [!CAUTION]\n> ",
+    "description": "Insert Caution"
+  },
+  "links": {
+    "prefix": "link",
+    "body": ["[${1:text}](${2:url}) ${0}"],
+    "description": "Add links"
+  },
+  "url": {
+    "prefix": "url",
+    "body": ["<${1}> ${0}"],
+    "description": "Add urls"
   }
 }
