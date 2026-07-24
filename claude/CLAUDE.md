@@ -47,6 +47,20 @@ Only proceed to code writing after the first two phases are complete and a clear
 
 Responses should follow the same three-phase structure: output the reflection and side-effects analysis first, then the code last. If the reasoning flow is skipped, briefly explain why.
 
+## Modern & Standard-Library-First Principle
+
+When generating code in any language, the following priority applies:
+
+1. **Standard library first**: Prefer the standard library over third-party dependencies when the stdlib provides an adequate solution. Introducing a new dependency requires justification (the stdlib solution is missing, buggy, or prohibitively verbose).
+2. **Modern idioms over legacy patterns**: Use the language's modern/recommended idioms (post-2020 era) rather than legacy patterns from earlier versions. This includes but is not limited to:
+   - Function declarations (arrow functions, concise method syntax, etc.)
+   - Collection operations (declarative/functional APIs over manual loops when readable)
+   - HTTP / I/O operations (modern client APIs over deprecated ones)
+   - Error handling (language-native patterns over hand-rolled workarounds)
+   - Type system (newer type constructs over `any`/`Object`/`void*` escape hatches)
+3. **Version awareness**: Target the language version specified in the project's toolchain/config file (e.g., `go.mod`, `pyproject.toml`, `.nvmrc`). Do not use features from versions newer than the project target, and do not use patterns already deprecated in the project's target version.
+4. **Language-specific details**: See `@CLAUDE_<Lang>.md` for concrete before/after mappings per language.
+
 ## Mandatory Verification Rules
 
 These rules apply unconditionally. No exceptions based on perceived simplicity or familiarity.
