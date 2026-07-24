@@ -18,14 +18,14 @@ tab_size = 4
 edit = [
   { run = '${EDITOR:-nvim} "$@"', desc = "$EDITOR", block = true, for = "unix" },
 ]
-[[plugin.prepend_fetchers]]
-url = "*"
-run = "git"
-group = "git"
 
 [plugin]
 prepend_preloaders = [{ mime = "{audio,video,image}/*", run = "mediainfo" }]
 prepend_previewers = [{ mime = "{audio,video,image}/*", run = "mediainfo" }]
+prepend_fetchers = [
+  { url = "*/", run = "git", group = "git" },
+  { url = "*", run = "git", group = "git" },
+]
 
 [tasks]
 image_alloc = 1073741824 # = 1024*1024*1024 = 1024MB
