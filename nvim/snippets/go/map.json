@@ -1,0 +1,67 @@
+{
+  "Map literal": {
+    "prefix": "map_l",
+    "body": ["${1:m} := map[${2:key_type}]${3:value_type}{", "\t${4:key}: ${5:value},", "}${0}"],
+    "description": "Map literal with initialization"
+  },
+  "Map make with capacity": {
+    "prefix": "map_m",
+    "body": ["${1:m} := make(map[${2:key_type}]${3:value_type}, ${4:capacity})${0}"],
+    "description": "Make map with capacity hint"
+  },
+  "Map get with ok": {
+    "prefix": "map_getv",
+    "body": ["${1:value}, ok := ${2:m}[${3:key}]", "if ok {", "\t${0}", "}"],
+    "description": "Get value from map with ok check"
+  },
+  "Map get with default": {
+    "prefix": "map_getd",
+    "body": ["${1:value}, ok := ${2:m}[${3:key}]", "if !ok {", "\t${1:value} = ${4:default_value}", "}${0}"],
+    "description": "Get value from map with default fallback"
+  },
+  "Map delete key": {
+    "prefix": "map_del",
+    "body": ["delete(${1:m}, ${2:key})${0}"],
+    "description": "Delete key from map (builtin)"
+  },
+  "Map contains key": {
+    "prefix": "map_ok",
+    "body": ["if _, ok := ${1:m}[${2:key}]; ok {", "\t${0}", "}"],
+    "description": "Check if map contains key"
+  },
+  "Map clone": {
+    "prefix": "map_clone",
+    "body": ["${1:cloned} := maps.Clone(${2:src})${0}"],
+    "description": "Shallow clone (Go 1.21+)"
+  },
+  "Map copy (overwrite)": {
+    "prefix": "map_copy",
+    "body": ["maps.Copy(${1:dst}, ${2:src})${0}"],
+    "description": "Copy entries from src into dst, overwriting existing keys (Go 1.21+)"
+  },
+  "Map merge (overlay wins)": {
+    "prefix": "map_merge",
+    "body": ["${1:merged} := maps.Clone(${2:base})", "maps.Copy(${1:merged}, ${3:overlay})${0}"],
+    "description": "Merge two maps — overlay keys take precedence (Go 1.21+)"
+  },
+  "Map delete by predicate": {
+    "prefix": "map_delfn",
+    "body": ["maps.DeleteFunc(${1:m}, func(${2:k} ${3:KT}, ${4:v} ${5:VT}) bool {", "\treturn ${6:// true to delete}", "})${0}"],
+    "description": "Delete entries matching predicate in-place (Go 1.21+)"
+  },
+  "Map keys as slice": {
+    "prefix": "map_keys",
+    "body": ["${1:keys} := slices.Collect(maps.Keys(${2:m}))${0}"],
+    "description": "Collect all keys into a slice (Go 1.23+)"
+  },
+  "Map values as slice": {
+    "prefix": "map_vals",
+    "body": ["${1:values} := slices.Collect(maps.Values(${2:m}))${0}"],
+    "description": "Collect all values into a slice (Go 1.23+)"
+  },
+  "Map iterate sorted by key": {
+    "prefix": "map_sortk",
+    "body": ["for _, ${1:k} := range slices.Sorted(maps.Keys(${2:m})) {", "\t${3:v} := ${2:m}[${1:k}]", "\t${0}", "}"],
+    "description": "Range over map entries in sorted key order (Go 1.23+)"
+  }
+}

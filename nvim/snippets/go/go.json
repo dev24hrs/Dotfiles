@@ -15,218 +15,998 @@
     ],
     "description": "Header Comment in Go FILE."
   },
-  "Slice Remove": {
-    "prefix": "sli_r",
-    "body": ["${1:slice} = append(${1:slice}[:${2:index}], ${1:slice}[${2:index}+1:]...)"],
-    "description": "Slice Remove."
+  "Struct definition": {
+    "prefix": "struct",
+    "body": ["type ${1:StructName} struct {", "\t${2:Field} ${3:type} `json:\"${4:${2:Field}}\"`", "}$0"],
+    "description": "Struct with JSON tags"
   },
-  "Slice append": {
-    "prefix": "sli_a",
-    "body": ["${1:slice} = append(${1:slice}, ${0:element})"]
+  "Struct embedding": {
+    "prefix": "struct_e",
+    "body": ["type ${1:Name} struct {", "\t${2:Base}", "\t${3:Field} ${4:Type}", "}${0}"],
+    "description": "Struct with embedded type (composition over inheritance)"
+  },
+  "Interface definition": {
+    "prefix": "interf",
+    "body": ["type ${1:InterfaceName} interface {", "\t${2:Method}(${3:params}) ${4:return_type}", "}${0}"],
+    "description": "Interface definition"
+  },
+  "Method declaration": {
+    "prefix": "method",
+    "body": ["func (${1:receiver} ${2:Type}) ${3:Method}(${4:params}) ${5:return_type} {", "\t${0}", "}"],
+    "description": "Method declaration"
+  },
+  "Function declaration": {
+    "prefix": "func",
+    "body": ["func ${1:name}(${2:params}) ${3:return_type} {", "\t${0}", "}"],
+    "description": "Function with parameters and return"
+  },
+  "Const declaration": {
+    "prefix": "cons",
+    "body": ["const (", "\t${1:Name} = ${2:value}", "\t${0}", ")"],
+    "description": "Const declaration"
   },
   "If Ok": {
     "prefix": "ifok",
     "body": ["if ${1:value}, ok := $2; ok {", "  $0", "}"],
     "description": "if ok."
   },
-  "GoMapWithValues": {
-    "prefix": "map_v",
-    "body": ["${1:mapname} := map[${2:keytype}]${3:valuetype}{", " \"${4:key1}\" : \"${5:value1}\", ", " \"${6:key2}\" : \"${7:value2}\", ", " \t$0", "}"],
-    "description": "Declare var map with inference"
+  "For loop": {
+    "prefix": "for",
+    "body": ["for ${1:i} := 0; ${1:i} < ${2:n}; ${1:i}++ {", "\t${0}", "}"],
+    "description": "C-style counted loop — for simple 0..n use 'forn' (Go 1.22+)"
   },
-  "Map Delete": {
-    "prefix": "map_d",
-    "body": ["delete(${1:map}, \"${2:key}\")"],
-    "description": "Map Delete."
+  "For range n": {
+    "prefix": "forn",
+    "body": ["for ${1:i} := range ${2:n} {", "\t${0}", "}"],
+    "description": "Loop n times with range-over-int (Go 1.22+)"
   },
-  "if key in a map": {
-    "prefix": "map_ok",
-    "body": "if ${1:value}, ok := ${2:map}[${3:key}]; ok {\n\t$4\n}",
-    "description": "if key in a map."
-  },
-  "sort implementation": {
-    "prefix": "sort",
-    "body": "type ${1:SortBy} []${2:Type}\n\nfunc (a $1) Len() int           { return len(a) }\nfunc (a $1) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }\nfunc (a $1) Less(i, j int) bool { ${3:return a[i] < a[j]} }",
-    "description": "Snippet for a custom sort.Sort interface implementation, for a given slice type."
-  },
-  "single constant": {
-    "prefix": "con",
-    "body": "const ${1:name} = ${2:value}",
-    "description": "Snippet for a constant"
-  },
-  "multiple constants": {
-    "prefix": "cons",
-    "body": "const (\n\t${1:name} = ${2:value}\n)",
-    "description": "Snippet for a constant block"
-  },
-  "type function declaration": {
-    "prefix": "type_f",
-    "body": "type ${1:name} func($3) $4",
-    "description": "Snippet for a type function declaration"
-  },
-  "type interface declaration": {
-    "prefix": "type_i",
-    "body": "type ${1:name} interface {\n\t$0\n}",
-    "description": "Snippet for a type interface"
-  },
-  "type struct declaration": {
-    "prefix": "type_s",
-    "body": "type ${1:name} struct {\n\t$0\n}",
-    "description": "Snippet for a struct declaration"
-  },
-  "function declaration": {
-    "prefix": "func",
-    "body": "func $1($2) $3 {\n\t$0\n}",
-    "description": "Snippet for function declaration"
-  },
-  "variable declaration": {
-    "prefix": "var",
-    "body": "var ${1:name} ${2:type}",
-    "description": "Snippet for a variable"
-  },
-  "variables declaration": {
-    "prefix": "vars",
-    "body": "var (\n\t${1:name} ${2:type} = ${3:value}\n)",
-    "description": "Snippet for a variable"
-  },
-  "switch statement": {
-    "prefix": "switch",
-    "body": "switch ${1:expression} {\ncase ${2:condition}:\n\t$0\n}",
-    "description": "Snippet for switch statement"
-  },
-  "select statement": {
-    "prefix": "select",
-    "body": "select {\ncase ${1:condition}:\n\t$0\n}",
-    "description": "Snippet for select statement"
-  },
-  "for n statement": {
-    "prefix": "fori",
-    "body": "for ${1:i} := ${2:0}; $1 < ${3:count}; $1${4:++} {\n\t$0\n}",
-    "description": "Snippet for a for loop"
-  },
-  "for range statement": {
+  "For range slice": {
     "prefix": "forr",
-    "body": "for ${1:_, }${2:v} := range ${3:v} {\n\t$0\n}",
-    "description": "Snippet for a for range loop"
+    "body": ["for ${1:index}, ${2:value} := range ${3:slice} {", "\t${0}", "}"],
+    "description": "For range over slice"
   },
-  "channel declaration": {
-    "prefix": "chan",
-    "body": "chan ${1:type}",
-    "description": "Snippet for a channel"
+  "For range map": {
+    "prefix": "form",
+    "body": ["for ${1:key}, ${2:value} := range ${3:map} {", "\t${0}", "}"],
+    "description": "For range over map"
   },
-  "map declaration": {
-    "prefix": "map",
-    "body": "map[${1:type}]${2:type}",
-    "description": "Snippet for a map"
+  "For range channel": {
+    "prefix": "forc",
+    "body": ["for ${1:value} := range ${2:ch} {", "\t${0}", "}"],
+    "description": "For range over channel"
   },
-  "if else statement": {
-    "prefix": "ife",
-    "body": "if ${1:condition} {\n\t$2\n} else {\n\t$0\n}",
-    "description": "Snippet for if else"
+  "Switch statement": {
+    "prefix": "sw",
+    "body": ["switch ${1:value} {", "\tcase ${2:case1}:", "\t\t${0}", "\tdefault:", "\t\t${3}", "}"],
+    "description": "Switch statement"
   },
-  "if err != nil": {
-    "prefix": "iferr",
-    "body": "if err != nil {\n\treturn ${1:nil}, ${2:err}\n}",
-    "description": "Snippet for if err != nil"
+  "Type switch": {
+    "prefix": "swt",
+    "body": ["switch ${1:v} := ${2:value}.(type) {", "\tcase ${3:type1}:", "\t\t${0}", "\tdefault:", "\t\t${4}", "}"],
+    "description": "Type switch"
   },
-  "method declaration": {
-    "prefix": "method",
-    "body": "func (${1:receiver} ${2:type}) ${3:method}($4) $5 {\n\t$0\n}",
-    "description": "Snippet for method declaration"
-  },
-  "make(...)": {
-    "prefix": "make",
-    "body": "make(${1:type}, ${2:0})",
-    "description": "Snippet for make statement"
-  },
-  "new(...)": {
-    "prefix": "new",
-    "body": "new(${1:type})",
-    "description": "Snippet for new statement"
-  },
-  "panic(...)": {
-    "prefix": "pan",
-    "body": "panic(\"$0\")",
-    "description": "Snippet for panic"
-  },
-  "goroutine anonymous function": {
-    "prefix": "go",
-    "body": "go func($1) {\n\t$0\n}($2)",
-    "description": "Snippet for anonymous goroutine declaration"
-  },
-  "goroutine function": {
-    "prefix": "gof",
-    "body": "go ${1:func}($0)",
-    "description": "Snippet for goroutine declaration"
-  },
-  "defer statement": {
+  "Defer function": {
     "prefix": "def",
-    "body": "defer ${1:func}($0)",
-    "description": "Snippet for defer statement"
+    "body": ["defer func() {", "\t${0}", "}()"],
+    "description": "Defer anonymous function"
   },
-  "http ResponseWriter *Request": {
-    "prefix": "http_r",
-    "body": "${1:w} http.ResponseWriter, ${2:r} *http.Request",
-    "description": "Snippet for http Response"
+  "Go routine": {
+    "prefix": "go",
+    "body": ["go func(${1:params}) {", "\t${0}", "}(${2:args})"],
+    "description": "Start a goroutine"
   },
-  "http.HandleFunc": {
-    "prefix": "http_h",
-    "body": "${1:http}.HandleFunc(\"${2:/}\", ${3:handler})",
-    "description": "Snippet for http.HandleFunc()"
+  "Channel create": {
+    "prefix": "chan",
+    "body": ["${1:ch} := make(chan ${2:type}, ${3:buffer})${0}"],
+    "description": "Create a channel"
   },
-  "http handler declaration": {
-    "prefix": "http_hand",
-    "body": "func $1(${2:w} http.ResponseWriter, ${3:r} *http.Request) {\n\t$0\n}",
-    "description": "Snippet for http handler declaration"
+  "Channel receive": {
+    "prefix": "recv",
+    "body": ["${1:value}, ok := <-${2:ch}", "${0}"],
+    "description": "Receive from channel"
   },
-  "http.Redirect": {
-    "prefix": "http_red",
-    "body": "http.Redirect(${1:w}, ${2:r}, \"${3:/}\", ${4:http.StatusFound})",
-    "description": "Snippet for http.Redirect()"
+  "Channel select": {
+    "prefix": "sel",
+    "body": [
+      "select {",
+      "\tcase ${1:value} := <-${2:ch}:",
+      "\t\t${3:// handle value}",
+      "\tcase <-${4:done}:",
+      "\t\t${5:// handle done}",
+      "\tcase <-time.After(${6:timeout}):",
+      "\t\t${7:// timeout}",
+      "}${0}"
+    ],
+    "description": "Select statement for channels"
   },
-  "http.Error": {
+  "Channel select simple": {
+    "prefix": "sels",
+    "body": ["select {", "\tcase ${1:value} := <-${2:ch}:", "\t\t${3:// handle value}", "\tcase <-${4:ctx}.Done():", "\t\t${5:// context done}", "}${0}"],
+    "description": "Simple select without timeout"
+  },
+  "Mutex lock": {
+    "prefix": "lock",
+    "body": ["${1:m}.Lock()", "defer ${1:m}.Unlock()", "${0}"],
+    "description": "Mutex lock and defer unlock"
+  },
+  "RWMutex lock": {
+    "prefix": "rlock",
+    "body": ["${1:m}.RLock()", "defer ${1:m}.RUnlock()", "${0}"],
+    "description": "RWMutex read lock and defer unlock"
+  },
+  "Atomic int64": {
+    "prefix": "atomic",
+    "body": ["var ${1:counter} atomic.${2:Int64}", "${0}", "// ${1:counter}.Add(1) / ${1:counter}.Load() / ${1:counter}.Store(${3:value})"],
+    "description": "atomic.Int64 — lock-free operations (Go 1.19+)"
+  },
+  "Sync.Once": {
+    "prefix": "once",
+    "body": ["var ${1:name}Once sync.Once", "", "${1:name}Once.Do(func() {", "\t${0}", "})"],
+    "description": "sync.Once for one-time initialization"
+  },
+  "Sync.WaitGroup add/done/wait": {
+    "prefix": "wg",
+    "body": [
+      "var wg sync.WaitGroup",
+      "",
+      "for ${1:range} {",
+      "\twg.Add(1)",
+      "\tgo func(${2:params}) {",
+      "\t\tdefer wg.Done()",
+      "\t\t${0}",
+      "\t}(${3:args})",
+      "}",
+      "",
+      "wg.Wait()"
+    ],
+    "description": "WaitGroup with goroutines"
+  },
+  "Errgroup with context": {
+    "prefix": "errgroup",
+    "body": [
+      "g, ctx := errgroup.WithContext(ctx)",
+      "",
+      "g.Go(func() error {",
+      "\t${0}",
+      "\treturn nil",
+      "})",
+      "",
+      "if err := g.Wait(); err != nil {",
+      "\treturn fmt.Errorf(\"${1:operation}: %w\", err)",
+      "}"
+    ],
+    "description": "Errgroup with context for concurrent error propagation"
+  },
+  "Context with timeout": {
+    "prefix": "ctx_t",
+    "body": ["ctx, cancel := context.WithTimeout(context.Background(), ${1:time.Second * 5})", "defer cancel()", "${0}"],
+    "description": "Context with timeout"
+  },
+  "Context with cancel": {
+    "prefix": "ctx_cancel",
+    "body": ["ctx, cancel := context.WithCancel(context.Background())", "defer cancel()", "${0}"],
+    "description": "Context with cancel"
+  },
+  "Context with timeout cause": {
+    "prefix": "ctx_t_cause",
+    "body": ["ctx, cancel := context.WithTimeoutCause(context.Background(), ${1:time.Second * 5}, fmt.Errorf(\"${2:reason}\"))", "defer cancel()", "${0}"],
+    "description": "Context with timeout and cause for debugging (Go 1.20+)"
+  },
+  "Context with cancel cause": {
+    "prefix": "ctx_c_cause",
+    "body": ["ctx, cancel := context.WithCancelCause(context.Background())", "defer cancel(${1:err})", "${0}"],
+    "description": "Context with cancel cause for debugging (Go 1.20+)"
+  },
+  "Context with deadline": {
+    "prefix": "ctx_deadline",
+    "body": ["ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(${1:30 * time.Second}))", "defer cancel()", "${0}"],
+    "description": "Context with absolute deadline"
+  },
+  "Context with value": {
+    "prefix": "ctx_value",
+    "body": ["ctx := context.WithValue(ctx, ${1:key}, ${2:value})${0}"],
+    "description": "Context with value — use sparingly, keys should be unexported types"
+  },
+  "HTTP server startup": {
+    "prefix": "http_server",
+    "body": [
+      "srv := &http.Server{",
+      "\tAddr:    \":${1:8080}\",",
+      "\tHandler: ${2:mux},",
+      "}",
+      "",
+      "go func() {",
+      "\tslog.Info(\"starting server\", \"addr\", srv.Addr)",
+      "\tif err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {",
+      "\t\tslog.Error(\"server error\", \"err\", err)",
+      "\t}",
+      "}()",
+      "",
+      "${0}",
+      "",
+      "// Graceful shutdown:",
+      "// ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)",
+      "// defer stop()",
+      "// <-ctx.Done()",
+      "// srv.Shutdown(context.Background())"
+    ],
+    "description": "HTTP server startup with graceful shutdown comments"
+  },
+  "HTTP middleware": {
+    "prefix": "http_middle",
+    "body": [
+      "func ${1:name}(next http.Handler) http.Handler {",
+      "\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {",
+      "\t\t${0}",
+      "\t\tnext.ServeHTTP(w, r)",
+      "\t})",
+      "}"
+    ],
+    "description": "HTTP middleware — func(http.Handler) http.Handler pattern"
+  },
+  "Http route (stdlib Go 1.22+)": {
+    "prefix": "http_route",
+    "body": ["${1:mux}.HandleFunc(\"${2:GET} ${3:/path}\", ${4:handler})${0}"],
+    "description": "Standard library HTTP route (Go 1.22+ pattern routing)"
+  },
+  "Http handler": {
+    "prefix": "http",
+    "body": ["func ${1:HandlerName}(w http.ResponseWriter, r *http.Request) {", "\t${0}", "}"],
+    "description": "HTTP handler function"
+  },
+  "Http path value": {
+    "prefix": "http_pathv",
+    "body": ["${1:value} := r.PathValue(\"${2:param}\")${0}"],
+    "description": "Extract path parameter (Go 1.22+ pattern routing)"
+  },
+  "Http error response": {
     "prefix": "http_err",
-    "body": "http.Error(${1:w}, ${2:err}.Error(), ${3:http.StatusInternalServerError})",
-    "description": "Snippet for http.Error()"
+    "body": ["http.Error(w, \"${1:message}\", http.Status${2:InternalServerError})${0}"],
+    "description": "HTTP error response"
   },
-  "fmt.Println": {
-    "prefix": "fp",
-    "body": "fmt.Println(\"$1\")",
-    "description": "Snippet for fmt.Println()"
+  "Http JSON response": {
+    "prefix": "http_resp",
+    "body": [
+      "b, err := json.Marshal(${1:data})",
+      "if err != nil {",
+      "\thttp.Error(w, err.Error(), http.StatusInternalServerError)",
+      "\treturn",
+      "}",
+      "w.Header().Set(\"Content-Type\", \"application/json\")",
+      "w.Write(b)${0}"
+    ],
+    "description": "HTTP JSON response — Marshal-before-write avoids partial writes on error"
   },
-  "fmt.Printf": {
-    "prefix": "ff",
-    "body": "fmt.Printf(\"$1\", ${2:var})",
-    "description": "Snippet for fmt.Printf()"
+  "JSON encode to writer": {
+    "prefix": "jsone",
+    "body": ["if err := json.NewEncoder(${1:w}).Encode(${2:data}); err != nil {", "\treturn fmt.Errorf(\"encode json: %w\", err)", "}${0}"],
+    "description": "json.NewEncoder — streaming encode to io.Writer (set headers before calling)"
   },
-  "log.Println": {
-    "prefix": "lp",
-    "body": "log.Println(\"$1\")",
-    "description": "Snippet for log.Println()"
+  "JSON decode from reader": {
+    "prefix": "jsond",
+    "body": ["if err := json.NewDecoder(${1:r.Body}).Decode(&${2:target}); err != nil {", "\treturn fmt.Errorf(\"decode json: %w\", err)", "}${0}"],
+    "description": "json.NewDecoder — streaming decode from io.Reader (preferred for HTTP bodies)"
   },
-  "log.Printf": {
-    "prefix": "lf",
-    "body": "log.Printf(\"$1\", ${2:var})",
-    "description": "Snippet for log.Printf()"
+  "JSON unmarshal": {
+    "prefix": "jsonu",
+    "body": ["if err := json.Unmarshal(${1:data}, &${2:target}); err != nil {", "\treturn fmt.Errorf(\"unmarshal json: %w\", err)", "}${0}"],
+    "description": "json.Unmarshal with error handling"
   },
-  "log variable content": {
-    "prefix": "lv",
-    "body": "log.Printf(\"${1:var}: %#+v\\\\n\", ${1:var})",
-    "description": "Snippet for log.Printf() with variable content"
+  "HTTP GET with context": {
+    "prefix": "http_get_ctx",
+    "body": [
+      "req, err := http.NewRequestWithContext(ctx, \"GET\", \"${1:url}\", nil)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"create request: %w\", err)",
+      "}",
+      "",
+      "client := &http.Client{Timeout: ${2:10 * time.Second}}",
+      "resp, err := client.Do(req)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"http get: %w\", err)",
+      "}",
+      "defer resp.Body.Close()",
+      "",
+      "if resp.StatusCode != http.StatusOK {",
+      "\treturn fmt.Errorf(\"http status: %s\", resp.Status)",
+      "}",
+      "",
+      "body, err := io.ReadAll(resp.Body)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"read body: %w\", err)",
+      "}${0}"
+    ],
+    "description": "HTTP GET with context and timeout"
   },
-  "benchmark function": {
-    "prefix": "bench",
-    "body": "func Benchmark$1(b *testing.B) {\n\tfor ${2:i} := 0; ${2:i} < b.N; ${2:i}++ {\n\t\t$0\n\t}\n}",
-    "description": "Snippet for Benchmark function"
+  "HTTP GET": {
+    "prefix": "http_get",
+    "body": [
+      "resp, err := http.Get(\"${1:url}\")",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"http get: %w\", err)",
+      "}",
+      "defer resp.Body.Close()",
+      "",
+      "if resp.StatusCode != http.StatusOK {",
+      "\treturn fmt.Errorf(\"http status: %s\", resp.Status)",
+      "}",
+      "",
+      "body, err := io.ReadAll(resp.Body)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"read body: %w\", err)",
+      "}${0}"
+    ],
+    "description": "HTTP GET request (convenience — prefer http_get_ctx for production with context/timeout)"
   },
-  "test function": {
-    "prefix": "test_func",
-    "body": "func Test$1(t *testing.T) {\n\t$0\n}",
-    "description": "Snippet for Test function"
+  "HTTP POST JSON with context": {
+    "prefix": "http_post_ctx",
+    "body": [
+      "${1:data} := ${2:RequestType}{${3:field}: ${4:value}}",
+      "jsonData, err := json.Marshal(${1:data})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"marshal json: %w\", err)",
+      "}",
+      "",
+      "req, err := http.NewRequestWithContext(ctx, \"POST\", \"${5:url}\", bytes.NewBuffer(jsonData))",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"create request: %w\", err)",
+      "}",
+      "req.Header.Set(\"Content-Type\", \"application/json\")",
+      "",
+      "client := &http.Client{Timeout: ${6:10 * time.Second}}",
+      "resp, err := client.Do(req)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"http post: %w\", err)",
+      "}",
+      "defer resp.Body.Close()",
+      "",
+      "if resp.StatusCode < 200 || resp.StatusCode >= 300 {",
+      "\treturn fmt.Errorf(\"http status: %s\", resp.Status)",
+      "}${0}"
+    ],
+    "description": "HTTP POST JSON with context and timeout"
   },
-  "test main": {
-    "prefix": "test_main",
-    "body": "func TestMain(m *testing.M) {\n\t$1\n\n\tos.Exit(m.Run())\n}",
+  "HTTP POST JSON": {
+    "prefix": "http_post",
+    "body": [
+      "${1:data} := ${2:RequestType}{${3:field}: ${4:value}}",
+      "jsonData, err := json.Marshal(${1:data})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"marshal json: %w\", err)",
+      "}",
+      "",
+      "resp, err := http.Post(\"${5:url}\", \"application/json\", bytes.NewBuffer(jsonData))",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"http post: %w\", err)",
+      "}",
+      "defer resp.Body.Close()",
+      "",
+      "if resp.StatusCode != http.StatusOK {",
+      "\treturn fmt.Errorf(\"http status: %s\", resp.Status)",
+      "}${0}"
+    ],
+    "description": "HTTP POST JSON request (convenience — prefer http_post_ctx for production with context)"
+  },
+  "HTTP with context": {
+    "prefix": "http_ctx",
+    "body": [
+      "req, err := http.NewRequestWithContext(ctx, \"${1:GET}\", \"${2:url}\", ${3:nil})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"create request: %w\", err)",
+      "}",
+      "",
+      "client := &http.Client{Timeout: ${4:10 * time.Second}}",
+      "resp, err := client.Do(req)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"http request: %w\", err)",
+      "}",
+      "defer resp.Body.Close()",
+      "${0}"
+    ],
+    "description": "HTTP with context and timeout (reuse *http.Client across requests for connection pooling)"
+  },
+  "HTTP with header": {
+    "prefix": "http_header",
+    "body": [
+      "req, err := http.NewRequestWithContext(ctx, \"${1:GET}\", \"${2:url}\", ${3:nil})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"create request: %w\", err)",
+      "}",
+      "req.Header.Set(\"${4:Authorization}\", \"${5:token}\")",
+      "req.Header.Set(\"Content-Type\", \"application/json\")",
+      "",
+      "client := &http.Client{Timeout: ${6:10 * time.Second}}",
+      "resp, err := client.Do(req)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"http request: %w\", err)",
+      "}",
+      "defer resp.Body.Close()",
+      "${0}"
+    ],
+    "description": "HTTP with custom headers, context, and timeout"
+  },
+  "Error handling": {
+    "prefix": "err",
+    "body": ["if err != nil {", "\t${1:return}", "}${0}"],
+    "description": "Standard error handling"
+  },
+  "Error handling with wrap": {
+    "prefix": "errw",
+    "body": ["if err != nil {", "\treturn fmt.Errorf(\"${1:context}: %w\", err)", "}${0}"],
+    "description": "Error handling with fmt.Errorf wrap"
+  },
+  "Error handling with log": {
+    "prefix": "errl",
+    "body": ["if err != nil {", "\tslog.Error(\"${1:context}\", \"err\", err)", "\treturn ${2}", "}${0}"],
+    "description": "Error handling with slog (Go 1.21+)"
+  },
+  "Error handling with custom error": {
+    "prefix": "errc",
+    "body": [
+      "// Define custom error type:",
+      "//   type ${1:CustomError} struct { Msg string; Err error }",
+      "//   func (e *${1:CustomError}) Error() string { return e.Msg + \": \" + e.Err.Error() }",
+      "//   func (e *${1:CustomError}) Unwrap() error { return e.Err }",
+      "if err != nil {",
+      "\treturn &${1:CustomError}{Msg: \"${2:context}\", Err: err}",
+      "}${0}"
+    ],
+    "description": "Error handling with custom error type — implement Error() + Unwrap() for errors.Is/As"
+  },
+  "Errors join": {
+    "prefix": "errjoin",
+    "body": ["err := errors.Join(${1:err1}, ${2:err2})", "if err != nil {", "\treturn fmt.Errorf(\"${3:context}: %w\", err)", "}${0}"],
+    "description": "Join multiple errors into one (Go 1.20+)"
+  },
+  "Sentinel error": {
+    "prefix": "errsentinel",
+    "body": ["var Err${1:Name} = errors.New(\"${2:description}\")${0}"],
+    "description": "Sentinel error value — use with errors.Is (Go 1.13+)"
+  },
+  "Errors.Is check": {
+    "prefix": "erris",
+    "body": ["if errors.Is(err, ${1:ErrSomething}) {", "\t${0}", "}"],
+    "description": "Check error chain with errors.Is (Go 1.13+)"
+  },
+  "Errors.As check": {
+    "prefix": "erras",
+    "body": ["var ${1:target} *${2:ErrorType}", "if errors.As(err, &${1:target}) {", "\t${0}", "}"],
+    "description": "Extract typed error from chain with errors.As (Go 1.13+)"
+  },
+  "Defer with recover": {
+    "prefix": "deferr",
+    "body": ["defer func() {", "\tif r := recover(); r != nil {", "\t\tslog.Error(\"panic recovered\", \"panic\", r)", "\t}", "}()${0}"],
+    "description": "Defer with recover via slog (Go 1.21+)"
+  },
+  "Panic handler": {
+    "prefix": "panic",
+    "body": [
+      "defer func() {",
+      "\tif r := recover(); r != nil {",
+      "\t\tslog.Error(\"panic\", \"panic\", r, \"stack\", string(debug.Stack()))",
+      "\t}",
+      "}()${0}"
+    ],
+    "description": "Panic handler with stack trace via slog (Go 1.21+)"
+  },
+  "Test function": {
+    "prefix": "test",
+    "body": ["func Test${1:Name}(t *testing.T) {", "\t${0}", "}"],
+    "description": "Test function"
+  },
+  "Test with context": {
+    "prefix": "test_ctx",
+    "body": ["func Test${1:Name}(t *testing.T) {", "\tctx := t.Context()", "\t${0}", "}"],
+    "description": "Test function with t.Context() — cancelled on test completion"
+  },
+  "Table-driven test": {
+    "prefix": "test_table",
+    "body": [
+      "func Test${1:Name}(t *testing.T) {",
+      "\ttests := []struct {",
+      "\t\tname string",
+      "\t\t${2:input} ${3:Type}",
+      "\t\t${4:want}  ${5:Type}",
+      "\t}{",
+      "\t\t{name: \"${6:case1}\", ${2:input}: ${7:value}, ${4:want}: ${8:expected}},",
+      "\t\t{name: \"${9:case2}\", ${2:input}: ${10:value}, ${4:want}: ${11:expected}},",
+      "\t}",
+      "\tfor _, tt := range tests {",
+      "\t\tt.Run(tt.name, func(t *testing.T) {",
+      "\t\t\tgot := ${12:functionUnderTest}(tt.${2:input})",
+      "\t\t\tif got != tt.${4:want} {",
+      "\t\t\t\tt.Errorf(\"got %v, want %v\", got, tt.${4:want})",
+      "\t\t\t}",
+      "\t\t})",
+      "\t}",
+      "}"
+    ],
+    "description": "Table-driven test"
+  },
+  "Test main": {
+    "prefix": "test_maim",
+    "body": ["func TestMain(m *testing.M) {", "\t$1", "", "\tos.Exit(m.Run())", "}"],
     "description": "Snippet for TestMain function"
+  },
+  "Benchmark function": {
+    "prefix": "bench",
+    "body": ["func Benchmark${1:Name}(b *testing.B) {", "\tfor i := range b.N {", "\t\t${0}", "\t}", "}"],
+    "description": "Benchmark function (Go 1.22+)"
+  },
+  "Slog info": {
+    "prefix": "slog",
+    "body": ["slog.${1:Info}(\"${2:message}\", \"${3:key}\", ${4:value}, \"${5:key2}\", ${6:value2})${0}"],
+    "description": "Structured logging with log/slog (Go 1.21+)"
+  },
+  "Slog error": {
+    "prefix": "slog_err",
+    "body": ["slog.Error(\"${1:message}\", \"err\", err, \"${2:key}\", ${3:value})${0}"],
+    "description": "Slog error logging with pre-wired err key"
+  },
+  "Slog with context": {
+    "prefix": "slog_ctx",
+    "body": ["slog.${1:Info}Context(ctx, \"${2:message}\", \"${3:key}\", ${4:value})${0}"],
+    "description": "Slog logging with context (for trace correlation)"
+  },
+  "Slog handler setup": {
+    "prefix": "slog_init",
+    "body": ["slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{", "\tLevel: slog.Level${1:Info},", "})))${0}"],
+    "description": "Initialize default slog with JSON handler (Go 1.21+)"
+  },
+  "Slice with make": {
+    "prefix": "makes",
+    "body": ["${1:slice} := make([]${2:type}, 0, ${3:cap})${0}"],
+    "description": "Make slice with capacity"
+  },
+  "Map with make": {
+    "prefix": "makem",
+    "body": ["${1:m} := make(map[${2:key_type}]${3:value_type})${0}"],
+    "description": "Make map"
+  },
+  "Read file": {
+    "prefix": "file_read",
+    "body": ["data, err := os.ReadFile(\"${1:filename}\")", "if err != nil {", "\treturn fmt.Errorf(\"read file: %w\", err)", "}${0}"],
+    "description": "Read entire file"
+  },
+  "Write file": {
+    "prefix": "file_write",
+    "body": ["if err := os.WriteFile(\"${1:filename}\", []byte(${2:data}), 0644); err != nil {", "\treturn fmt.Errorf(\"write file: %w\", err)", "}${0}"],
+    "description": "Write to file"
+  },
+  "Open file with defer": {
+    "prefix": "file_open",
+    "body": ["f, err := os.Open(\"${1:filename}\")", "if err != nil {", "\treturn fmt.Errorf(\"open file: %w\", err)", "}", "defer f.Close()", "${0}"],
+    "description": "Open file with defer close"
+  },
+  "Create file with defer": {
+    "prefix": "file_create",
+    "body": ["f, err := os.Create(\"${1:filename}\")", "if err != nil {", "\treturn fmt.Errorf(\"create file: %w\", err)", "}", "defer f.Close()", "${0}"],
+    "description": "Create file with defer close"
+  },
+  "File exists": {
+    "prefix": "file_exists",
+    "body": [
+      "_, err := os.Stat(\"${1:filename}\")",
+      "if err == nil {",
+      "\t${2:// file exists}",
+      "} else if errors.Is(err, fs.ErrNotExist) {",
+      "\t${3:// file does not exist}",
+      "} else {",
+      "\treturn fmt.Errorf(\"stat file: %w\", err)",
+      "}${0}"
+    ],
+    "description": "Check if file exists — errors.Is works with wrapped errors (Go 1.13+)"
+  },
+  "Create temp file": {
+    "prefix": "file_temp",
+    "body": [
+      "f, err := os.CreateTemp(\"\", \"${1:prefix}\")",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"create temp file: %w\", err)",
+      "}",
+      "defer os.Remove(f.Name())",
+      "defer f.Close()",
+      "${0}"
+    ],
+    "description": "os.CreateTemp — temp file with auto-cleanup"
+  },
+  "Walk directory": {
+    "prefix": "file_walk",
+    "body": [
+      "err := filepath.WalkDir(${1:root}, func(path string, d fs.DirEntry, err error) error {",
+      "\tif err != nil {",
+      "\t\treturn err",
+      "\t}",
+      "\tif d.IsDir() {",
+      "\t\treturn nil",
+      "\t}",
+      "\t${0}",
+      "\treturn nil",
+      "})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"walk dir: %w\", err)",
+      "}"
+    ],
+    "description": "filepath.WalkDir — walk directory tree (Go 1.16+)"
+  },
+  "Path join": {
+    "prefix": "pathj",
+    "body": ["${1:path} := filepath.Join(${2:base}, ${3:sub})${0}"],
+    "description": "filepath.Join — join path elements with OS separator"
+  },
+  "Env with default string": {
+    "prefix": "envs",
+    "body": ["${1:value} := os.Getenv(\"${2:KEY}\")", "if ${1:value} == \"\" {", "\t${1:value} = \"${3:default}\"", "}${0}"],
+    "description": "Env string with default"
+  },
+  "Env with default int": {
+    "prefix": "envi",
+    "body": [
+      "${1:value} := ${2:0}",
+      "if ${3:envStr} := os.Getenv(\"${4:KEY}\"); ${3:envStr} != \"\" {",
+      "\tif ${5:parsed}, err := strconv.Atoi(${3:envStr}); err == nil {",
+      "\t\t${1:value} = ${5:parsed}",
+      "\t}",
+      "}${0}"
+    ],
+    "description": "Env int with default"
+  },
+  "Load .env file": {
+    "prefix": "envf",
+    "body": [
+      "func loadEnv(filename string) error {",
+      "\tf, err := os.Open(filename)",
+      "\tif err != nil {",
+      "\t\treturn fmt.Errorf(\"open env file: %w\", err)",
+      "\t}",
+      "\tdefer f.Close()",
+      "",
+      "\tscanner := bufio.NewScanner(f)",
+      "\tfor scanner.Scan() {",
+      "\t\tline := strings.TrimSpace(scanner.Text())",
+      "\t\tif line == \"\" || strings.HasPrefix(line, \"#\") {",
+      "\t\t\tcontinue",
+      "\t\t}",
+      "\t\t// strip inline comments",
+      "\t\tif idx := strings.IndexAny(line, \" #\"); idx != -1 {",
+      "\t\t\tline = strings.TrimRight(line[:idx], \" \")",
+      "\t\t}",
+      "\t\t// remove optional export prefix",
+      "\t\tline = strings.TrimPrefix(line, \"export \")",
+      "\t\tparts := strings.SplitN(line, \"=\", 2)",
+      "\t\tif len(parts) != 2 {",
+      "\t\t\tcontinue",
+      "\t\t}",
+      "\t\tkey := strings.TrimSpace(parts[0])",
+      "\t\tvalue := strings.TrimSpace(parts[1])",
+      "\t\t// strip surrounding quotes (single or double)",
+      "\t\tif len(value) >= 2 {",
+      "\t\t\tif (value[0] == '\"' && value[len(value)-1] == '\"') ||",
+      "\t\t\t\t(value[0] == '\\'' && value[len(value)-1] == '\\'') {",
+      "\t\t\t\tvalue = value[1 : len(value)-1]",
+      "\t\t\t}",
+      "\t\t}",
+      "\t\tos.Setenv(key, value)",
+      "\t}",
+      "\treturn scanner.Err()",
+      "}",
+      "${0}"
+    ],
+    "description": "Load .env file (robust: handles quotes, inline comments, export prefix, \\r\\n)"
+  },
+  "SQL Open": {
+    "prefix": "sql_open",
+    "body": [
+      "db, err := sql.Open(\"${1:driver}\", \"${2:dsn}\")",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"open db: %w\", err)",
+      "}",
+      "",
+      "if err := db.PingContext(ctx); err != nil {",
+      "\treturn fmt.Errorf(\"ping db: %w\", err)",
+      "}",
+      "",
+      "// Note: sql.Open does not create a connection. The *sql.DB pool is meant",
+      "// to be long-lived; defer db.Close() only in main() or the top-level setup.",
+      "${0}"
+    ],
+    "description": "Open SQL database"
+  },
+  "SQL Query": {
+    "prefix": "sql_query",
+    "body": [
+      "rows, err := db.QueryContext(ctx, \"${1:SELECT * FROM table WHERE id = ?}\", ${2:args})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"query: %w\", err)",
+      "}",
+      "defer rows.Close()",
+      "",
+      "var ${3:results} []${4:Type}",
+      "for rows.Next() {",
+      "\tvar ${5:item} ${4:Type}",
+      "\tif err := rows.Scan(${6:&item.Field1, &item.Field2}); err != nil {",
+      "\t\treturn fmt.Errorf(\"scan: %w\", err)",
+      "\t}",
+      "\t${3:results} = append(${3:results}, ${5:item})",
+      "}",
+      "",
+      "if err := rows.Err(); err != nil {",
+      "\treturn fmt.Errorf(\"rows: %w\", err)",
+      "}${0}"
+    ],
+    "description": "SQL query with context — scan into multiple struct fields"
+  },
+  "SQL QueryRow": {
+    "prefix": "sql_row",
+    "body": [
+      "var ${1:value} ${2:type}",
+      "err := db.QueryRowContext(ctx, \"${3:SELECT column FROM table WHERE id = ?}\", ${4:id}).Scan(&${1:value})",
+      "if err != nil {",
+      "\tif errors.Is(err, sql.ErrNoRows) {",
+      "\t\t${5:// not found}",
+      "\t}",
+      "\treturn fmt.Errorf(\"query row: %w\", err)",
+      "}${0}"
+    ],
+    "description": "SQL query single row with context"
+  },
+  "SQL Exec": {
+    "prefix": "sql_exec",
+    "body": [
+      "result, err := db.ExecContext(ctx, \"${1:INSERT INTO table (col) VALUES (?)}\", ${2:args})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"exec: %w\", err)",
+      "}",
+      "",
+      "rowsAffected, err := result.RowsAffected()",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"rows affected: %w\", err)",
+      "}${0}"
+    ],
+    "description": "SQL exec with context"
+  },
+  "SQL Transaction": {
+    "prefix": "sql_tx",
+    "body": [
+      "tx, err := db.BeginTx(ctx, nil)",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"begin tx: %w\", err)",
+      "}",
+      "defer tx.Rollback()",
+      "",
+      "_, err = tx.ExecContext(ctx, \"${1:UPDATE table SET col = ? WHERE id = ?}\", ${2:value}, ${3:id})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"exec in tx: %w\", err)",
+      "}",
+      "",
+      "if err := tx.Commit(); err != nil {",
+      "\treturn fmt.Errorf(\"commit tx: %w\", err)",
+      "}${0}"
+    ],
+    "description": "SQL transaction with context"
+  },
+  "SQL Prepare": {
+    "prefix": "sql_prepare",
+    "body": [
+      "stmt, err := db.PrepareContext(ctx, \"${1:SELECT * FROM table WHERE id = ?}\")",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"prepare: %w\", err)",
+      "}",
+      "defer stmt.Close()",
+      "",
+      "${0}"
+    ],
+    "description": "SQL prepared statement with context"
+  },
+  "SQL nullable types": {
+    "prefix": "sql_null",
+    "body": ["${1:field} := sql.Null[${2:string}]{V: ${3:value}, Valid: ${4:true}}${0}"],
+    "description": "sql.Null[T] — generic nullable type (Go 1.22+)"
+  },
+  "String trim": {
+    "prefix": "str_trim",
+    "body": ["${1:trimmed} := strings.TrimSpace(${2:str})${0}"],
+    "description": "Trim spaces"
+  },
+  "String split": {
+    "prefix": "str_split",
+    "body": ["${1:parts} := strings.Split(${2:str}, \"${3:,}\")${0}"],
+    "description": "Split string"
+  },
+  "String join": {
+    "prefix": "str_join",
+    "body": ["${1:result} := strings.Join(${2:slice}, \"${3:, }\")${0}"],
+    "description": "Join strings"
+  },
+  "String contains": {
+    "prefix": "str_contains",
+    "body": ["if strings.Contains(${1:str}, \"${2:substring}\") {", "\t${0}", "}"],
+    "description": "Check if string contains substring"
+  },
+  "String has prefix": {
+    "prefix": "str_prefix",
+    "body": ["if strings.HasPrefix(${1:str}, \"${2:prefix}\") {", "\t${0}", "}"],
+    "description": "Check string prefix"
+  },
+  "String has suffix": {
+    "prefix": "str_suffix",
+    "body": ["if strings.HasSuffix(${1:str}, \"${2:suffix}\") {", "\t${0}", "}"],
+    "description": "Check string suffix"
+  },
+  "String replace": {
+    "prefix": "str_rep",
+    "body": ["${1:result} := strings.ReplaceAll(${2:str}, \"${3:old}\", \"${4:new}\")${0}"],
+    "description": "Replace all occurrences"
+  },
+  "String to int": {
+    "prefix": "str_int",
+    "body": ["${1:num}, err := strconv.Atoi(${2:str})", "if err != nil {", "\treturn fmt.Errorf(\"parse int: %w\", err)", "}${0}"],
+    "description": "String to int"
+  },
+  "String to int64": {
+    "prefix": "str_int64",
+    "body": ["${1:num}, err := strconv.ParseInt(${2:str}, 10, 64)", "if err != nil {", "\treturn fmt.Errorf(\"parse int64: %w\", err)", "}${0}"],
+    "description": "String to int64"
+  },
+  "String to float": {
+    "prefix": "str_float",
+    "body": ["${1:num}, err := strconv.ParseFloat(${2:str}, 64)", "if err != nil {", "\treturn fmt.Errorf(\"parse float: %w\", err)", "}${0}"],
+    "description": "String to float64"
+  },
+  "Int to string": {
+    "prefix": "str_itoa",
+    "body": ["${1:s} := strconv.Itoa(${2:num})${0}"],
+    "description": "Int to string via strconv.Itoa"
+  },
+  "Int64 to string": {
+    "prefix": "str_fint",
+    "body": ["${1:s} := strconv.FormatInt(${2:num}, ${3:10})${0}"],
+    "description": "Int64 to string in given base via strconv.FormatInt"
+  },
+  "fmt.Sprintf": {
+    "prefix": "fmts",
+    "body": ["${1:s} := fmt.Sprintf(\"${2:%s %d}\", ${3:args})${0}"],
+    "description": "fmt.Sprintf — format a string without printing"
+  },
+  "String builder": {
+    "prefix": "str_build",
+    "body": ["var builder strings.Builder", "builder.WriteString(\"${1:str}\")", "${0}", "result := builder.String()"],
+    "description": "String builder"
+  },
+  "String builder efficient": {
+    "prefix": "str_buildeff",
+    "body": ["var builder strings.Builder", "builder.Grow(${1:1024})", "builder.WriteString(\"${2:str}\")", "${0}", "result := builder.String()"],
+    "description": "String builder with preallocation"
+  },
+  "Time now and since": {
+    "prefix": "time_now",
+    "body": ["${1:start} := time.Now()", "${0}", "${2:// elapsed := time.Since(${1:start})}"],
+    "description": "time.Now() + time.Since() — measure elapsed time"
+  },
+  "Time parse": {
+    "prefix": "time_parse",
+    "body": ["${1:t}, err := time.Parse(\"${2:2006-01-02}\", ${3:value})", "if err != nil {", "\treturn fmt.Errorf(\"parse time: %w\", err)", "}${0}"],
+    "description": "time.Parse — parse string into time.Time"
+  },
+  "Time format": {
+    "prefix": "time_fmt",
+    "body": ["${1:s} := ${2:t}.Format(\"${3:2006-01-02 15:04:05}\")${0}"],
+    "description": "Time.Format — format time.Time as string (reference: Mon Jan 2 15:04:05 MST 2006)"
+  },
+  "Time sleep": {
+    "prefix": "time_sleep",
+    "body": ["time.Sleep(${1:time.Second})${0}"],
+    "description": "time.Sleep — pause goroutine"
+  },
+  "Time ticker": {
+    "prefix": "time_tick",
+    "body": [
+      "ticker := time.NewTicker(${1:time.Second})",
+      "defer ticker.Stop()",
+      "",
+      "for {",
+      "\tselect {",
+      "\tcase <-ticker.C:",
+      "\t\t${0}",
+      "\tcase <-ctx.Done():",
+      "\t\treturn",
+      "\t}",
+      "}"
+    ],
+    "description": "time.NewTicker — periodic task with context cancellation"
+  },
+  "Base64 encode": {
+    "prefix": "b64_enc",
+    "body": ["${1:encoded} := base64.${2:Std}Encoding.EncodeToString(${3:data})${0}"],
+    "description": "base64 encode to string"
+  },
+  "Base64 decode": {
+    "prefix": "b64_dec",
+    "body": [
+      "${1:decoded}, err := base64.${2:Std}Encoding.DecodeString(${3:encoded})",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"decode base64: %w\", err)",
+      "}${0}"
+    ],
+    "description": "base64 decode from string"
+  },
+  "Hex encode": {
+    "prefix": "hex_enc",
+    "body": ["${1:encoded} := hex.EncodeToString(${2:data})${0}"],
+    "description": "hex encode to string"
+  },
+  "SHA256 hash": {
+    "prefix": "hash256",
+    "body": ["${1:hash} := sha256.Sum256(${2:data})", "${3:hex} := fmt.Sprintf(\"%x\", ${1:hash})${0}"],
+    "description": "crypto/sha256 — compute SHA-256 hash"
+  },
+  "URL parse": {
+    "prefix": "urlp",
+    "body": [
+      "${1:u}, err := url.Parse(\"${2:https://example.com}\")",
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"parse url: %w\", err)",
+      "}${0}",
+      "// ${1:u}.Scheme, ${1:u}.Host, ${1:u}.Path, ${1:u}.Query()"
+    ],
+    "description": "url.Parse — parse and inspect URL"
+  },
+  "Functional options pattern": {
+    "prefix": "opts",
+    "body": [
+      "type ${1:Option} func(*${2:config})",
+      "",
+      "type ${2:config} struct {",
+      "\t${3:field} ${4:Type}",
+      "}",
+      "",
+      "func With${5:Field}(${6:val} ${4:Type}) ${1:Option} {",
+      "\treturn func(c *${2:config}) {",
+      "\t\tc.${3:field} = ${6:val}",
+      "\t}",
+      "}",
+      "",
+      "func New${7:Service}(opts ...${1:Option}) *${7:Service} {",
+      "\tcfg := &${2:config}{${8:defaults}}",
+      "\tfor _, opt := range opts {",
+      "\t\topt(cfg)",
+      "\t}",
+      "\treturn &${7:Service}{cfg: cfg}",
+      "}${0}"
+    ],
+    "description": "Functional options pattern for constructor"
+  },
+  "Iterator (iter.Seq)": {
+    "prefix": "iter_seq",
+    "body": ["func ${1:name}(${2:params}) iter.Seq[${3:Type}] {", "\treturn func(yield func(${3:Type}) bool) {", "\t\t${0}", "\t}", "}"],
+    "description": "Single-value iterator (Go 1.23+)"
+  },
+  "Iterator (iter.Seq2)": {
+    "prefix": "iter_seq2",
+    "body": ["func ${1:name}(${2:params}) iter.Seq2[${3:K}, ${4:V}] {", "\treturn func(yield func(${3:K}, ${4:V}) bool) {", "\t\t${0}", "\t}", "}"],
+    "description": "Key-value iterator (Go 1.23+)"
+  },
+  "Signal handler": {
+    "prefix": "signal",
+    "body": ["ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)", "defer stop()", "${0}"],
+    "description": "Signal-aware context — cancelled on SIGINT/SIGTERM (Go 1.16+)"
+  },
+  "Graceful shutdown": {
+    "prefix": "signal_shutdown",
+    "body": [
+      "ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)",
+      "defer stop()",
+      "",
+      "// Do work",
+      "${0}",
+      "",
+      "select {",
+      "\tcase <-ctx.Done():",
+      "\t\tslog.Info(\"shutdown complete\")",
+      "\tcase <-time.After(${1:30 * time.Second}):",
+      "\t\tslog.Error(\"shutdown timeout\")",
+      "}"
+    ],
+    "description": "Graceful shutdown with signal.NotifyContext + slog (Go 1.16+)"
   }
 }

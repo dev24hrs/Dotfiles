@@ -1,0 +1,109 @@
+{
+  "Slice append": {
+    "prefix": "slice_append",
+    "body": ["${1:slice} = append(${1:slice}, ${2:elements}...)${0}"],
+    "description": "Append elements to slice"
+  },
+  "Slice append single": {
+    "prefix": "slice_app",
+    "body": ["${1:slice} = append(${1:slice}, ${2:element})${0}"],
+    "description": "Append single element to slice"
+  },
+  "Slice clone": {
+    "prefix": "slice_clone",
+    "body": ["${1:cloned} := slices.Clone(${2:src})${0}"],
+    "description": "Shallow clone (Go 1.21+)"
+  },
+  "Slice delete element": {
+    "prefix": "slice_del",
+    "body": ["${1:slice} = slices.Delete(${1:slice}, ${2:i}, ${2:i}+1)${0}"],
+    "description": "Delete single element at index (Go 1.21+)"
+  },
+  "Slice delete range": {
+    "prefix": "slice_delr",
+    "body": ["${1:slice} = slices.Delete(${1:slice}, ${2:i}, ${3:j})${0}"],
+    "description": "Delete range [i, j) from slice (Go 1.21+)"
+  },
+  "Slice delete unordered": {
+    "prefix": "slice_delu",
+    "body": [
+      "${1:slice}[${2:i}] = ${1:slice}[len(${1:slice})-1]",
+      "${1:slice} = ${1:slice}[:len(${1:slice})-1]${0}"
+    ],
+    "description": "Delete element without preserving order (fastest — no stdlib equivalent)"
+  },
+  "Slice insert": {
+    "prefix": "slice_insert",
+    "body": ["${1:slice} = slices.Insert(${1:slice}, ${2:i}, ${3:element})${0}"],
+    "description": "Insert element at index (Go 1.21+)"
+  },
+  "Slice contains": {
+    "prefix": "slice_contains",
+    "body": ["if slices.Contains(${1:slice}, ${2:value}) {", "\t${0}", "}"],
+    "description": "Check if slice contains value (Go 1.21+)"
+  },
+  "Slice index": {
+    "prefix": "slice_index",
+    "body": ["${1:i} := slices.Index(${2:slice}, ${3:value})${0}"],
+    "description": "Find first index of value; -1 if not found (Go 1.21+)"
+  },
+  "Slice filter in-place": {
+    "prefix": "slice_filter",
+    "body": ["${1:slice} = slices.DeleteFunc(${1:slice}, func(${2:v} ${3:Type}) bool {", "\treturn ${4:// true to remove}", "})${0}"],
+    "description": "Remove elements matching predicate in-place (Go 1.21+)"
+  },
+  "Slice reverse": {
+    "prefix": "slice_reverse",
+    "body": ["slices.Reverse(${1:slice})${0}"],
+    "description": "Reverse in-place (Go 1.21+)"
+  },
+  "Slice grow": {
+    "prefix": "slice_grow",
+    "body": ["${1:slice} = slices.Grow(${1:slice}, ${2:additional})${0}"],
+    "description": "Pre-allocate capacity for n more elements (Go 1.21+)"
+  },
+  "Slice chunk": {
+    "prefix": "slice_chunk",
+    "body": ["${1:chunks} := slices.Chunk(${2:slice}, ${3:n})${0}"],
+    "description": "Split into chunks of n elements, returns iterator (Go 1.23+)"
+  },
+  "Slice compact": {
+    "prefix": "slice_compact",
+    "body": ["${1:slice} = slices.Compact(${1:slice})${0}"],
+    "description": "Remove adjacent duplicates — sort first if needed (Go 1.21+)"
+  },
+  "Slice dedup (unsorted)": {
+    "prefix": "slice_unique",
+    "body": [
+      "seen := make(map[${1:type}]struct{})",
+      "${2:slice} = slices.DeleteFunc(${2:slice}, func(${3:v} ${1:type}) bool {",
+      "\tif _, ok := seen[${3:v}]; ok {",
+      "\t\treturn true",
+      "\t}",
+      "\tseen[${3:v}] = struct{}{}",
+      "\treturn false",
+      "})${0}"
+    ],
+    "description": "Remove all duplicates from unsorted slice with single pass (Go 1.21+)"
+  },
+  "Slice max": {
+    "prefix": "slice_max",
+    "body": ["${1:v} := slices.Max(${2:slice})${0}"],
+    "description": "Maximum value (Go 1.21+)"
+  },
+  "Slice min": {
+    "prefix": "slice_min",
+    "body": ["${1:v} := slices.Min(${2:slice})${0}"],
+    "description": "Minimum value (Go 1.21+)"
+  },
+  "Slice repeat": {
+    "prefix": "slice_repeat",
+    "body": ["${1:slice} := slices.Repeat([]${2:Type}{${3:value}}, ${4:n})${0}"],
+    "description": "Create slice by repeating value n times (Go 1.23+)"
+  },
+  "Slice collect from iterator": {
+    "prefix": "slice_collect",
+    "body": ["${1:slice} := slices.Collect(${2:iter})${0}"],
+    "description": "Collect iterator into slice (Go 1.23+) — e.g. slices.Collect(maps.Keys(m))"
+  }
+}

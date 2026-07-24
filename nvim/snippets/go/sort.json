@@ -1,0 +1,97 @@
+{
+  "Sort with slices.Sort": {
+    "prefix": "sort",
+    "body": ["slices.Sort(${1:slice})${0}"],
+    "description": "Sort ordered slice in-place (Go 1.21+)"
+  },
+  "Sort with custom comparison": {
+    "prefix": "sort_func",
+    "body": [
+      "slices.SortFunc(${1:slice}, func(${2:a}, ${3:b} ${4:Type}) int {",
+      "\treturn cmp.Compare(${5:a.Field}, ${6:b.Field})",
+      "})${0}"
+    ],
+    "description": "Sort with custom 3-way comparison using slices.SortFunc + cmp.Compare (Go 1.21+)"
+  },
+  "Sort descending": {
+    "prefix": "sort_desc",
+    "body": [
+      "slices.SortFunc(${1:slice}, func(${2:a}, ${3:b} ${4:Type}) int {",
+      "\treturn cmp.Compare(${3:b}, ${2:a})",
+      "})${0}"
+    ],
+    "description": "Sort descending — swap a/b in cmp.Compare (Go 1.21+)"
+  },
+  "Sort stable": {
+    "prefix": "sort_stable",
+    "body": [
+      "slices.SortStableFunc(${1:slice}, func(${2:a}, ${3:b} ${4:Type}) int {",
+      "\treturn cmp.Compare(${5:a.Field}, ${6:b.Field})",
+      "})${0}"
+    ],
+    "description": "Stable sort — equal elements preserve original order (Go 1.21+)"
+  },
+  "Sort by field (index-based)": {
+    "prefix": "sort_field",
+    "body": ["sort.Slice(${1:slice}, func(${2:i}, ${3:j} int) bool {", "\treturn ${1:slice}[${2:i}].${4:Field} ${5:<} ${1:slice}[${3:j}].${4:Field}", "})${0}"],
+    "description": "Sort struct slice by field using sort.Slice (prefer slices.SortFunc + cmp.Compare when possible)"
+  },
+  "Sort map by key": {
+    "prefix": "sort_mapk",
+    "body": [
+      "for _, ${1:k} := range slices.Sorted(maps.Keys(${2:m})) {",
+      "\t${3:v} := ${2:m}[${1:k}]",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Iterate map in sorted key order (Go 1.23+)"
+  },
+  "Sort map by value": {
+    "prefix": "sort_mapv",
+    "body": [
+      "type ${1:pair} struct {",
+      "\tK ${2:key_type}",
+      "\tV ${3:value_type}",
+      "}",
+      "${4:pairs} := make([]${1:pair}, 0, len(${5:m}))",
+      "for k, v := range ${5:m} {",
+      "\t${4:pairs} = append(${4:pairs}, ${1:pair}{k, v})",
+      "}",
+      "slices.SortFunc(${4:pairs}, func(a, b ${1:pair}) int {",
+      "\treturn cmp.Compare(a.V, b.V)",
+      "})${0}"
+    ],
+    "description": "Sort map entries by value into a pair slice (Go 1.21+)"
+  },
+
+  "Binary search sorted slice": {
+    "prefix": "search_bin",
+    "body": ["${1:i}, ${2:found} := slices.BinarySearch(${3:sorted_slice}, ${4:target})${0}"],
+    "description": "Binary search on sorted slice (Go 1.21+)"
+  },
+  "Binary search with custom comparison": {
+    "prefix": "search_func",
+    "body": [
+      "${1:i}, ${2:found} := slices.BinarySearchFunc(${3:sorted_slice}, ${4:target}, func(${5:elem} ${6:Type}, ${7:target} ${8:Type}) int {",
+      "\treturn cmp.Compare(${9:elem.Field}, ${10:target.Field})",
+      "})${0}"
+    ],
+    "description": "Binary search with custom 3-way comparison (Go 1.21+)"
+  },
+  "Check if sorted": {
+    "prefix": "issort",
+    "body": ["if !slices.IsSorted(${1:slice}) {", "\t${0}", "}"],
+    "description": "Check if slice is sorted (Go 1.21+)"
+  },
+  "Check if sorted with comparison": {
+    "prefix": "issort_func",
+    "body": [
+      "if !slices.IsSortedFunc(${1:slice}, func(${2:a}, ${3:b} ${4:Type}) int {",
+      "\treturn cmp.Compare(${5:a}, ${6:b})",
+      "}) {",
+      "\t${0}",
+      "}"
+    ],
+    "description": "Check sorted with custom comparison (Go 1.21+)"
+  }
+}

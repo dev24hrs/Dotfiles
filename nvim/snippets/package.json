@@ -7,6 +7,18 @@
         "path": "./go/go.json"
       },
       {
+        "language": "go",
+        "path": "./go/slice.json"
+      },
+      {
+        "language": "go",
+        "path": "./go/map.json"
+      },
+      {
+        "language": "go",
+        "path": "./go/sort.json"
+      },
+      {
         "language": "rust",
         "path": "./rust/rust.json"
       },

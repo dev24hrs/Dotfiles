@@ -1,42 +1,760 @@
 {
-  "Describe unit test": {
+  "=== IMPORTS ===": { "prefix": "_imports_", "body": [], "description": "--- Imports ---" },
+  "import default": {
+    "prefix": "imd",
+    "body": ["import ${1:name} from \"${2:module}\"${0}"],
+    "description": "Import default export"
+  },
+  "import named": {
+    "prefix": "imn",
+    "body": ["import { ${1:named} } from \"${2:module}\"${0}"],
+    "description": "Import named exports"
+  },
+  "import named + default": {
+    "prefix": "imnd",
+    "body": ["import ${1:default}, { ${2:named} } from \"${3:module}\"${0}"],
+    "description": "Import default + named exports"
+  },
+  "import all as": {
+    "prefix": "ima",
+    "body": ["import * as ${1:alias} from \"${2:module}\"${0}"],
+    "description": "Import all as namespace"
+  },
+  "import type": {
+    "prefix": "imt",
+    "body": ["import type { ${1:Type} } from \"${2:module}\"${0}"],
+    "description": "Import type only (erased at compile time)"
+  },
+  "import dynamic": {
+    "prefix": "imdy",
+    "body": ["const ${1:module} = await import(\"${2:module}\")${0}"],
+    "description": "Dynamic import — code splitting"
+  },
+
+  "=== EXPORTS ===": { "prefix": "_exports_", "body": [], "description": "--- Exports ---" },
+  "export default": {
+    "prefix": "exd",
+    "body": ["export default ${1:expression}${0}"],
+    "description": "Default export"
+  },
+  "export named": {
+    "prefix": "exn",
+    "body": ["export { ${1:name} }${0}"],
+    "description": "Named export"
+  },
+  "export const": {
+    "prefix": "exc",
+    "body": ["export const ${1:name} = ${2:value}${0}"],
+    "description": "Export const declaration"
+  },
+  "export type": {
+    "prefix": "ext",
+    "body": ["export type { ${1:Type} }${0}"],
+    "description": "Export type (inline type-only export)"
+  },
+  "barrel export": {
+    "prefix": "exb",
+    "body": ["export { ${1:name} } from \"${2:./module}\"${0}"],
+    "description": "Re-export (barrel pattern)"
+  },
+
+  "=== VARIABLES ===": { "prefix": "_vars_", "body": [], "description": "--- Variables ---" },
+  "const declaration": {
+    "prefix": "const",
+    "body": ["const ${1:name} = ${2:value}${0}"],
+    "description": "const — block-scoped immutable binding"
+  },
+  "let declaration": {
+    "prefix": "let",
+    "body": ["let ${1:name} = ${2:value}${0}"],
+    "description": "let — block-scoped mutable binding"
+  },
+  "const assertion": {
+    "prefix": "consta",
+    "body": ["const ${1:name} = ${2:value} as const${0}"],
+    "description": "const assertion — literal types + readonly"
+  },
+  "satisfies operator": {
+    "prefix": "sat",
+    "body": ["${1:expression} satisfies ${2:Type}${0}"],
+    "description": "satisfies — check type without widening (TS 4.9+)"
+  },
+
+  "=== FUNCTIONS ===": { "prefix": "_funcs_", "body": [], "description": "--- Functions ---" },
+  "function declaration": {
+    "prefix": "func",
+    "body": ["function ${1:name}(${2:params})${3:: ${4:ReturnType}} {", "\t${0}", "}"],
+    "description": "Function declaration with optional return type"
+  },
+  "async function": {
+    "prefix": "afunc",
+    "body": ["async function ${1:name}(${2:params})${3:: Promise<${4:ReturnType}>} {", "\t${0}", "}"],
+    "description": "Async function declaration"
+  },
+  "arrow function": {
+    "prefix": "af",
+    "body": ["const ${1:name} = (${2:params})${3:: ${4:ReturnType}} => {", "\t${0}", "}"],
+    "description": "Arrow function assigned to const"
+  },
+  "async arrow function": {
+    "prefix": "aaf",
+    "body": ["const ${1:name} = async (${2:params})${3:: Promise<${4:ReturnType}>} => {", "\t${0}", "}"],
+    "description": "Async arrow function"
+  },
+  "generator function": {
+    "prefix": "gf",
+    "body": ["function* ${1:name}(${2:params})${3:: Generator<${4:YieldType}>} {", "\t${0}", "}"],
+    "description": "Generator function"
+  },
+  "IIFE": {
+    "prefix": "iife",
+    "body": [";(async () => {", "\t${0}", "})()"],
+    "description": "Immediately-invoked async function expression"
+  },
+
+  "=== TYPES ===": { "prefix": "_types_", "body": [], "description": "--- Types ---" },
+  "interface": {
+    "prefix": "int",
+    "body": ["interface ${1:Name} {", "\t${2:field}: ${3:Type}", "}${0}"],
+    "description": "Interface declaration"
+  },
+  "interface extends": {
+    "prefix": "inte",
+    "body": ["interface ${1:Name} extends ${2:Base} {", "\t${3:field}: ${4:Type}", "}${0}"],
+    "description": "Interface extending another interface"
+  },
+  "type alias": {
+    "prefix": "type",
+    "body": ["type ${1:Name} = ${2:Type}${0}"],
+    "description": "Type alias"
+  },
+  "type union": {
+    "prefix": "typeu",
+    "body": ["type ${1:Name} = ${2:\"a\"} | ${3:\"b\"}${0}"],
+    "description": "Union type"
+  },
+  "type intersection": {
+    "prefix": "typei",
+    "body": ["type ${1:Name} = ${2:A} & ${3:B}${0}"],
+    "description": "Intersection type"
+  },
+  "generic type": {
+    "prefix": "typeg",
+    "body": ["type ${1:Name}<T${2: extends ${3:Constraint}}> = ${4:Type}${0}"],
+    "description": "Generic type alias with optional constraint"
+  },
+  "generic function": {
+    "prefix": "fng",
+    "body": ["function ${1:name}<T${2: extends ${3:Constraint}}>(${4:arg}: T)${5:: ${6:ReturnType}} {", "\t${0}", "}"],
+    "description": "Generic function"
+  },
+  "Record type": {
+    "prefix": "rec",
+    "body": ["Record<${1:Keys}, ${2:Value}>${0}"],
+    "description": "Record<K, V> — map-like object type"
+  },
+  "Pick type": {
+    "prefix": "pick",
+    "body": ["Pick<${1:Type}, ${2:\"field1\" | \"field2\"}>${0}"],
+    "description": "Pick<T, K> — select subset of keys"
+  },
+  "Omit type": {
+    "prefix": "omit",
+    "body": ["Omit<${1:Type}, ${2:\"field1\" | \"field2\"}>${0}"],
+    "description": "Omit<T, K> — exclude keys"
+  },
+  "Partial type": {
+    "prefix": "part",
+    "body": ["Partial<${1:Type}>${0}"],
+    "description": "Partial<T> — all properties optional"
+  },
+  "enum": {
+    "prefix": "en",
+    "body": ["enum ${1:Name} {", "\t${2:Key} = ${3:\"value\"},", "}${0}"],
+    "description": "String enum (prefer const enum or union types for simple cases)"
+  },
+  "type predicate": {
+    "prefix": "tp",
+    "body": ["function ${1:isType}(value: unknown): value is ${2:Type} {", "\treturn ${3:typeof value === \"${4:type}\"}", "}${0}"],
+    "description": "Type predicate — user-defined type guard"
+  },
+  "typeof type guard": {
+    "prefix": "tg",
+    "body": ["if (typeof ${1:value} === \"${2:string}\") {", "\t${1:value} // typed as ${2:string}", "}${0}"],
+    "description": "typeof type narrowing"
+  },
+  "discriminated union": {
+    "prefix": "disc",
+    "body": ["type ${1:Name} =", "\t| { kind: \"${2:a}\"; ${3:aProp}: ${4:Type} }", "\t| { kind: \"${5:b}\"; ${6:bProp}: ${7:Type} }${0}"],
+    "description": "Discriminated union — exhaustive pattern matching with `kind` field"
+  },
+  "mapped type": {
+    "prefix": "mapped",
+    "body": ["type ${1:Name}<T> = {", "\t[K in keyof T]: ${2:T[K]}", "}${0}"],
+    "description": "Mapped type — transform each property of T"
+  },
+  "mapped type with modifier": {
+    "prefix": "mappedm",
+    "body": ["type ${1:Name}<T> = {", "\t[K in keyof T as ${2:K}]: ${3:T[K]}", "}${0}"],
+    "description": "Mapped type with key remapping (TS 4.1+)"
+  },
+  "keyof typeof": {
+    "prefix": "kot",
+    "body": ["type ${1:Name} = keyof typeof ${2:object}${0}"],
+    "description": "keyof typeof — extract keys as union from runtime object"
+  },
+  "ReturnType": {
+    "prefix": "rt",
+    "body": ["type ${1:Name} = ReturnType<typeof ${2:function}>${0}"],
+    "description": "ReturnType<T> — extract return type from function"
+  },
+  "Parameters": {
+    "prefix": "params",
+    "body": ["type ${1:Name} = Parameters<typeof ${2:function}>${0}"],
+    "description": "Parameters<T> — extract parameter types as tuple"
+  },
+  "Awaited": {
+    "prefix": "awaited",
+    "body": ["type ${1:Name} = Awaited<${2:PromiseType}>${0}"],
+    "description": "Awaited<T> — unwrap Promise (works recursively)"
+  },
+  "NonNullable": {
+    "prefix": "nn",
+    "body": ["NonNullable<${1:Type}>${0}"],
+    "description": "NonNullable<T> — exclude null and undefined"
+  },
+  "Required": {
+    "prefix": "reqd",
+    "body": ["Required<${1:Type}>${0}"],
+    "description": "Required<T> — all properties become required"
+  },
+
+  "=== CONTROL FLOW ===": { "prefix": "_flow_", "body": [], "description": "--- Control Flow ---" },
+  "if statement": {
+    "prefix": "if",
+    "body": ["if (${1:condition}) {", "\t${0}", "}"],
+    "description": "if statement"
+  },
+  "if else": {
+    "prefix": "ife",
+    "body": ["if (${1:condition}) {", "\t${2}", "} else {", "\t${0}", "}"],
+    "description": "if-else statement"
+  },
+  "if else if": {
+    "prefix": "ifel",
+    "body": ["if (${1:condition}) {", "\t${2}", "} else if (${3:condition}) {", "\t${0}", "}"],
+    "description": "if-else-if chain"
+  },
+  "switch statement": {
+    "prefix": "sw",
+    "body": ["switch (${1:value}) {", "\tcase ${2:pattern}:", "\t\t${3}", "\t\tbreak", "\tdefault:", "\t\t${0}", "}"],
+    "description": "switch statement with exhaustiveness"
+  },
+  "for of": {
+    "prefix": "for",
+    "body": ["for (const ${1:item} of ${2:iterable}) {", "\t${0}", "}"],
+    "description": "for-of loop — iterate values"
+  },
+  "for in": {
+    "prefix": "fori",
+    "body": ["for (const ${1:key} in ${2:object}) {", "\t${0}", "}"],
+    "description": "for-in loop — iterate keys"
+  },
+  "for with index": {
+    "prefix": "forx",
+    "body": ["${1:arr}.forEach((${2:item}, ${3:i}) => {", "\t${0}", "})"],
+    "description": "Array forEach with index"
+  },
+  "while loop": {
+    "prefix": "wh",
+    "body": ["while (${1:condition}) {", "\t${0}", "}"],
+    "description": "while loop"
+  },
+  "try catch": {
+    "prefix": "tr",
+    "body": ["try {", "\t${1}", "} catch (${2:error}) {", "\t${3:console.error(error)}", "}${0}"],
+    "description": "try-catch block"
+  },
+  "try catch finally": {
+    "prefix": "trf",
+    "body": ["try {", "\t${1}", "} catch (${2:error}) {", "\t${3:console.error(error)}", "} finally {", "\t${0}", "}"],
+    "description": "try-catch-finally"
+  },
+
+  "=== PROMISES ===": { "prefix": "_promises_", "body": [], "description": "--- Promises / Async ---" },
+  "Promise constructor": {
+    "prefix": "pr",
+    "body": ["new Promise<${1:Type}>((${2:resolve}, ${3:reject}) => {", "\t${0}", "})"],
+    "description": "new Promise constructor"
+  },
+  "then catch chain": {
+    "prefix": "prc",
+    "body": ["${1:promise}.then((${2:result}) => {", "\t${3}", "}).catch((${4:error}) => {", "\t${0}", "})"],
+    "description": "Promise then-catch chain"
+  },
+  "Promise all": {
+    "prefix": "pall",
+    "body": ["const [${1:a}, ${2:b}] = await Promise.all([${3:promiseA}, ${4:promiseB}])${0}"],
+    "description": "Promise.all — concurrent execution with destructured result"
+  },
+  "Promise allSettled": {
+    "prefix": "pals",
+    "body": ["const ${1:results} = await Promise.allSettled(${2:promises})${0}"],
+    "description": "Promise.allSettled — wait for all regardless of rejection"
+  },
+
+  "=== ARRAYS ===": { "prefix": "_arrays_", "body": [], "description": "--- Arrays ---" },
+  "array map": {
+    "prefix": "arr",
+    "body": ["${1:arr}.map((${2:item}) => ${3:transform})${0}"],
+    "description": "Array.map — transform each element"
+  },
+  "array filter": {
+    "prefix": "arrf",
+    "body": ["${1:arr}.filter((${2:item}) => ${3:condition})${0}"],
+    "description": "Array.filter — keep matching elements"
+  },
+  "array reduce": {
+    "prefix": "arrr",
+    "body": ["${1:arr}.reduce((${2:acc}, ${3:item}) => {", "\t${0}", "\treturn ${2:acc}", "}, ${4:initial})"],
+    "description": "Array.reduce — accumulate values"
+  },
+  "array find": {
+    "prefix": "arrfd",
+    "body": ["${1:arr}.find((${2:item}) => ${3:condition})${0}"],
+    "description": "Array.find — first matching element"
+  },
+  "array flatMap": {
+    "prefix": "arrfm",
+    "body": ["${1:arr}.flatMap((${2:item}) => ${3:transform})${0}"],
+    "description": "Array.flatMap — map then flatten one level"
+  },
+  "array slice": {
+    "prefix": "arrs",
+    "body": ["${1:arr}.slice(${2:0}, ${3:end})${0}"],
+    "description": "Array.slice — shallow copy a portion"
+  },
+
+  "=== OBJECTS ===": { "prefix": "_objects_", "body": [], "description": "--- Objects ---" },
+  "object destructure": {
+    "prefix": "obd",
+    "body": ["const { ${1:prop1}, ${2:prop2} } = ${3:object}${0}"],
+    "description": "Object destructuring"
+  },
+  "object destructure with rename": {
+    "prefix": "obdr",
+    "body": ["const { ${1:prop}: ${2:alias} } = ${3:object}${0}"],
+    "description": "Object destructuring with property renaming"
+  },
+  "object spread": {
+    "prefix": "obs",
+    "body": ["{ ...${1:source}, ${2:overrides} }${0}"],
+    "description": "Object spread — shallow merge with overrides"
+  },
+  "Object entries loop": {
+    "prefix": "obk",
+    "body": ["for (const [${1:key}, ${2:value}] of Object.entries(${3:object})) {", "\t${0}", "}"],
+    "description": "Iterate object entries with destructuring"
+  },
+  "optional chaining": {
+    "prefix": "oc",
+    "body": ["${1:object}?.${2:property}${3:?.${4:nested}}${0}"],
+    "description": "Optional chaining — safe property access"
+  },
+  "nullish coalescing": {
+    "prefix": "nc",
+    "body": ["${1:value} ?? ${2:defaultValue}${0}"],
+    "description": "Nullish coalescing — fallback for null/undefined only"
+  },
+  "nullish assignment": {
+    "prefix": "nca",
+    "body": ["${1:value} ??= ${2:defaultValue}${0}"],
+    "description": "??= — assign only if null/undefined (ES2021)"
+  },
+  "logical OR assignment": {
+    "prefix": "ora",
+    "body": ["${1:value} ||= ${2:defaultValue}${0}"],
+    "description": "||= — assign only if falsy (ES2021)"
+  },
+  "logical AND assignment": {
+    "prefix": "anda",
+    "body": ["${1:value} &&= ${2:expr}${0}"],
+    "description": "&&= — assign only if truthy (ES2021)"
+  },
+  "at() negative index": {
+    "prefix": "at",
+    "body": ["${1:arr}.at(${2:-1})${0}"],
+    "description": ".at() — access element with negative index support (ES2022)"
+  },
+  "structuredClone": {
+    "prefix": "sclone",
+    "body": ["const ${1:copy} = structuredClone(${2:original})${0}"],
+    "description": "structuredClone() — deep clone (works with Map, Set, Date, etc.)"
+  },
+  "Object.groupBy": {
+    "prefix": "grp",
+    "body": ["const ${1:groups} = Object.groupBy(${2:items}, (${3:item}) => ${4:key})${0}"],
+    "description": "Object.groupBy — group items by key (ES2024)"
+  },
+  "Map.groupBy": {
+    "prefix": "grpm",
+    "body": ["const ${1:groups} = Map.groupBy(${2:items}, (${3:item}) => ${4:key})${0}"],
+    "description": "Map.groupBy — group items into Map (ES2024)"
+  },
+
+  "=== COLLECTIONS ===": { "prefix": "_collections_", "body": [], "description": "--- Set / Map ---" },
+  "Set new": {
+    "prefix": "set",
+    "body": ["const ${1:set} = new Set<${2:Type}>(${3:values})${0}"],
+    "description": "new Set<T>() — unique value collection"
+  },
+  "Set add": {
+    "prefix": "seta",
+    "body": ["${1:set}.add(${2:value})${0}"],
+    "description": "Set.add() — add value (returns the Set for chaining)"
+  },
+  "Set has": {
+    "prefix": "seth",
+    "body": ["if (${1:set}.has(${2:value})) {", "\t${0}", "}"],
+    "description": "Set.has() — O(1) membership check"
+  },
+  "Map new": {
+    "prefix": "map",
+    "body": ["const ${1:map} = new Map<${2:KeyType}, ${3:ValueType}>(${4:entries})${0}"],
+    "description": "new Map<K, V>() — key-value collection (keys can be any type)"
+  },
+  "Map set": {
+    "prefix": "maps",
+    "body": ["${1:map}.set(${2:key}, ${3:value})${0}"],
+    "description": "Map.set() — set entry (returns the Map for chaining)"
+  },
+  "Map get": {
+    "prefix": "mapg",
+    "body": ["const ${1:value} = ${2:map}.get(${3:key})${0}"],
+    "description": "Map.get() — retrieve entry"
+  },
+
+  "=== REACT ===": { "prefix": "_react_", "body": [], "description": "--- React ---" },
+  "React component (arrow)": {
+    "prefix": "rc",
+    "body": ["export const ${1:ComponentName} = ({ ${2:prop} }${3:: ${4:Props}}) => {", "\treturn (", "\t\t${0}", "\t)", "}"],
+    "description": "React functional component — arrow style with explicit props (not React.FC)"
+  },
+  "React component (function)": {
+    "prefix": "rcf",
+    "body": ["export function ${1:ComponentName}({ ${2:prop} }${3:: ${4:Props}}) {", "\treturn (", "\t\t${0}", "\t)", "}"],
+    "description": "React functional component — function declaration with explicit props"
+  },
+  "useState hook": {
+    "prefix": "rus",
+    "body": ["const [${1:state}, set${1/(.*)/${1:/capitalize}/}] = useState<${2:Type}>(${3:initial})${0}"],
+    "description": "useState hook with type parameter"
+  },
+  "useEffect hook": {
+    "prefix": "rue",
+    "body": ["useEffect(() => {", "\t${1}", "\treturn () => {", "\t\t${2:// cleanup}", "\t}", "}, [${3:deps}])${0}"],
+    "description": "useEffect hook with cleanup and dependency array"
+  },
+  "useCallback hook": {
+    "prefix": "ruc",
+    "body": ["const ${1:fn} = useCallback((${2:params}) => {", "\t${0}", "}, [${3:deps}])"],
+    "description": "useCallback — memoized callback"
+  },
+  "useMemo hook": {
+    "prefix": "rum",
+    "body": ["const ${1:value} = useMemo<${2:Type}>(() => ${3:computation}, [${4:deps}])${0}"],
+    "description": "useMemo — memoized value"
+  },
+  "useRef hook": {
+    "prefix": "rur",
+    "body": ["const ${1:ref} = useRef<${2:HTMLDivElement}>(null)${0}"],
+    "description": "useRef hook with element type"
+  },
+  "useContext hook": {
+    "prefix": "rux",
+    "body": ["const ${1:value} = useContext(${2:Context})${0}"],
+    "description": "useContext — consume context value"
+  },
+  "useReducer hook": {
+    "prefix": "rud",
+    "body": ["const [${1:state}, ${2:dispatch}] = useReducer(${3:reducer}, ${4:initialState})${0}"],
+    "description": "useReducer hook"
+  },
+  "custom hook": {
+    "prefix": "rh",
+    "body": ["export function use${1:HookName}(${2:params}) {", "\t${0}", "\treturn ${3}", "}"],
+    "description": "Custom React hook"
+  },
+  "React props type": {
+    "prefix": "rp",
+    "body": ["type ${1:ComponentName}Props = {", "\t${2:prop}: ${3:Type}", "}${0}"],
+    "description": "React component props type"
+  },
+
+  "=== CONSOLE ===": { "prefix": "_console_", "body": [], "description": "--- Console / Debug ---" },
+  "console.log": {
+    "prefix": "cl",
+    "body": ["console.log(${1:value})${0}"],
+    "description": "console.log"
+  },
+  "console.log labeled": {
+    "prefix": "cll",
+    "body": ["console.log(\"${1:label}:\", ${1:label})${0}"],
+    "description": "console.log with label + value pair"
+  },
+  "console.error": {
+    "prefix": "ce",
+    "body": ["console.error(${1:error})${0}"],
+    "description": "console.error"
+  },
+  "console.table": {
+    "prefix": "ct",
+    "body": ["console.table(${1:data})${0}"],
+    "description": "console.table — tabular data display"
+  },
+  "console.time": {
+    "prefix": "ctm",
+    "body": ["console.time(\"${1:label}\")", "${0}", "console.timeEnd(\"${1:label}\")"],
+    "description": "console.time/timeEnd — measure duration"
+  },
+  "console.trace": {
+    "prefix": "ctr",
+    "body": ["console.trace(\"${1:message}\")${0}"],
+    "description": "console.trace — stack trace to console"
+  },
+
+  "=== CLASSES ===": { "prefix": "_classes_", "body": [], "description": "--- Classes ---" },
+  "class": {
+    "prefix": "cls",
+    "body": ["class ${1:ClassName} ${2:extends ${3:BaseClass}} {", "\tconstructor(${4:params}) {", "\t\t${5:super()}", "\t}", "\t${0}", "}"],
+    "description": "Class declaration with constructor"
+  },
+  "class method": {
+    "prefix": "clsm",
+    "body": ["${1:public} ${2:methodName}(${3:params})${4:: ${5:ReturnType}} {", "\t${0}", "}"],
+    "description": "Class method (inside class body)"
+  },
+  "class property": {
+    "prefix": "clsp",
+    "body": ["${1:private} ${2:propName}${3:: ${4:Type}} = ${5:value}${0}"],
+    "description": "Class property declaration"
+  },
+
+  "=== ERROR HANDLING ===": { "prefix": "_errors_", "body": [], "description": "--- Error Handling ---" },
+  "throw error": {
+    "prefix": "th",
+    "body": ["throw new Error(${1:\"${2:message}\"})${0}"],
+    "description": "Throw new Error"
+  },
+  "custom error class": {
+    "prefix": "err",
+    "body": [
+      "class ${1:Name}Error extends Error {",
+      "\tconstructor(${2:params}) {",
+      "\t\tsuper(${3:message})",
+      "\t\tthis.name = \"${1:Name}Error\"",
+      "\t}",
+      "}${0}"
+    ],
+    "description": "Custom Error subclass"
+  },
+
+  "=== ZOD ===": { "prefix": "_zod_", "body": [], "description": "--- Zod Validation ---" },
+  "zod object schema": {
+    "prefix": "zo",
+    "body": ["const ${1:Name}Schema = z.object({", "\t${2:field}: ${3:z.string()},", "})${0}"],
+    "description": "Zod object schema"
+  },
+  "zod infer type": {
+    "prefix": "zi",
+    "body": ["type ${1:Name} = z.infer<typeof ${2:Schema}>${0}"],
+    "description": "Zod inferred type from schema"
+  },
+  "zod parse safe": {
+    "prefix": "zp",
+    "body": [
+      "const ${1:result} = ${2:Schema}.safeParse(${3:data})",
+      "if (!${1:result}.success) {",
+      "\treturn ${4:handle error}",
+      "}",
+      "const ${5:validated} = ${1:result}.data${0}"
+    ],
+    "description": "Zod safeParse — typed validation without throwing"
+  },
+
+  "=== TESTING ===": { "prefix": "_testing_", "body": [], "description": "--- Testing (Vitest / Jest) ---" },
+  "describe block": {
     "prefix": "desc",
-    "body": ["describe('function', () => {", "", "})"],
-    "description": "describe unit test"
+    "body": ["describe(\"${1:feature}\", () => {", "\t${0}", "})"],
+    "description": "describe test suite block"
   },
-  "Before unit test": {
-    "prefix": "bef",
-    "body": ["before(() => {", "", "})"],
-    "description": "before unit test"
-  },
-  "BeforeAll unit test": {
-    "prefix": "befa",
-    "body": ["beforeAll(() => {", "", "})"],
-    "description": "beforeAll unit test"
-  },
-  "After unit test": {
-    "prefix": "after",
-    "body": ["after(() => {", "    sandbox.restore()", "})"],
-    "description": "after unit test"
-  },
-  "AfterAll unit test": {
-    "prefix": "after_a",
-    "body": ["afterAll(() => {", "    sandbox.restore()", "})"],
-    "description": "afterAll unit test"
-  },
-  "AfterEach unit test": {
-    "prefix": "after_e",
-    "body": ["afterEach(() => {", "    sandbox.reset()", "})"],
-    "description": "afterEach unit test"
-  },
-  "It unit test": {
+  "it test case": {
     "prefix": "itt",
-    "body": ["it('should return ', () => {", "", "})"],
-    "description": "it unit test"
+    "body": ["it(\"should ${1:expected behavior}\", ${2:async} () => {", "\t${0}", "})"],
+    "description": "it test case (vitest/jest)"
   },
-  "ItParams mocha test": {
-    "prefix": "itp",
-    "body": ["itParam('should return when ${value.case}', data, (value) => {", "", "})"],
-    "description": "itParam mocha test"
+  "it test case with arrange-act-assert": {
+    "prefix": "itta",
+    "body": [
+      "it(\"should ${1:expected behavior}\", ${2:async} () => {",
+      "\t// Arrange",
+      "\t${3}",
+      "",
+      "\t// Act",
+      "\tconst result = ${4}",
+      "",
+      "\t// Assert",
+      "\texpect(result).${5:toBe(${6:expected})}",
+      "})${0}"
+    ],
+    "description": "it test case with AAA pattern"
+  },
+  "expect toBe": {
+    "prefix": "exp",
+    "body": ["expect(${1:actual}).${2:toBe}(${3:expected})${0}"],
+    "description": "expect assertion"
+  },
+  "expect toEqual": {
+    "prefix": "expe",
+    "body": ["expect(${1:actual}).toEqual(${2:expected})${0}"],
+    "description": "expect deep equality assertion"
+  },
+  "expect toThrow": {
+    "prefix": "expt",
+    "body": ["expect(() => ${1:fn()}).toThrow(${2:error})${0}"],
+    "description": "expect function to throw"
+  },
+  "expect async toBe": {
+    "prefix": "expa",
+    "body": ["await expect(${1:promise}).resolves.${2:toBe}(${3:expected})${0}"],
+    "description": "expect async value — resolves/rejects"
+  },
+  "beforeEach / beforeAll": {
+    "prefix": "bef",
+    "body": ["${1:beforeEach}(() => {", "\t${0}", "})"],
+    "description": "beforeEach/beforeAll setup hook"
+  },
+  "afterEach / afterAll": {
+    "prefix": "after",
+    "body": ["${1:afterEach}(() => {", "\t${0}", "})"],
+    "description": "afterEach/afterAll cleanup hook"
+  },
+  "test fixtures / factory": {
+    "prefix": "fix",
+    "body": [
+      "function create${1:Entity}(${2:overrides}: Partial<${3:EntityType}> = {}): ${3:EntityType} {",
+      "\treturn {",
+      "\t\t${4:// defaults}",
+      "\t\t...${2:overrides},",
+      "\t}",
+      "}${0}"
+    ],
+    "description": "Test fixture factory with overrides"
+  },
+  "mock function": {
+    "prefix": "mock",
+    "body": ["const ${1:fn} = ${2:vi}.fn(${3:implementation})${0}"],
+    "description": "vi.fn() / jest.fn() — mock function"
+  },
+  "mock module": {
+    "prefix": "mockm",
+    "body": ["${1:vi}.mock(\"${2:module}\", () => ({", "\t${3:// mock implementation}", "}))${0}"],
+    "description": "vi.mock() / jest.mock() — mock module"
+  },
+
+  "=== WEB APIs ===": { "prefix": "_web_", "body": [], "description": "--- Modern Web APIs ---" },
+  "URL constructor": {
+    "prefix": "url",
+    "body": ["const ${1:url} = new URL(\"${2:/path}\", ${3:base})${0}"],
+    "description": "new URL() — parse and build URLs safely"
+  },
+  "URL search params": {
+    "prefix": "urlp",
+    "body": ["const ${1:params} = new URLSearchParams({ ${2:key}: \"${3:value}\" })${0}"],
+    "description": "URLSearchParams — build query strings safely"
+  },
+  "crypto randomUUID": {
+    "prefix": "uuid",
+    "body": ["const ${1:id} = crypto.randomUUID()${0}"],
+    "description": "crypto.randomUUID() — generate v4 UUID (modern, no library needed)"
+  },
+  "AbortController": {
+    "prefix": "abort",
+    "body": ["const ${1:controller} = new AbortController()", "const { signal } = ${1:controller}", "", "${1:controller}.abort(${2:reason}) // to cancel${0}"],
+    "description": "AbortController — cancel fetch requests / async operations"
+  },
+  "fetch with AbortController": {
+    "prefix": "fea",
+    "body": ["const ${1:controller} = new AbortController()", "setTimeout(() => ${1:controller}.abort(), ${2:5000})", "", "const ${3:response} = await fetch(${4:url}, { signal: ${1:controller}.signal })", "if (!${3:response}.ok) throw new Error(`HTTP $${${3:response}.status}`)", "const ${5:data} = await ${3:response}.json() as ${6:Type}${0}"],
+    "description": "fetch with AbortController timeout — cancels after N ms"
+  },
+  "import.meta": {
+    "prefix": "meta",
+    "body": ["import.meta.${1:url}${0}"],
+    "description": "import.meta — ESM metadata (url, dirname, env, etc.)"
+  },
+
+  "=== MISC ===": { "prefix": "_misc_", "body": [], "description": "--- Miscellaneous ---" },
+  "TODO comment": {
+    "prefix": "td",
+    "body": ["// TODO(${1:username}): ${2:description}${0}"],
+    "description": "TODO comment with owner"
+  },
+  "FIXME comment": {
+    "prefix": "fixme",
+    "body": ["// FIXME: ${1:description}${0}"],
+    "description": "FIXME comment"
+  },
+  "template literal": {
+    "prefix": "tl",
+    "body": ["`${1:prefix}$${${2:expression}}${3:suffix}`${0}"],
+    "description": "Template literal with interpolated expression"
+  },
+  "JSON stringify pretty": {
+    "prefix": "js",
+    "body": ["JSON.stringify(${1:object}, null, 2)${0}"],
+    "description": "Pretty-print JSON"
+  },
+  "JSON parse safe": {
+    "prefix": "jp",
+    "body": ["try {", "\tconst ${1:data} = JSON.parse(${2:json}) as ${3:Type}", "} catch {", "\t${4:// handle parse error}", "}${0}"],
+    "description": "JSON.parse with try-catch and type assertion"
+  },
+  "sleep / delay": {
+    "prefix": "sl",
+    "body": ["await new Promise((resolve) => setTimeout(resolve, ${1:1000}))${0}"],
+    "description": "Sleep/delay using setTimeout + Promise"
+  },
+  "event listener": {
+    "prefix": "ev",
+    "body": ["${1:target}.addEventListener(\"${2:click}\", (${3:event}) => {", "\t${0}", "})"],
+    "description": "addEventListener with callback"
+  },
+  "spread array": {
+    "prefix": "sp",
+    "body": ["[...${1:source}, ${2:newElement}]${0}"],
+    "description": "Array spread — create new array with additions"
+  },
+  "fetch GET": {
+    "prefix": "fe",
+    "body": [
+      "const ${1:response} = await fetch(${2:url})",
+      "if (!${1:response}.ok) throw new Error(`HTTP $${${1:response}.status}`)",
+      "const ${3:data} = await ${1:response}.json() as ${4:Type}${0}"
+    ],
+    "description": "fetch GET with error handling and type assertion"
+  },
+  "fetch POST JSON": {
+    "prefix": "fep",
+    "body": [
+      "const ${1:response} = await fetch(${2:url}, {",
+      "\tmethod: \"POST\",",
+      "\theaders: { \"Content-Type\": \"application/json\" },",
+      "\tbody: JSON.stringify(${3:body}),",
+      "})",
+      "if (!${1:response}.ok) throw new Error(`HTTP $${${1:response}.status}`)",
+      "const ${4:data} = await ${1:response}.json() as ${5:Type}${0}"
+    ],
+    "description": "fetch POST JSON with headers and error handling"
   }
 }

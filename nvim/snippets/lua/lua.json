@@ -16,100 +16,401 @@
     ],
     "description": "Header Comment in LUA FILE."
   },
-  "require": {
+  "Module header": {
+    "prefix": "mod",
+    "body": [
+      "--[[",
+      "  ${1:Module name}",
+      "  ${2:Description}",
+      "  @author ${3:author}",
+      "  @date ${4:date}",
+      "--]]",
+      "",
+      "local ${5:module} = {}",
+      "",
+      "function ${5:module}.${6:func}(${7:args})",
+      "\t${0}",
+      "end",
+      "",
+      "return ${5:module}"
+    ],
+    "description": "Module header with documentation"
+  },
+  "Plugin setup pattern": {
+    "prefix": "setup",
+    "body": [
+      "local M = {}",
+      "",
+      "--- @class ${1:Plugin}Config",
+      "--- @field ${2:option} ${3:type} ${4:description}",
+      "local default_config = {",
+      "\t${2:option} = ${5:default_value},",
+      "}",
+      "",
+      "--- @param opts? ${1:Plugin}Config",
+      "function M.setup(opts)",
+      "\topts = vim.tbl_deep_extend(\"force\", default_config, opts or {})",
+      "\t${0}",
+      "end",
+      "",
+      "return M"
+    ],
+    "description": "Standard Neovim plugin setup pattern with config merging"
+  },
+  "Module require": {
     "prefix": "req",
-    "body": ["require(${1:module})"],
-    "description": "Require module"
+    "body": ["local ${1:module} = require(\"${2:module_name}\")${0}"],
+    "description": "Require a module"
   },
-  "locreq": {
-    "prefix": "lreq",
-    "body": ["local ${1:module} = require(\"${2:$1}\")$0"],
-    "description": "Require module as a variable"
+  "Module require with alias": {
+    "prefix": "reqa",
+    "body": ["local ${1:alias} = require(\"${2:module_name}\").${3:submodule}${0}"],
+    "description": "Require with alias"
   },
-  "return": {
-    "prefix": "ret",
-    "body": ["return $0"],
-    "description": "Return value"
-  },
-  "assigment": {
-    "prefix": "local",
-    "body": ["local ${1:varName} = ${0:value}"],
-    "description": "Define a variable"
-  },
-  "local-function": {
-    "prefix": "local_f",
-    "body": ["local function ${1:name}($2)", "\t${0}", "end"],
-    "description": "Define a local function"
-  },
-  "local-var-function": {
-    "prefix": "local_fv",
-    "body": ["local ${1:name} = function($2)", "\t${0}", "end"],
-    "description": "Assign a function to a local variable"
-  },
-  "class": {
-    "prefix": "class",
-    "body": ["${1:M} = {}\n", "$1.${2:new} = function($3)", "\t${6}", "end"],
-    "description": "Create a class"
-  },
-  "if": {
-    "prefix": "if",
-    "body": ["if ${1:true} then", "\t$0", "end"]
-  },
-  "elseif": {
-    "prefix": "elseif",
-    "body": ["elseif ${1:true} then", "\t$0"]
-  },
-  "for": {
-    "prefix": "for",
-    "body": ["for $1 do", "\t$0", "end"],
-    "description": "for statement"
-  },
-  "for-numeric": {
-    "prefix": "forn",
-    "body": ["for ${1:i} = ${2:1}, ${3:10} do", "\t$0", "end"],
-    "description": "for numeric range statement"
-  },
-  "for-ipairs": {
-    "prefix": "fori",
-    "body": ["for ${1:i}, ${2:x} in ipairs(${3:t}) do", "\t$0", "end"],
-    "description": "for i, x in ipairs(t)"
-  },
-  "for-pairs": {
-    "prefix": "forp",
-    "body": ["for ${1:k}, ${2:v} in pairs(${3:t}) do", "\t$0", "end"],
-    "description": "for k, v in pairs(t)"
-  },
-  "forline": {
-    "prefix": "forline",
-    "body": ["local f = io.open(${1:${2:filename}}, \"${3:r}\")\n", "while true do", "\tline = f:read()", "\tif line == nil then break end\n", "\t${0}", "end"],
-    "description": "Read file line by line"
-  },
-  "function": {
+  "Function definition": {
     "prefix": "func",
-    "body": ["function ${1:name}($2)", "\t${0}", "end"],
-    "description": "Define a function"
+    "body": ["function ${1:name}(${2:args})", "\t${0}", "end"],
+    "description": "Create a function"
   },
-  "assign-function": {
-    "prefix": "func_v",
-    "body": ["${1:name} = function($2)", "\t${0}", "end"],
-    "description": "Assign a function to a variable"
+  "Anonymous function": {
+    "prefix": "func_a",
+    "body": ["${1:name} = function(${2:args})", "\t${0}", "end"],
+    "description": "Assign anonymous function to a variable"
+  },
+  "Function with doc": {
+    "prefix": "func_d",
+    "body": [
+      "--- ${1:Description}",
+      "--- @param ${2:param} ${3:type} ${4:description}",
+      "--- @return ${5:type} ${6:description}",
+      "function ${7:name}(${2:param})",
+      "\t${0}",
+      "end"
+    ],
+    "description": "Function with documentation"
+  },
+  "Local function": {
+    "prefix": "func_l",
+    "body": ["local function ${1:name}(${2:args})", "\t${0}", "end"],
+    "description": "Local function"
+  },
+  "Local function with doc": {
+    "prefix": "func_ld",
+    "body": [
+      "--- ${1:Description}",
+      "--- @param ${2:param} ${3:type} ${4:description}",
+      "--- @return ${5:type} ${6:description}",
+      "local function ${7:name}(${2:param})",
+      "\t${0}",
+      "end"
+    ],
+    "description": "Local function with documentation"
+  },
+  "Method definition": {
+    "prefix": "method",
+    "body": ["function ${1:object}:${2:method}(${3:args})", "\t${0}", "end"],
+    "description": "Method definition using colon"
+  },
+  "Function with multiple returns": {
+    "prefix": "func_r",
+    "body": ["function ${1:name}(${2:args})", "\t${0}", "\treturn ${3:value1}, ${4:value2}", "end"],
+    "description": "Function with multiple returns"
+  },
+  "Local variable": {
+    "prefix": "loc",
+    "body": ["local ${1:name} = ${2:value}${0}"],
+    "description": "Local variable"
+  },
+  "Constant": {
+    "prefix": "const",
+    "body": ["local ${1:NAME} = ${2:value}${0}"],
+    "description": "Constant (local variable in uppercase)"
+  },
+  "Inline if": {
+    "prefix": "ifin",
+    "body": ["local ${1:result} = ${2:condition} and ${3:true_value} or ${4:false_value}${0}"],
+    "description": "Inline if (ternary operator)"
+  },
+  "If else": {
+    "prefix": "ife",
+    "body": ["if ${1:condition} then", "\t${2}", "else", "\t${0}", "end"],
+    "description": "If else statement"
+  },
+  "If statement": {
+    "prefix": "if",
+    "body": ["if ${1:condition} then", "\t${0}", "end"],
+    "description": "If statement"
+  },
+  "For loop numeric": {
+    "prefix": "for",
+    "body": ["for ${1:i} = ${2:1}, ${3:10} do", "\t${0}", "end"],
+    "description": "Numeric for loop"
+  },
+  "For loop with step": {
+    "prefix": "fors",
+    "body": ["for ${1:i} = ${2:1}, ${3:10}, ${4:2} do", "\t${0}", "end"],
+    "description": "Numeric for loop with step"
+  },
+  "For loop ipairs": {
+    "prefix": "fori",
+    "body": ["for ${1:i}, ${2:value} in ipairs(${3:table}) do", "\t${0}", "end"],
+    "description": "For loop with ipairs (array)"
+  },
+  "For loop pairs": {
+    "prefix": "forp",
+    "body": ["for ${1:key}, ${2:value} in pairs(${3:table}) do", "\t${0}", "end"],
+    "description": "For loop with pairs (all keys)"
+  },
+  "For loop with only keys": {
+    "prefix": "fork",
+    "body": ["for ${1:key} in pairs(${2:table}) do", "\t${0}", "end"],
+    "description": "For loop with only keys"
+  },
+  "For loop with only values": {
+    "prefix": "forv",
+    "body": ["for _, ${1:value} in pairs(${2:table}) do", "\t${0}", "end"],
+    "description": "For loop with only values"
+  },
+  "Class": {
+    "prefix": "class",
+    "body": [
+      "local ${1:M} = {}",
+      "",
+      "function ${1:M}:${2:new}(${3:args})",
+      "\tlocal self = setmetatable({}, { __index = ${1:M} })",
+      "\t${0}",
+      "\treturn self",
+      "end",
+      "",
+      "return ${1:M}"
+    ],
+    "description": "Class with metatable-based OOP"
   },
   "while": {
     "prefix": "while",
-    "body": ["while ${1:true} do", "\t$0", "end"]
+    "body": ["while ${1:true} do", "\t${0}", "end"],
+    "description": "While loop"
   },
-  "self": {
+  "Method on self": {
     "prefix": "self",
-    "body": ["function self:${1:methodName}($2)", "\t$0", "end"]
+    "body": ["function self:${1:methodName}(${2:args})", "\t${0}", "end"],
+    "description": "Method on self (colon syntax)"
   },
-  "pcall": {
-    "prefix": "pca",
-    "body": ["pcall(${1:function})"],
-    "description": "Protect call a function"
+  "Pcall": {
+    "prefix": "pcall",
+    "body": ["local success, result = pcall(${1:func}, ${2:args})", "if not success then", "\t${0}", "end"],
+    "description": "Protected call"
   },
-  "locpcall": {
-    "prefix": "lpca",
-    "body": ["local ${1:status}, ${2:err_or_value} = pcall(${3:function})"],
-    "description": "Protect call a function as a variable"
+  "Keymap set": {
+    "prefix": "keymap",
+    "body": ["vim.keymap.set(\"${1:n}\", \"${2:<leader>}\", ${3:rhs}, { desc = \"${4:description}\" })${0}"],
+    "description": "Keymap with description (Neovim 0.7+)"
+  },
+  "Keymap set (buffer)": {
+    "prefix": "keymapb",
+    "body": ["vim.keymap.set(\"${1:n}\", \"${2:<leader>}\", ${3:rhs}, { buffer = ${4:bufnr}, desc = \"${5:description}\" })${0}"],
+    "description": "Buffer-local keymap (Neovim 0.7+)"
+  },
+  "Autocmd": {
+    "prefix": "autocmd",
+    "body": ["vim.api.nvim_create_autocmd(${1:Event}, {", "\tpattern = \"${2:*}\",", "\tcallback = function(args)", "\t\t${0}", "\tend,", "})"],
+    "description": "Create autocmd with callback (Neovim 0.7+)"
+  },
+  "Augroup": {
+    "prefix": "augroup",
+    "body": [
+      "local ${1:group} = vim.api.nvim_create_augroup(\"${2:name}\", { clear = true })",
+      "",
+      "vim.api.nvim_create_autocmd(${3:Event}, {",
+      "\tgroup = ${1:group},",
+      "\tpattern = \"${4:*}\",",
+      "\tcallback = function(args)",
+      "\t\t${0}",
+      "\tend,",
+      "})"
+    ],
+    "description": "Augroup with autocmd (Neovim 0.7+)"
+  },
+  "User command": {
+    "prefix": "command",
+    "body": [
+      "vim.api.nvim_create_user_command(\"${1:Cmd}\", function(opts)",
+      "\t${0}",
+      "end, {",
+      "\tnargs = \"${2:0}\",",
+      "\tdesc = \"${3:description}\",",
+      "})"
+    ],
+    "description": "Create user command (Neovim 0.7+)"
+  },
+  "Vim schedule": {
+    "prefix": "schedule",
+    "body": ["vim.schedule(function()", "\t${0}", "end)"],
+    "description": "Defer execution to main loop (Neovim 0.7+)"
+  },
+  "Vim schedule wrap": {
+    "prefix": "schedule_w",
+    "body": ["-- use vim.schedule_wrap to defer a callback", "local ${1:wrapped} = vim.schedule_wrap(function(${2:args})", "\t${0}", "end)"],
+    "description": "Wrap a callback to defer to main loop (Neovim 0.7+)"
+  },
+  "Table deep extend": {
+    "prefix": "tbl_merge",
+    "body": ["${1:merged} = vim.tbl_deep_extend(\"force\", ${2:defaults}, ${3:user} or {})${0}"],
+    "description": "Deep merge tables — user values override defaults"
+  },
+  "Table filter": {
+    "prefix": "tbl_filter",
+    "body": ["local ${1:filtered} = vim.tbl_filter(function(${2:v})", "\treturn ${3:condition}", "end, ${4:table})${0}"],
+    "description": "Filter table values with predicate"
+  },
+  "Table map": {
+    "prefix": "tbl_map",
+    "body": ["local ${1:mapped} = vim.tbl_map(function(${2:v})", "\treturn ${3:transform}", "end, ${4:table})${0}"],
+    "description": "Map table values with transform"
+  },
+  "Table keys": {
+    "prefix": "tbl_keys",
+    "body": ["local ${1:keys} = vim.tbl_keys(${2:table})${0}"],
+    "description": "Get table keys as list"
+  },
+  "Table contains": {
+    "prefix": "tbl_cont",
+    "body": ["if vim.tbl_contains(${1:table}, ${2:value}) then", "\t${0}", "end"],
+    "description": "Check if list contains value (Neovim 0.8+)"
+  },
+  "Table isEmpty": {
+    "prefix": "tbl_empty",
+    "body": ["if vim.tbl_isempty(${1:table}) then", "\t${0}", "end"],
+    "description": "Check if table is empty"
+  },
+  "Vim iter": {
+    "prefix": "viter",
+    "body": [
+      "vim.iter(${1:table}):${2:filter}(function(${3:v})",
+      "\treturn ${4:condition}",
+      "end):${5:map}(function(${3:v})",
+      "\treturn ${6:transform}",
+      "end):totable()${0}"
+    ],
+    "description": "Functional iteration with vim.iter (Neovim 0.10+)"
+  },
+  "Vim inspect": {
+    "prefix": "vinspect",
+    "body": ["vim.print(${1:value})${0}"],
+    "description": "Pretty-print value to :messages (Neovim 0.10+)"
+  },
+  "Vim system": {
+    "prefix": "vsystem",
+    "body": [
+      "vim.system({ \"${1:cmd}\" }, { text = true }, function(obj)",
+      "\tif obj.code == 0 then",
+      "\t\t${2:-- handle obj.stdout}",
+      "\telse",
+      "\t\t${3:-- handle obj.stderr}",
+      "\tend",
+      "end)${0}"
+    ],
+    "description": "Async system command (Neovim 0.10+, replaces vim.fn.system)"
+  },
+  "String format": {
+    "prefix": "str_fmt",
+    "body": ["string.format(\"${1:%s}\", ${2:value})${0}"],
+    "description": "String format"
+  },
+  "String concat": {
+    "prefix": "str_con",
+    "body": ["local ${1:result} = ${2:str1} .. ${3:str2}${0}"],
+    "description": "String concatenation"
+  },
+  "String concat with table": {
+    "prefix": "str_join",
+    "body": ["local ${1:result} = table.concat(${2:table}, \"${3:}\")${0}"],
+    "description": "Concatenate strings from table"
+  },
+  "String find": {
+    "prefix": "str_find",
+    "body": ["local ${1:start}, ${2:end} = string.find(${3:str}, \"${4:pattern}\")${0}"],
+    "description": "Find pattern in string"
+  },
+  "String match": {
+    "prefix": "str_match",
+    "body": ["local ${1:capture} = string.match(${2:str}, \"${3:pattern}\")${0}"],
+    "description": "Match pattern in string"
+  },
+  "String sub": {
+    "prefix": "str_sub",
+    "body": ["local ${1:result} = string.sub(${2:str}, ${3:start}, ${4:end})${0}"],
+    "description": "Substring"
+  },
+  "String split": {
+    "prefix": "str_split",
+    "body": ["local ${1:parts} = vim.split(${2:str}, \"${3:,}\")${0}"],
+    "description": "Split string by separator using vim.split"
+  },
+  "String trim": {
+    "prefix": "str_trim",
+    "body": ["local ${1:result} = vim.trim(${2:str})${0}"],
+    "description": "Trim whitespace using vim.trim (Neovim 0.8+)"
+  },
+  "Open file": {
+    "prefix": "file_open",
+    "body": ["local file = io.open(\"${1:filename}\", \"${2:r}\")", "if not file then", "\terror(\"Could not open file\")", "end", "${0}", "file:close()"],
+    "description": "Open file with error handling"
+  },
+  "Read file": {
+    "prefix": "file_read",
+    "body": [
+      "local file = io.open(\"${1:filename}\", \"r\")",
+      "if not file then",
+      "\terror(\"Could not open file\")",
+      "end",
+      "",
+      "local ${2:content} = file:read(\"*a\")",
+      "file:close()",
+      "${0}"
+    ],
+    "description": "Read entire file"
+  },
+  "Read file line by line": {
+    "prefix": "file_readline",
+    "body": [
+      "local file = io.open(\"${1:filename}\", \"r\")",
+      "if not file then",
+      "\terror(\"Could not open file\")",
+      "end",
+      "",
+      "for line in file:lines() do",
+      "\t${0}",
+      "end",
+      "",
+      "file:close()"
+    ],
+    "description": "Read file line by line"
+  },
+  "Write file": {
+    "prefix": "file_write",
+    "body": [
+      "local file = io.open(\"${1:filename}\", \"w\")",
+      "if not file then",
+      "\terror(\"Could not open file\")",
+      "end",
+      "",
+      "file:write(${2:content})",
+      "file:close()${0}"
+    ],
+    "description": "Write to file"
+  },
+  "Append file": {
+    "prefix": "file_append",
+    "body": [
+      "local file = io.open(\"${1:filename}\", \"a\")",
+      "if not file then",
+      "\terror(\"Could not open file\")",
+      "end",
+      "",
+      "file:write(${2:content})",
+      "file:close()${0}"
+    ],
+    "description": "Append to file"
   }
 }
