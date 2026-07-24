@@ -77,7 +77,8 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                         module = "blink.cmp.sources.snippets",
                         score_offset = 3,
                         opts = {
-                            friendly_snippets = true,
+                            -- set false to using self snippets
+                            friendly_snippets = false,
                             search_paths = { vim.fn.stdpath("config") .. "/snippets" },
                             global_snippets = { "all" },
                             clipboard_register = "+",
