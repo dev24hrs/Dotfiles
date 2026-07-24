@@ -4,6 +4,7 @@ vim.pack.add({
 })
 require("image").setup({
     backend = "kitty",
+    kitty_method = "normal",
     processor = "magick_cli",
     ignore_download_error = true, -- don't throw on remote image download failures
     integrations = {
@@ -14,6 +15,9 @@ require("image").setup({
         },
     },
 })
+
+vim.api.nvim_set_hl(0, "RenderMarkdownH3Bg", { bg = "#3e4934" })
+vim.api.nvim_set_hl(0, "RenderMarkdownH4Bg", { bg = "#49503b" })
 
 require("render-markdown").setup({
     file_types = { "markdown" },
@@ -30,6 +34,14 @@ require("render-markdown").setup({
         position = "inline",
         border = false,
         render_modes = true, -- keep rendering while inserting
+        backgrounds = {
+            "RenderMarkdownH1Bg",
+            "RenderMarkdownH2Bg",
+            "RenderMarkdownH3Bg",
+            "RenderMarkdownH4Bg",
+            "RenderMarkdownH5Bg",
+            "RenderMarkdownH6Bg",
+        },
     },
     bullet = {
         enabled = true,
