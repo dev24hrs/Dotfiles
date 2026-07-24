@@ -24,7 +24,7 @@ pbcopy < ~/.ssh/id_ed25519.pub
 ```
 
 2. git config
-   `~/.gitconfig` 或 `~/.config/git/config` (个人选择)
+   `~/.gitconfig` 或 `~/.config/git/config`
 
 <details>
   <summary>git config</summary>
@@ -43,7 +43,7 @@ pbcopy < ~/.ssh/id_ed25519.pub
   # 开启文件系统监视器，极大提升在大型仓库中执行 git status 的速度
   fsmonitor = true
   # 忽略全局的各种系统生成文件 (需自行创建该文件)
-  excludesfile = ~/.config/git/.gitignore_global
+  excludesfile = ~/.gitignore_global
   # 确保分页器使用系统自带的 less，并支持颜色显示
   pager = less -RFX
 
@@ -87,7 +87,7 @@ pbcopy < ~/.ssh/id_ed25519.pub
   indentHeuristic = true
 
 [merge]
-  conflictstyle = diff3
+  conflictstyle = zdiff3
 
 [fetch]
   # 拉取时自动清理远程已删除的分支（保持本地分支列表干净）
@@ -184,6 +184,3 @@ abbr -a gri 'git rebase -i'
 abbr -a grh 'git reset --hard'
 abbr -a grs 'git reset --soft'
 ```
-
-5. git.fish
-   refer to [git.fish](https://github.com/dev24hrs/Dotfiles/blob/main/fish/config.fish)
