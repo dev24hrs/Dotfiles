@@ -1,6 +1,6 @@
 # Rime 输入法
 
-##  安装 squirrel
+## 安装 squirrel
 
 - 官网下载 [Rime](https://github.com/rime/squirrel). 安装完成后需要到设置->键盘->输入法 中添加鼠须管输入法
 
@@ -10,6 +10,7 @@
   brew install --cask squirrel
   ## brew install squirrel-app
   ```
+
 ## 安装[雾凇拼音](https://dvel.me/posts/rime-ice/)
 
 - 点击 mac右上角输入法squirrel图标,打开settings目录
