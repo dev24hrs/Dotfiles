@@ -2,7 +2,7 @@ vim.pack.add({
     { src = "https://github.com/mfussenegger/nvim-lint" },
 })
 
-vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
     group = vim.api.nvim_create_augroup("User_LintInit", { clear = true }),
     callback = function()
         if package.loaded["lint"] then
@@ -19,10 +19,8 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "InsertLeave" }, {
             jsonc = { "jsonlint" },
             sql = { "sqlfluff" },
             python = { "ruff" },
-            javascript = { "eslint_d" },
-            typescript = { "eslint_d" },
             markdown = { "markdownlint" },
-            fish = { "fish_indent" },
+            fish = { "fish" }, -- comes with Fish installation
         }
 
         lint.linters.sqlfluff.args = {

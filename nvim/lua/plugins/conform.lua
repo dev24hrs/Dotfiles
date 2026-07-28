@@ -9,19 +9,16 @@ conform.setup({
         go = { "goimports", "gofumpt" },
         yaml = { "yamlfmt" },
 
-        -- JavaScript/TypeScript 生态
-        javascript = { "prettierd", "prettier", stop_after_first = true },
-        javascriptreact = { "prettierd", "prettier", stop_after_first = true },
-        typescript = { "prettierd", "prettier", stop_after_first = true },
-        typescriptreact = { "prettierd", "prettier", stop_after_first = true },
-
-        -- 其他前端格式
-        json = { "prettierd", "prettier", stop_after_first = true },
-        jsonc = { "prettierd", "prettier", stop_after_first = true },
-        markdown = { "prettierd", "prettier", stop_after_first = true },
-        html = { "prettierd", "prettier", stop_after_first = true },
-        css = { "prettierd", "prettier", stop_after_first = true },
-        scss = { "prettierd", "prettier", stop_after_first = true },
+        -- 前端
+        javascript = { "oxfmt" },
+        javascriptreact = { "oxfmt" },
+        typescript = { "oxfmt" },
+        typescriptreact = { "oxfmt" },
+        json = { "oxfmt" },
+        jsonc = { "oxfmt" },
+        markdown = { "oxfmt" },
+        html = { "oxfmt" },
+        css = { "oxfmt" },
 
         -- Python: ruff_format 已包含格式化，ruff_fix 处理 lint 修复
         python = { "ruff_organize_imports", "ruff_format" },
@@ -65,12 +62,3 @@ vim.keymap.set({ "n", "v" }, "<leader>w", function()
         end)
     end)
 end, { desc = "[Conform]: Format and Saved" })
-
--- 保存时自动删除行尾空格
-vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-    pattern = { "*" },
-    callback = function()
-        vim.cmd([[%s/\s\+$//e]])
-        vim.fn.setpos(".", vim.fn.getpos("."))
-    end,
-})

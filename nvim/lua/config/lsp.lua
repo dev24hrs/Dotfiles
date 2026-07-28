@@ -8,10 +8,11 @@ vim.lsp.enable({
     "bashls",
     "fish_lsp",
     "sqls",
-    "ts_ls",
     "marksman",
     "taplo",
     "sourcekit", -- swift
+    "tsgo",
+    "oxlint",
 })
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -81,7 +82,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         buf_map("]w", diag_next(severity.WARN), "[Lsp]: Next WARN")
 
         if client:supports_method("textDocument/documentColor") then
-            vim.lsp.document_color.enable(true, { bufnr, style = "virtual" })
+            vim.lsp.document_color.enable(true, { bufnr = bufnr, style = "virtual" })
         end
 
         if client:supports_method("textDocument/inlayHint") then

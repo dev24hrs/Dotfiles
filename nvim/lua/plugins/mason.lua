@@ -16,7 +16,6 @@ local opts = {
         --[[
             use brew install
             "lua-language-server", -- Lua LSP lua_ls
-            "typescript-language-server", -- Typescript  LSP
             "gopls", -- Go LSP
             "rust-analyzer", -- Rust LSP
         ]]
@@ -27,13 +26,13 @@ local opts = {
         "sqls", -- SQL LSP
         "marksman", -- Markdown LSP
         "pyright", -- Python LSP
+        "tsgo", -- TypeScript LSP
 
         -- Formatters (for conform.nvim and general use)
         "stylua", -- Lua
         "goimports", --Golang
         "gofumpt", --Golang
-        "prettier",
-        "prettierd",
+        "oxfmt", -- TypeScript
         "sqlfmt", -- 'Sql
         "ruff", -- Python
         "shfmt", -- Shell
@@ -42,12 +41,12 @@ local opts = {
 
         -- -- Linters
         "golangci-lint", -- Go
+        "oxlint", -- TypeScript
         "selene", -- Lua
         "shellcheck", -- Shell
         "yamllint", -- YAML
         "jsonlint", -- JSON
         "sqlfluff", -- SQL
-        "eslint_d", -- JavaScript / TypeScript
         "markdownlint", -- Markdown
 
         -- Debuggers--
