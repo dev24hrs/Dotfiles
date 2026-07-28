@@ -7,4 +7,4 @@ complete -c tool -n "__fish_seen_subcommand_from nh" -a "(__fish_complete_subcom
 
 complete -c tool -n __fish_use_subcommand -a "ch " -d "查询 cheat.sh 备忘录"
 
-complete -c tool -n __fish_use_subcommand -a "ds " -d "清除当前目录下的 .DS_Store 文件"
+complete -c tool -n __fish_use_subcommand -a "dsclean " -d "清除当前目录下的 .DS_Store 文件"
