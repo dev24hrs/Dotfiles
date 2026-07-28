@@ -58,6 +58,37 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+-- Disable heavy features for files larger than 1.5MB
+local bigfile_group = vim.api.nvim_create_augroup("User_BigFile", { clear = true })
+local bigfile_size = 1024 * 1024 * 1.5
+
+vim.api.nvim_create_autocmd({ "BufReadPre", "FileReadPre" }, {
+    group = bigfile_group,
+    callback = function(args)
+        local ok, size = pcall(vim.fn.getfsize, args.file)
+        if not ok or size < bigfile_size then
+            return
+        end
+        vim.b.bigfile = true
+        vim.opt_local.foldmethod = "manual"
+        vim.opt_local.spell = false
+        vim.opt_local.list = false
+        vim.opt_local.swapfile = false
+        vim.opt_local.undofile = false
+    end,
+})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+    group = bigfile_group,
+    callback = function(args)
+        if vim.b.bigfile then
+            for _, client in ipairs(vim.lsp.get_clients({ bufnr = args.buf })) do
+                client:stop()
+            end
+        end
+    end,
+})
+
 -- 创建 :H 命令，在新的竖屏中打开 help
 vim.api.nvim_create_user_command("H", function(opts)
     vim.cmd("vertical help " .. (opts.args ~= "" and opts.args or ""))
