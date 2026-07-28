@@ -35,11 +35,8 @@ return {
     cmd = { "tsc", "--lsp", "--stdio" },
     filetypes = {
         "javascript",
-        "javascript.jsx",
         "javascriptreact",
         "typescript",
-        "typescript.tsx",
-        "typescriptreact",
     },
     root_dir = function(bufnr, on_dir)
         -- The project root is where the LSP can be started from

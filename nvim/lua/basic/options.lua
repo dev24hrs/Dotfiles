@@ -1,7 +1,6 @@
 -- Basic
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-vim.g.have_nerd_font = true
 vim.opt.termguicolors = true
 
 -- Performance improvements
@@ -46,34 +45,21 @@ vim.opt.breakindent = true
 vim.opt.linebreak = true
 vim.opt.autoindent = true
 vim.opt.smartindent = false
--- require('basic.langIndent')
-
--- UTF8
-vim.scriptencoding = "utf-8"
-vim.opt.encoding = "utf-8"
-vim.opt.fileencoding = "utf-8"
 
 -- Others
 vim.opt.splitright = true
-vim.g.bigfile_size = 1024 * 1024 * 1.5
 vim.g.markdown_folding = 1
 
 -- 文件类型映射
 vim.filetype.add({
     extension = {
+        gotmpl = "gotmpl",
         mdx = "markdown",
+        tsx = "typescript",
     },
     filename = {
         ["LICENSE"] = "license",
-        ["docker-compose.yaml"] = "yaml",
-        ["docker-compose.yml"] = "yaml",
-        ["go.work"] = "gowork",
         [".yamllint"] = "yaml",
         [".yamlfmt"] = "yaml",
-    },
-    pattern = {
-        ["docker%-compose%..*%.ya?ml"] = "yaml",
-        [".*%.gotmpl"] = "gotmpl",
-        [".*%.yamllint"] = "yaml",
     },
 })

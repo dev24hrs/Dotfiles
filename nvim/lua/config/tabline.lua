@@ -219,9 +219,9 @@ end
 function M.setup()
     M.set_highlights()
 
-    vim.api.nvim_create_augroup("MyTabline", { clear = true })
+    local tabline_group = vim.api.nvim_create_augroup("User_Tabline", { clear = true })
     vim.api.nvim_create_autocmd("ColorScheme", {
-        group = "MyTabline",
+        group = tabline_group,
         callback = M.set_highlights,
     })
 

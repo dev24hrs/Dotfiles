@@ -36,12 +36,26 @@ require("noice").setup({
         },
     },
     lsp = {
-        progress = { enabled = false }, -- 使用 fidget 处理进度
+        progress = { enabled = false },
         hover = { enabled = false },
         signature = { enabled = false },
         message = { enabled = false },
     },
 })
+
+-- ── Native ui2: replaces noice cmdline + eliminates "Press ENTER" ─────
+-- vim.opt.cmdheight = 0 -- hide cmdline when idle, overlay when active
+-- require("vim._core.ui2").enable({
+--     enable = true,
+--     msg = {
+--         targets = "cmd",
+--         cmd = { height = 0.5 },
+--         dialog = { height = 0.5 },
+--         msg = { height = 0.5, timeout = 4000 },
+--         pager = { height = 1 },
+--     },
+-- })
+
 require("fidget").setup({
     progress = {
         poll_rate = 0,

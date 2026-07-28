@@ -5,13 +5,13 @@ local indent_configs = {
     {
         size = 2,
         expand = true,
-        fts = { "json", "jsonc", "yaml", "markdown", "sh", "toml", "sql", "gitcommit" },
+        fts = { "json", "jsonc", "yaml", "markdown", "sh", "toml", "sql", "gitcommit", "javascript", "typescript" },
     },
     -- 4 空格缩进组
     {
         size = 4,
         expand = true,
-        fts = { "c", "cpp", "python", "lua", "rust" },
+        fts = { "c", "cpp", "python", "lua", "rust", "swift" },
     },
     -- 4 物理 Tab 组
     {

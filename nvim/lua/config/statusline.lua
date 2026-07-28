@@ -285,9 +285,9 @@ end
 function M.setup()
     M.set_highlights()
 
-    vim.api.nvim_create_augroup("MyStatusline", { clear = true })
+    local statusline_group = vim.api.nvim_create_augroup("User_Statusline", { clear = true })
     vim.api.nvim_create_autocmd("ColorScheme", {
-        group = "MyStatusline",
+        group = statusline_group,
         callback = M.set_highlights,
     })
 

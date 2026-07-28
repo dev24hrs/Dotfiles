@@ -5,7 +5,8 @@ vim.diagnostic.config({
     underline = { severity = vim.diagnostic.severity.ERROR },
     virtual_text = {
         format = function(diagnostic)
-            return string.format("%s [%s] ", diagnostic.message, diagnostic.source)
+            local msg = diagnostic.message:gsub("\n", " ")
+            return string.format("%s [%s] ", msg, diagnostic.source)
         end,
         spacing = 4,
         source = "if_many",

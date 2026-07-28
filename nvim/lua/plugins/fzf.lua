@@ -2,7 +2,12 @@ vim.pack.add({
     { src = "https://github.com/ibhagwan/fzf-lua" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
 })
--- vim.cmd('FzfLua register_ui_select')
+vim.api.nvim_create_autocmd("VimEnter", {
+    once = true,
+    callback = function()
+        require("fzf-lua").register_ui_select()
+    end,
+})
 
 require("fzf-lua").setup({
     winopts = {
