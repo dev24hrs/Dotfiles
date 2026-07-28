@@ -195,7 +195,7 @@ function M.toggle_panel()
         end
     end, { buffer = buf, silent = true })
 
-    -- [u] 【全新重构】：更新单插件
+    -- [u] 更新单插件（异步回调通知）
     vim.keymap.set("n", "u", function()
         local cursor_line = vim.api.nvim_win_get_cursor(win)[1]
         local line_info = vim.b[buf].line_to_plugin and vim.b[buf].line_to_plugin[cursor_line]
@@ -205,36 +205,44 @@ function M.toggle_panel()
             if pack and pack.update then
                 vim.notify("⚡ [vim.pack] 开始更新: " .. line_info.name, vim.log.levels.INFO)
 
-                -- 传入 { force = true } 阻止原生 UI 唤起
-                pack.update({ line_info.name }, { force = true })
-
-                vim.notify("✨ [vim.pack] " .. line_info.name .. " 更新已完成！", vim.log.levels.INFO)
-                render_ui(buf)
+                pack.update({ line_info.name }, { force = true }, function()
+                    vim.schedule(function()
+                        vim.notify("✨ [vim.pack] " .. line_info.name .. " 更新已完成！", vim.log.levels.INFO)
+                        render_ui(buf)
+                    end)
+                end)
             end
         end
     end, { buffer = buf, silent = true })
 
-    -- [U] 【全新重构】：更新全部插件
+    -- [U] 更新全部插件（异步回调通知）
     vim.keymap.set("n", "U", function()
         local pack = rawget(vim, "pack")
         if pack and pack.update then
             vim.notify("⚡ [vim.pack] 更新全部插件，请稍候...", vim.log.levels.INFO)
 
-            -- 同理，全局更新也禁止原生 UI
-            pack.update(nil, { force = true })
-
-            vim.notify("✨ [vim.pack] 全部插件更新完毕！", vim.log.levels.INFO)
-            render_ui(buf)
+            pack.update(nil, { force = true }, function()
+                vim.schedule(function()
+                    vim.notify("✨ [vim.pack] 全部插件更新完毕！", vim.log.levels.INFO)
+                    render_ui(buf)
+                end)
+            end)
         end
     end, { buffer = buf, silent = true })
 
-    -- [r] 【同步lockfile】: 同步lockfile
+    -- [r] 同步lockfile（异步回调通知）
     vim.keymap.set("n", "r", function()
-        vim.notify("⚡ [vim.pack] 开始同步lockfile ", vim.log.levels.INFO)
-        vim.pack.update(nil, { force = true, target = "lockfile" })
+        local pack = rawget(vim, "pack")
+        if pack and pack.update then
+            vim.notify("⚡ [vim.pack] 开始同步lockfile...", vim.log.levels.INFO)
 
-        vim.notify("✨ [vim.pack] 同步lockfile完毕！", vim.log.levels.INFO)
-        render_ui(buf)
+            pack.update(nil, { force = true, target = "lockfile" }, function()
+                vim.schedule(function()
+                    vim.notify("✨ [vim.pack] 同步lockfile完毕！", vim.log.levels.INFO)
+                    render_ui(buf)
+                end)
+            end)
+        end
     end, { buffer = buf, silent = true })
 
     -- [d] 删除 Unused 插件

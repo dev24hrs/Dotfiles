@@ -2,6 +2,7 @@ vim.pack.add({
     { src = "https://github.com/numToStr/Comment.nvim" },
 })
 
+---@diagnostic disable-next-line: missing-fields
 require("Comment").setup({
     padding = true,
     sticky = true,
@@ -11,7 +12,13 @@ require("Comment").setup({
     },
 })
 -- enable commenting for unsupported filetypes
-vim.bo.commentstring = "//%s"
+vim.api.nvim_create_autocmd("FileType", {
+    callback = function(ev)
+        if vim.bo[ev.buf].commentstring == "" then
+            vim.bo[ev.buf].commentstring = "//%s"
+        end
+    end,
+})
 
 local api = require("Comment.api")
 vim.keymap.set("n", "<C-.>", api.toggle.linewise.current, { desc = "[Comment]: Toggle comment line" })

@@ -80,18 +80,12 @@ local function mode_component()
 end
 
 ----------------------------------------------------------------------
--- Git branch (gitsigns → Fugitive fallback)
+-- Git branch (gitsigns)
 ----------------------------------------------------------------------
 local function git_branch()
-    local ok, head = pcall(function()
-        return vim.b.gitsigns_head
-    end)
-    if ok and head and head ~= "" then
+    local head = vim.b.gitsigns_head
+    if head and head ~= "" then
         return " " .. head
-    end
-    local ok2, fugitive_head = pcall(vim.fn.FugitiveHead)
-    if ok2 and fugitive_head and fugitive_head ~= "" then
-        return " " .. fugitive_head
     end
     return nil
 end
@@ -100,10 +94,8 @@ end
 -- Git diff (gitsigns)
 ----------------------------------------------------------------------
 local function git_diff()
-    local ok, gs = pcall(function()
-        return vim.b.gitsigns_status_dict
-    end)
-    if not ok or not gs then
+    local gs = vim.b.gitsigns_status_dict
+    if not gs then
         return nil
     end
     local a, c, r = (gs.added or 0), (gs.changed or 0), (gs.removed or 0)
@@ -298,15 +290,19 @@ end
 -- Start with no statusline; activate on first buffer backed by a real file
 vim.opt.laststatus = 0
 
+local setup_done = false
 local setup_group = vim.api.nvim_create_augroup("StatuslineDefer", { clear = true })
 vim.api.nvim_create_autocmd("BufEnter", {
     group = setup_group,
     callback = function()
+        if setup_done then
+            return
+        end
         if vim.fn.filereadable(vim.api.nvim_buf_get_name(0)) ~= 1 then
             return
         end
         M.setup()
-        vim.api.nvim_del_augroup_by_name("StatuslineDefer")
+        setup_done = true
     end,
 })
 

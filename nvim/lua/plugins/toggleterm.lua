@@ -18,11 +18,15 @@ require("toggleterm").setup({
         border = "single",
     },
 })
-function _Set_terminal_keymaps()
-    local opts = { buffer = 0 }
-    vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
-end
-vim.cmd("autocmd! TermOpen term://*toggleterm#* lua _Set_terminal_keymaps()")
+local terminal_group = vim.api.nvim_create_augroup("User_ToggleTerm", { clear = true })
+
+vim.api.nvim_create_autocmd("TermOpen", {
+    group = terminal_group,
+    pattern = "term://*toggleterm#*",
+    callback = function()
+        vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], { buffer = 0 })
+    end,
+})
 
 -- lazygit
 local Terminal = require("toggleterm.terminal").Terminal
@@ -42,7 +46,7 @@ local lazygit = Terminal:new({
     -- function to run on opening the terminal
     on_open = function(term)
         vim.cmd("startinsert!")
-        vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+        vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = term.bufnr, noremap = true, silent = true })
     end,
     -- function to run on closing the terminal
     on_close = function()
@@ -50,8 +54,6 @@ local lazygit = Terminal:new({
     end,
 })
 
-function _Lazygit_toggle()
+vim.keymap.set("n", "<leader>lg", function()
     lazygit:toggle()
-end
-
-vim.api.nvim_set_keymap("n", "<leader>lg", "<cmd>lua _Lazygit_toggle()<CR>", { noremap = true, silent = true })
+end, { desc = "[ToggleTerm]: Toggle Lazygit" })

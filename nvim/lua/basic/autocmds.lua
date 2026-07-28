@@ -8,10 +8,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- don't auto comment new line
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    pattern = "*",
+vim.api.nvim_create_autocmd("FileType", {
     callback = function()
-        vim.opt.formatoptions = vim.opt.formatoptions - { "c", "r", "o" }
+        vim.opt_local.formatoptions = vim.opt_local.formatoptions - { "c", "r", "o" }
     end,
 })
 

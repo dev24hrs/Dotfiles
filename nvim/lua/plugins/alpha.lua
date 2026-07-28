@@ -85,7 +85,6 @@ local quotes = {
 }
 
 local function get_formatted_quote()
-    math.randomseed(os.time())
     local pair = quotes[math.random(#quotes)]
     local quote_text = pair[1]
     local author = "— " .. pair[2]
