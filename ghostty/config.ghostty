@@ -22,7 +22,7 @@ cursor-style-blink          = true
 
 # window
 window-width                = 188
-window-height               = 60
+window-height               = 58
 window-padding-balance      = true
 window-padding-x            = 0
 window-padding-y            = 0
