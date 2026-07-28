@@ -1,11 +1,12 @@
 local M = {}
 
--- Colors from original lualine config
 local colors = {
     MAGENTA = "#A89984",
     RED = "#FB4934",
     CYAN = "#8EC07C",
+    GREEN = "#B8BB26",
     YELLOW = "#E5C07B",
+    ORANGE = "#FE8019",
     BLUE = "#83A598",
     BG = "#282828",
 }
@@ -37,9 +38,9 @@ function M.set_highlights()
     -- b: git
     vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.CYAN, bg = colors.BG, bold = true })
     -- b: diff
-    vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = colors.CYAN, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "GitSignsChange", { fg = colors.YELLOW, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "GitSignsRemove", { fg = colors.RED, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.CYAN, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiffChange", { fg = colors.ORANGE, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiffRemove", { fg = colors.RED, bg = colors.BG })
     -- b: diagnostics (per-severity colors)
     vim.api.nvim_set_hl(0, "DiagError", { fg = colors.RED, bg = colors.BG })
     vim.api.nvim_set_hl(0, "DiagWarn", { fg = colors.YELLOW, bg = colors.BG })
@@ -111,13 +112,13 @@ local function git_diff()
     end
     local parts = {}
     if a > 0 then
-        parts[#parts + 1] = "%#GitSignsAdd#+" .. a
+        parts[#parts + 1] = "%#StatusDiffAdd#+" .. a
     end
     if c > 0 then
-        parts[#parts + 1] = "%#GitSignsChange#~" .. c
+        parts[#parts + 1] = "%#StatusDiffChange#~" .. c
     end
     if r > 0 then
-        parts[#parts + 1] = "%#GitSignsRemove#-" .. r
+        parts[#parts + 1] = "%#StatusDiffRemove#-" .. r
     end
     return table.concat(parts, " ")
 end
