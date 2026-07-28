@@ -81,10 +81,6 @@
       "rev": "b1fd9df3bb4a41c8f45778a3859ee80ef6b367e3",
       "src": "https://github.com/nvim-mini/mini.pairs"
     },
-    "neogen": {
-      "rev": "23e7e9f883d01289ebd90e98025acc860ea26366",
-      "src": "https://github.com/danymat/neogen"
-    },
     "noice.nvim": {
       "rev": "7bfd942445fb63089b59f97ca487d605e715f155",
       "src": "https://github.com/folke/noice.nvim"

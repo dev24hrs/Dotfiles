@@ -2,7 +2,7 @@
   "Lua File Header": {
     "prefix": "hea",
     "body": [
-      "-- ================================================================================================",
+      "-- =======================================================================================",
       "-- Copyright (c) $CURRENT_YEAR dev24hrs. All Rights Reserved.",
       "-- The source code is released under the MIT License.",
       "-- License that can be found in the LICENSE file.",
@@ -12,7 +12,7 @@
       "-- DESC : ${1:Description of the plugin} for Neovim.",
       "-- LINKS :$0",
       "--   > github : https://github.com/${2:github}/${3:repo}",
-      "-- ================================================================================================"
+      "-- ======================================================================================="
     ],
     "description": "Header Comment in LUA FILE."
   },
