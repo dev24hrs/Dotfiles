@@ -23,7 +23,7 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufReadPost", "BufNewFile" }, {
             todo.jump_prev()
         end, { desc = "[Todo]: Previous Todo comment" })
 
-        vim.keymap.set("n", "<leader>ft", "<cmd>TodoQuickFix<CR>", { desc = "[Todo]: Show Todo comments" })
+        vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<CR>", { desc = "[Todo]: Show Todo comments" })
     end,
 })
 
