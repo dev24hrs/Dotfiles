@@ -70,30 +70,14 @@ CONFIG_MAP=(
 # 最后 git 提交Dotfiles更新
 ```
 
-- `./cfg migrate`: 当前mac环境,之前只手动配置`~/.config`,无`dotfiles`
-
-```bash
-mkdir -p ~/Dotfiles && cd ~/Dotfiles
-
-# 把config 已有配置都迁移进 Dotfiles
-./cfg.sh migrate
-
-# 检查结果
-ls -la ~/.config/fish   # 应该显示 -> ~/Dotfiles/fish
-
-# 3. 提交
-git add .
-git commit -m "chore: migrate existing configs to Dotfiles"
-git push
-```
-
 ## Brewfile
 
-- 导出当前 mac 已安装的所有包
+- 同步到 Brewfile 文件
 
 ```bash
-brew bundle dump --file=~/Dotfiles/Brewfile --force
+brew bundle dump --file=~/Dotfiles/Brewfile --force --no-vscode
 # --force 表示已存在则覆盖
+# --no-vscode 表示跳过vscode相关
 ```
 
 - 在新 mac 上安装 Brewfile 里的所有包
@@ -114,20 +98,6 @@ brew bundle check --file=~/Dotfiles/Brewfile
 brew bundle cleanup --file=~/Dotfiles/Brewfile
 # 加 --force 才会真正删除，不加只是预览
 brew bundle cleanup --file=~/Dotfiles/Brewfile --force
-```
-
-- 装了新包之后同步到 Brewfile
-
-```bash
-# 重新导出
-brew bundle dump --file=~/Dotfiles/Brewfile --force
-```
-
-- [Fish脚本](https://github.com/dev24hrs/Dotfiles/blob/main/fish/functions/brewup.fish)
-
-```bash
-# 生成 brewfile, 无vscode 相关依赖
-brewup file
 ```
 
 ## Enhance terminal
@@ -304,14 +274,6 @@ brew install zoxide
 
 ```bash
 zoxide init fish | source
-```
-
-### Delta
-
-- install [delta](https://github.com/dandavison/delta)
-
-```bash
-brew install git-delta
 ```
 
 ### Eza

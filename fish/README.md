@@ -126,8 +126,8 @@ zoxide init fish | source
 补全效果:
 
 ```bash
-➜ tool ds
-ch  (查询 cheat.sh 备忘录)  ds  (清除当前目录下的 .DS_Store 文件)  nh  (使用 nohup 后台运行命令)
+➜ tool dsclean
+ch  (查询 cheat.sh 备忘录)  dsclean  (清除当前目录下的 .DS_Store 文件)  nh  (使用 nohup 后台运行命令)
 ```
 
 ### functions
