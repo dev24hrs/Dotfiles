@@ -92,32 +92,26 @@ body {
   --always-black: 0 0% 0%;
 
   /* 对应typora的侧边栏 */
-  --box-shadow-search:
-    0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --box-shadow-search: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --box-shadow-userinput:
-    0 0.25rem 1.25rem hsl(var(--always-black) / 3.5%),
-    0 0 0 0.5px hsla(var(--border-300) / 0.15);
+    0 0.25rem 1.25rem hsl(var(--always-black) / 3.5%), 0 0 0 0.5px hsla(var(--border-300) / 0.15);
   --box-shadow-userinput-hover:
-    0 0.25rem 1.25rem hsl(var(--always-black) / 3.5%),
-    0 0 0 0.5px hsla(var(--border-200) / 0.3);
+    0 0.25rem 1.25rem hsl(var(--always-black) / 3.5%), 0 0 0 0.5px hsla(var(--border-200) / 0.3);
   --box-shadow-userinput-focus:
-    0 0.25rem 1.25rem hsl(var(--always-black) / 7.5%),
-    0 0 0 0.5px hsla(var(--border-200) / 0.3);
+    0 0.25rem 1.25rem hsl(var(--always-black) / 7.5%), 0 0 0 0.5px hsla(var(--border-200) / 0.3);
 
   /*
     --font-serif: "RecMonoCasual Nerd Font","FiraMono Nerd Font","Source Han Sans SC VF";
     --font-sans: "RecMonoCasual Nerd Font","FiraMono Nerd Font","Source Han Sans SC VF",-apple-system,system-ui,Arial, sans-serif;
     --font-mono: "RecMonoCasual Nerd Font Mono","FiraMono Nerd Font Mono","Source Han Sans SC VF",ui-monospace,monospace;
    */
-  --font-serif:
-    "RecMonoCasual Nerd Font", "FiraMono Nerd Font", "Source Han Serif SC",
-    serif;
+  --font-serif: "RecMonoCasual Nerd Font", "FiraMono Nerd Font", "Source Han Serif SC", serif;
   --font-sans:
-    "RecMonoCasual Nerd Font Mono", "Source Han Sans SC VF",
-    "FiraMono Nerd Font Mono", system-ui, -apple-system, "Segoe UI", sans-serif;
+    "RecMonoCasual Nerd Font Mono", "Source Han Sans SC VF", "FiraMono Nerd Font Mono", system-ui,
+    -apple-system, "Segoe UI", sans-serif;
   --font-mono:
-    "RecMonoCasual Nerd Font Mono", "FiraMono Nerd Font Mono",
-    "Source Han Sans SC VF", Menlo, monospace;
+    "RecMonoCasual Nerd Font Mono", "FiraMono Nerd Font Mono", "Source Han Sans SC VF", Menlo,
+    monospace;
 
   --font-weight: 400;
   --font-strong: 600;
@@ -311,6 +305,12 @@ body {
 ::selection {
   background-color: var(--LOGO-color) !important;
   color: var(--font-color) !important;
+}
+
+/* 删除线 */
+#write del {
+  text-decoration: line-through;
+  text-decoration-color: red;
 }
 
 /* ---------- 6.3 有序列表和无序列表 ---------- */
@@ -976,12 +976,7 @@ a:hover {
   > .file-node-children
   > .file-library-node
   > .file-node-content
-  > :is(
-    .file-node-open-state,
-    .file-node-icon,
-    .file-node-title,
-    .file-tree-rename-div
-  ) {
+  > :is(.file-node-open-state, .file-node-icon, .file-node-title, .file-tree-rename-div) {
   animation: treeItemIn 0.35s ease-out both;
   animation-delay: var(--tree-delay);
 }
@@ -991,12 +986,7 @@ a:hover {
   > .file-node-children
   > .file-library-node.file-node-expanded
   > .file-node-content
-  > :is(
-    .file-node-open-state,
-    .file-node-icon,
-    .file-node-title,
-    .file-tree-rename-div
-  ) {
+  > :is(.file-node-open-state, .file-node-icon, .file-node-title, .file-tree-rename-div) {
   animation-duration: 0.001s !important;
   animation-delay: 0s !important;
 }
@@ -1054,10 +1044,7 @@ a:hover {
   transition: translate 0.25s ease-out;
 }
 
-#file-library-tree
-  .file-library-file-node
-  > .file-node-content:hover
-  .file-node-icon,
+#file-library-tree .file-library-file-node > .file-node-content:hover .file-node-icon,
 .file-node-content:hover .file-node-title {
   translate: 4px 0;
 }
@@ -1107,29 +1094,15 @@ a:hover {
 /* 文件节点的图标 */
 
 /* 隐藏原有的默认图标 */
-#file-library-tree
-  .file-library-file-node
-  > .file-node-content
-  .file-node-icon
-  svg,
-#file-library-tree
-  .file-library-file-node
-  > .file-node-content
-  .file-node-icon
-  i,
-#file-library-tree
-  .file-library-file-node
-  > .file-node-content
-  .file-node-icon::before {
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon svg,
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon i,
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon::before {
   display: none !important;
   content: none !important;
 }
 
 /* 改造原图标的包裹容器 */
-#file-library-tree
-  .file-library-file-node
-  > .file-node-content
-  .file-node-icon {
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -1140,10 +1113,7 @@ a:hover {
 }
 
 /* 绘制实心圆点与朦胧光晕 */
-#file-library-tree
-  .file-library-file-node
-  > .file-node-content
-  .file-node-icon::after {
+#file-library-tree .file-library-file-node > .file-node-content .file-node-icon::after {
   content: "";
   display: block;
   width: 6px;
@@ -1437,10 +1407,7 @@ a:hover {
 }
 
 .no-collapse-outline .outline-children > li:first-child > .outline-item::before,
-.no-collapse-outline
-  .outline-content
-  > li:nth-child(2)
-  > .outline-item::before {
+.no-collapse-outline .outline-content > li:nth-child(2) > .outline-item::before {
   top: -8px;
   height: calc(50% + 8px);
 }
@@ -1473,25 +1440,19 @@ a:hover {
   .outline-content
   > li.outline-item-wrapper:first-child
   > .outline-children::before,
-.outline-content
-  > li.outline-item-open:first-child
-  > .outline-children::before {
+.outline-content > li.outline-item-open:first-child > .outline-children::before {
   top: -15px;
 }
 
 /* 隐藏部分不需要的连线 */
 .outline-content > li:only-of-type > .outline-item::before,
-.no-collapse-outline
-  .outline-item-wrapper:last-of-type
-  > .outline-children::before,
+.no-collapse-outline .outline-item-wrapper:last-of-type > .outline-children::before,
 .no-collapse-outline
   .outline-children
   > li.outline-item-wrapper:last-child
   > .outline-children::before,
 .outline-item-open:last-of-type > .outline-children::before,
-.outline-children
-  > li.outline-item-open:last-child
-  > .outline-children::before {
+.outline-children > li.outline-item-open:last-child > .outline-children::before {
   display: none;
 }
 

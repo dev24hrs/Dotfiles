@@ -1,6 +1,4 @@
-
 :root {
-
   /* Colors */
   --bg-color: rgba(250, 249, 245, 1);
   --text-color: rgba(55, 53, 47, 1);
@@ -37,8 +35,11 @@
   --active-file-bg-color: rgba(237, 237, 239, 1);
 
   /* Typography */
-  --body-font: "RecMonoCasual Nerd Font Mono", "Source Han Sans SC VF","FiraMono Nerd Font Mono",-apple-system,BlinkMacSystemFont, sans-serif;
-  --monospace-font: "RecMonoCasual Nerd Font Mono", "Source Han Sans SC VF","FiraMono Nerd Font Mono", monospace;
+  --body-font:
+    "RecMonoCasual Nerd Font Mono", "Source Han Sans SC VF", "FiraMono Nerd Font Mono",
+    -apple-system, BlinkMacSystemFont, sans-serif;
+  --monospace-font:
+    "RecMonoCasual Nerd Font Mono", "Source Han Sans SC VF", "FiraMono Nerd Font Mono", monospace;
 
   /* Type scale */
   --font-size: 16px;
@@ -63,7 +64,8 @@
   --border-radius-lg: 4px;
 
   /* Inline code */
-  --code-font: "RecMonoCasual Nerd Font Mono", "FiraMono Nerd Font Mono","Source Han Sans SC VF", monospace;
+  --code-font:
+    "RecMonoCasual Nerd Font Mono", "FiraMono Nerd Font Mono", "Source Han Sans SC VF", monospace;
   --code-bg-color: rgba(135, 131, 120, 0.15);
   --code-color: rgba(235, 87, 87, 1);
   --code-border-radius: 3px;
@@ -126,12 +128,12 @@ p {
   line-height: var(--line-height);
 }
 
-h1+p,
-h2+p,
-h3+p,
-h4+p,
-h5+p,
-h6+p {
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p {
   margin-top: 8px;
 }
 
@@ -156,7 +158,7 @@ h6+p {
 }
 
 /* Image captions */
-#write .md-image>.md-meta {
+#write .md-image > .md-meta {
   color: rgba(55, 53, 47, 0.65);
   font-size: 14px;
   font-style: italic;
@@ -311,8 +313,8 @@ tbody tr:hover {
   background-color: rgba(55, 53, 47, 0.06);
 }
 
-h2+table tr:first-child th,
-h2+table tr:first-child td {
+h2 + table tr:first-child th,
+h2 + table tr:first-child td {
   border-top-width: 0;
 }
 
@@ -350,24 +352,24 @@ ol ol ol {
   list-style-type: lower-roman;
 }
 
-#write ul>li::marker {
+#write ul > li::marker {
   color: var(--accent-color);
   font-weight: 600;
 }
 
-#write ol>li::marker {
+#write ol > li::marker {
   color: var(--accent-color);
   font-weight: 600;
   font-size: 15.2px;
 }
 
-#write ul ul>li::marker,
-#write ol ol>li::marker {
+#write ul ul > li::marker,
+#write ol ol > li::marker {
   color: rgba(193, 202, 204, 0.7);
 }
 
-#write ul ul ul>li::marker,
-#write ol ol ol>li::marker {
+#write ul ul ul > li::marker,
+#write ol ol ol > li::marker {
   color: rgba(193, 202, 204, 0.5);
 }
 
@@ -376,7 +378,7 @@ li p {
 }
 
 /* Task list checkboxes */
-#write .md-task-list-item>input {
+#write .md-task-list-item > input {
   appearance: none;
   -webkit-appearance: none;
   display: inline-block;
@@ -392,19 +394,19 @@ li p {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#write .md-task-list-item>input:hover {
+#write .md-task-list-item > input:hover {
   border-color: var(--todo-bg-color);
   background-color: rgba(36, 131, 226, 0.08);
   transform: scale(1.05) var(--gpu-acceleration);
 }
 
-#write .md-task-list-item>input:focus {
+#write .md-task-list-item > input:focus {
   outline: 2px solid var(--todo-bg-color);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(36, 131, 226, 0.1);
 }
 
-#write .md-task-list-item>input[checked] {
+#write .md-task-list-item > input[checked] {
   background: var(--todo-bg-color);
   border: 2px solid var(--todo-bg-color);
   animation: checkboxPop 0.2s ease-out;
@@ -424,7 +426,7 @@ li p {
   }
 }
 
-#write .md-task-list-item>input[checked]::before {
+#write .md-task-list-item > input[checked]::before {
   content: "";
   display: block;
   width: 5.6px;
@@ -458,7 +460,7 @@ li p {
   }
 }
 
-#write .md-task-list-item>input[checked]+label,
+#write .md-task-list-item > input[checked] + label,
 #write .md-task-list-item.task-list-done {
   color: rgba(115, 113, 109, 0.7);
   text-decoration: line-through;
@@ -466,7 +468,7 @@ li p {
   transition: all 0.2s ease;
 }
 
-.md-image>.md-meta {
+.md-image > .md-meta {
   border-radius: var(--border-radius);
   padding: 2px 0px 0px 4px;
   font-size: 14.4px;
@@ -495,7 +497,8 @@ li p {
   line-height: 1;
   color: var(--accent-color);
   opacity: 0.3;
-  font-family: "RecMonoCasual Nerd Font Mono", "FiraMono Nerd Font Mono","Source Han Sans SC VF", serif;
+  font-family:
+    "RecMonoCasual Nerd Font Mono", "FiraMono Nerd Font Mono", "Source Han Sans SC VF", serif;
 }
 
 #write blockquote p:first-child {
@@ -519,7 +522,7 @@ li p {
 
 .md-alert::before,
 .admonition::before {
-  content: 'i';
+  content: "i";
   position: absolute;
   left: 14px;
   top: 14px;
@@ -532,25 +535,25 @@ li p {
 }
 
 .md-alert-note::before {
-  content: 'i';
+  content: "i";
 }
 
 .md-alert-tip::before {
-  content: '*';
+  content: "*";
   font-style: normal;
 }
 
 .md-alert-important::before {
-  content: '!';
+  content: "!";
 }
 
 .md-alert-warning::before {
-  content: '‼';
+  content: "‼";
   font-style: normal;
 }
 
 .md-alert-caution::before {
-  content: '×';
+  content: "×";
   font-style: normal;
 }
 
@@ -636,8 +639,8 @@ li p {
 }
 
 pre {
-  --monospace: "Cascadia Code Variable", SFMono-Regular, Menlo, Consolas,
-    "PT Mono", "Liberation Mono";
+  --monospace:
+    "Cascadia Code Variable", SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono";
 }
 
 /* Code fences */
@@ -650,7 +653,10 @@ pre {
   overflow: visible;
   padding: 0;
   font-size: var(--code-block-font-size);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 
   contain: layout style;
   will-change: border-color, box-shadow;
@@ -824,20 +830,24 @@ pre {
 }
 
 /* Typora lacks :has; position tooltip below diagram fences. */
-#write .md-fences:is([lang="mermaid"],
-  [lang="flowchart"],
-  [lang="sequence"],
-  [lang="gantt"],
-  [lang="classDiagram"],
-  [lang="stateDiagram"],
-  [lang="erDiagram"],
-  [lang="journey"],
-  [lang="pie"],
-  [lang="gitGraph"],
-  [lang="mindmap"],
-  [lang="timeline"],
-  [lang="js-sequence-diagram"],
-  [lang="flow"]) .code-tooltip {
+#write
+  .md-fences:is(
+    [lang="mermaid"],
+    [lang="flowchart"],
+    [lang="sequence"],
+    [lang="gantt"],
+    [lang="classDiagram"],
+    [lang="stateDiagram"],
+    [lang="erDiagram"],
+    [lang="journey"],
+    [lang="pie"],
+    [lang="gitGraph"],
+    [lang="mindmap"],
+    [lang="timeline"],
+    [lang="js-sequence-diagram"],
+    [lang="flow"]
+  )
+  .code-tooltip {
   right: -5px;
   bottom: auto;
   top: 100%;
@@ -936,7 +946,10 @@ code {
   padding: 0 2px;
   margin: 0 -2px;
   border-radius: 2px;
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 #write a:hover {
@@ -957,7 +970,7 @@ code {
 
 /* Selection and marks. */
 ::selection {
-  background-color: #D97757 !important;
+  background-color: #d97757 !important;
   color: #141413 !important;
 }
 
@@ -1026,7 +1039,6 @@ mark.gray {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -1107,7 +1119,7 @@ mark.gray {
   border-left: 1px solid var(--border-color);
 }
 
-.outline-content>li:first-of-type::before {
+.outline-content > li:first-of-type::before {
   top: 0;
 }
 
@@ -1130,7 +1142,7 @@ mark.gray {
   border-left: 1px solid var(--border-color);
 }
 
-.outline-content ul>li:last-of-type::before {
+.outline-content ul > li:last-of-type::before {
   content: "";
   width: 1px;
   height: 10px;
@@ -1148,7 +1160,7 @@ mark.gray {
   border: 1px solid rgba(0, 0, 0, 0);
 }
 
-.outline-item>.outline-label {
+.outline-item > .outline-label {
   text-decoration: none;
 }
 
@@ -1170,7 +1182,7 @@ mark.gray {
   border-bottom: 1px solid var(--border-color);
 }
 
-.outline-content>li:first-of-type>.outline-item::before {
+.outline-content > li:first-of-type > .outline-item::before {
   top: calc(50% - 1px) !important;
   border-top: 1px solid var(--border-color);
   border-bottom: none;
@@ -1180,7 +1192,7 @@ mark.gray {
   -webkit-border-bottom-left-radius: 0;
 }
 
-.outline-content>li:first-of-type>.outline-item::after {
+.outline-content > li:first-of-type > .outline-item::after {
   content: "";
   width: 1px;
   height: 100%;
@@ -1191,8 +1203,8 @@ mark.gray {
   border-left: 1px solid var(--bg-color);
 }
 
-.outline-content>li:last-of-type>.outline-item::before,
-.outline-content>li ul>li:last-of-type>.outline-item::before {
+.outline-content > li:last-of-type > .outline-item::before,
+.outline-content > li ul > li:last-of-type > .outline-item::before {
   z-index: 90;
   background: rgba(0, 0, 0, 0);
   border-left: 1px solid var(--border-color);
@@ -1204,12 +1216,12 @@ mark.gray {
   -webkit-border-top-left-radius: 0;
 }
 
-.outline-content>li:only-of-type>.outline-item::before,
-.outline-content>li:last-of-type::before {
+.outline-content > li:only-of-type > .outline-item::before,
+.outline-content > li:last-of-type::before {
   display: none;
 }
 
-.outline-content>li:only-of-type {
+.outline-content > li:only-of-type {
   margin-left: -6px;
 }
 
@@ -1229,13 +1241,13 @@ mark.gray {
 }
 
 .outline-item:hover,
-.outline-item:hover>.outline-expander:before,
-.outline-item:hover>.outline-expander {
+.outline-item:hover > .outline-expander:before,
+.outline-item:hover > .outline-expander {
   background: var(--active-file-bg-color) !important;
   color: var(--text-color) !important;
 }
 
-li>.outline-item-active {
+li > .outline-item-active {
   background: var(--active-file-bg-color);
 }
 
@@ -1254,7 +1266,7 @@ li>.outline-item-active {
   display: none;
 }
 
-.ty-on-outline-filter .outline-content>li>ul,
+.ty-on-outline-filter .outline-content > li > ul,
 .ty-on-outline-filter .outline-content .outline-item {
   margin-left: 0;
 }
@@ -1373,30 +1385,30 @@ li>.outline-item-active {
   width: 9.1424px !important;
 }
 
-.file-node-expanded>.file-node-children {
+.file-node-expanded > .file-node-children {
   margin-left: 33.7136px;
 }
 
-.file-tree-node>.file-node-background {
+.file-tree-node > .file-node-background {
   border-radius: 5.7136px;
   margin-left: -13.7136px;
   border: none !important;
 }
 
-#file-library-tree .file-node-root>.file-node-content {
+#file-library-tree .file-node-root > .file-node-content {
   margin-left: -3.4288px !important;
 }
 
-#file-library-tree .file-tree-node>.file-node-content {
+#file-library-tree .file-tree-node > .file-node-content {
   margin-left: -17.1424px;
 }
 
-#file-library-tree .file-node-collapsed>.file-node-content,
-#file-library-tree .file-node-expanded>.file-node-content {
+#file-library-tree .file-node-collapsed > .file-node-content,
+#file-library-tree .file-node-expanded > .file-node-content {
   margin-left: -10.2864px;
 }
 
-.file-library-node:not(.file-node-root):focus>.file-node-content {
+.file-library-node:not(.file-node-root):focus > .file-node-content {
   outline: none;
 }
 
@@ -1405,8 +1417,8 @@ li>.outline-item-active {
   margin-bottom: 3.4288px;
 }
 
-.file-library-node:not(.file-node-root):focus>.file-node-background,
-.file-library-node.active:not(.file-node-root):focus>.file-node-background {
+.file-library-node:not(.file-node-root):focus > .file-node-background,
+.file-library-node.active:not(.file-node-root):focus > .file-node-background {
   border: 1px dashed var(--text-color) !important;
 }
 
@@ -1425,7 +1437,7 @@ li>.outline-item-active {
   font-weight: 700;
 }
 
-#file-library-tree .file-node-root>.file-node-children {
+#file-library-tree .file-node-root > .file-node-children {
   margin-left: 30.2864px;
 }
 
@@ -1433,7 +1445,7 @@ li>.outline-item-active {
   position: relative;
 }
 
-.file-node-expanded>.file-node-content .fa-caret-down {
+.file-node-expanded > .file-node-content .fa-caret-down {
   margin-right: 1.1424px;
 }
 
@@ -1459,12 +1471,12 @@ li>.outline-item-active {
   border-left: 1px solid var(--border-color);
 }
 
-#file-library-tree .file-node-content>.file-node-icon::before {
+#file-library-tree .file-node-content > .file-node-icon::before {
   position: relative;
   z-index: 35;
 }
 
-#file-library-tree .file-node-content>.file-node-icon::after {
+#file-library-tree .file-node-content > .file-node-icon::after {
   content: "";
   position: absolute;
   z-index: 20;
@@ -1477,39 +1489,43 @@ li>.outline-item-active {
   background: rgba(0, 0, 0, 0);
 }
 
-#file-library-tree .active>.file-node-content>.file-node-icon::after {
+#file-library-tree .active > .file-node-content > .file-node-icon::after {
   width: 9.1424px;
 }
 
-#file-library-tree .file-node-expanded>.file-node-content>.file-node-icon::after {
+#file-library-tree .file-node-expanded > .file-node-content > .file-node-icon::after {
   left: -22.8576px;
   top: 17.1424px;
   width: 9.1424px;
 }
 
-#file-library-tree .file-node-collapsed>.file-node-content>.file-node-icon::after {
+#file-library-tree .file-node-collapsed > .file-node-content > .file-node-icon::after {
   left: -22.8576px;
   top: 16px;
   width: 13.7136px;
 }
 
-.os-windows #file-library-tree .file-node-collapsed>.file-node-content>.file-node-icon::after {
+.os-windows #file-library-tree .file-node-collapsed > .file-node-content > .file-node-icon::after {
   top: 17.1424px;
 }
 
-#file-library-tree .file-node-children>div:last-of-type>.file-node-content>.file-node-icon::after {
+#file-library-tree
+  .file-node-children
+  > div:last-of-type
+  > .file-node-content
+  > .file-node-icon::after {
   border-top: none;
   border-bottom: 1px solid var(--border-color);
   border-bottom-left-radius: 3.4288px;
   top: -1.1424px;
 }
 
-#file-library-tree .file-node-children>div:last-of-type>.file-node-content::before {
+#file-library-tree .file-node-children > div:last-of-type > .file-node-content::before {
   height: 11.4288px;
   top: -10.2864px;
 }
 
-.file-node-root>.file-node-content>.file-node-icon::after {
+.file-node-root > .file-node-content > .file-node-icon::after {
   display: none;
 }
 
@@ -1644,7 +1660,12 @@ li>.outline-item-active {
   width: 0.8571em;
 }
 
-.os-windows #file-library-tree .file-node-children > div:last-of-type > .file-node-content > .file-node-icon::after {
+.os-windows
+  #file-library-tree
+  .file-node-children
+  > div:last-of-type
+  > .file-node-content
+  > .file-node-icon::after {
   border-bottom-left-radius: 0.2143em;
   top: -0.0714em;
 }
@@ -1675,7 +1696,6 @@ li>.outline-item-active {
 
 /* Print/PDF export overrides. */
 @media print {
-
   .typora-export * {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
@@ -1746,7 +1766,7 @@ li>.outline-item-active {
   }
 
   #write img,
-  #write .md-task-list-item>input {
+  #write .md-task-list-item > input {
     will-change: auto !important;
     transform: none !important;
   }
@@ -1770,7 +1790,7 @@ li>.outline-item-active {
   }
 
   #write h1:first-of-type,
-  #write>h1:first-child {
+  #write > h1:first-child {
     page-break-before: auto;
     break-before: auto;
   }
@@ -1953,7 +1973,7 @@ li>.outline-item-active {
 #write .md-htmlblock-container {
   background: rgba(0, 0, 0, 0) !important;
   box-shadow: none !important;
-  border: 0 !important
+  border: 0 !important;
 }
 
 #write div[style*="border:1px solid #ccc"][style*="padding: 15px"],
@@ -1964,13 +1984,13 @@ li>.outline-item-active {
   background: rgba(249, 249, 249, 1) !important;
   border-color: rgba(208, 208, 208, 1) !important;
   color: rgba(55, 53, 47, 1) !important;
-  box-shadow: 0 0 0 1px rgba(15, 15, 15, .08) inset !important;
+  box-shadow: 0 0 0 1px rgba(15, 15, 15, 0.08) inset !important;
 }
 
 #write div[style*="border:1px solid #aaa"] {
   background: rgba(245, 245, 245, 1) !important;
   border-color: rgba(192, 192, 192, 1) !important;
-  color: rgba(55, 53, 47, 1) !important
+  color: rgba(55, 53, 47, 1) !important;
 }
 
 #write [style*="background-color: #e0e0ff"],
@@ -1978,7 +1998,7 @@ li>.outline-item-active {
 #write [style*="background-color: rgb(224, 224, 255)"] {
   background: rgba(224, 224, 255, 1) !important;
   border-color: rgba(160, 160, 255, 1) !important;
-  color: rgba(47, 58, 122, 1) !important
+  color: rgba(47, 58, 122, 1) !important;
 }
 
 #write [style*="background-color: #e0ffe0"],
@@ -1986,13 +2006,13 @@ li>.outline-item-active {
 #write [style*="background-color: rgb(224, 255, 224)"] {
   background: rgba(224, 255, 224, 1) !important;
   border-color: rgba(95, 201, 102, 1) !important;
-  color: rgba(31, 74, 31, 1) !important
+  color: rgba(31, 74, 31, 1) !important;
 }
 
 #write div[style*="font-size: 20px"] {
   background: rgba(0, 0, 0, 0) !important;
   border: 0 !important;
-  color: rgba(110, 110, 110, 1) !important
+  color: rgba(110, 110, 110, 1) !important;
 }
 
 #write .md-htmlblock-container *,
@@ -2000,15 +2020,15 @@ li>.outline-item-active {
   opacity: 1 !important;
   filter: none !important;
   mix-blend-mode: normal !important;
-  color: inherit !important
+  color: inherit !important;
 }
 
 /* Strikethrough. */
 s,
 del,
 .del {
-  color: rgba(55, 53, 47, 0.5);
   text-decoration: line-through;
+  text-decoration-color: red;
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
 }
