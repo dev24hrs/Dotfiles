@@ -36,7 +36,7 @@ function M.set_highlights()
     vim.api.nvim_set_hl(0, "StatusMode", { fg = colors.RED, bg = colors.BG, bold = true })
     vim.api.nvim_set_hl(0, "StatusModeTerm", { fg = colors.RED, bg = colors.BG, bold = true })
     -- b: git
-    vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.CYAN, bg = colors.BG, bold = true })
+    vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.CYAN, bg = colors.BG })
     -- b: diff
     vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.CYAN, bg = colors.BG })
     vim.api.nvim_set_hl(0, "StatusDiffChange", { fg = colors.ORANGE, bg = colors.BG })
@@ -47,11 +47,11 @@ function M.set_highlights()
     vim.api.nvim_set_hl(0, "DiagInfo", { fg = colors.BLUE, bg = colors.BG })
     vim.api.nvim_set_hl(0, "DiagHint", { fg = colors.MAGENTA, bg = colors.BG })
     -- c: filename
-    vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.MAGENTA, bg = colors.BG, bold = true })
+    vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.MAGENTA, bg = colors.BG })
     -- x: indent, encoding, fileformat
-    vim.api.nvim_set_hl(0, "StatusInfo", { fg = colors.MAGENTA, bg = colors.BG, bold = true })
+    vim.api.nvim_set_hl(0, "StatusInfo", { fg = colors.MAGENTA, bg = colors.BG })
     -- y: filetype
-    vim.api.nvim_set_hl(0, "StatusFiletype", { fg = colors.BLUE, bg = colors.BG, bold = true })
+    vim.api.nvim_set_hl(0, "StatusFiletype", { fg = colors.BLUE, bg = colors.BG })
     -- z: lsp
     vim.api.nvim_set_hl(0, "StatusLSP", { fg = colors.RED, bg = colors.BG, bold = true })
 end
