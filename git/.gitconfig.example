@@ -1,19 +1,25 @@
+
 [user]
-    name = dev24hrs
-    email = asang24dev@gmail.com
+    name = xxx
+    email = xxx@gmail.com
 [core]
     editor = nvim
-    pager = delta
+    # 确保分页器使用系统自带的 less，并支持颜色显示
+    pager = less -RFX
     # 自动转换换行符 (Windows 设为 true, macOS/Linux 设为 input)
     autocrlf = input
     # 忽略文件权限变化（避免因为 chmod 导致整片文件变红)
     filemode = false
-    # 开启文件系统监视器，极大提升在大型仓库中执行 git status 的速度
+    # 忽略文件大小写（macOS 默认不区分，建议开启避免混乱）
+    ignorecase = true
+    # 预加载索引提升性能（大仓库显著加速 status/diff）
+    preloadindex = true
+    # 开启文件系统监视器，极大提升在大型仓库中执行 git status 的速度(需 Git 2.37+)
     fsmonitor = true
+    # 长路径支持（Windows 下必须开启，macOS/Linux 默认支持）
+    # longpaths = true
     # 忽略全局的各种系统生成文件 (需自行创建该文件)
     excludesfile = ~/.gitignore_global
-    # 确保分页器使用系统自带的 less，并支持颜色显示
-    # pager = less -RFX
 
 [init]
     # 默认初始分支名为 main
@@ -22,17 +28,6 @@
 [branch]
     # 分支排序：按最近提交时间排序，最常修改的分支排在前面
     sort = -committerdate
-
-[delta]
-    navigate = true
-    true-color = always
-    light = false
-    side-by-side = false
-    line-numbers = true
-    syntax-theme = gruvbox-dark
-
-[interactive]
-    diffFilter = delta --color-only
 
 [color]
     ui = auto
@@ -54,7 +49,7 @@
     algorithm = histogram
     # 开启重命名检测的高级模式（复制和重命名）
     renames = copies
-    # 让 delta 自动对搬移的代码块着色，而不是标为删除+新增
+    # 自动对搬移的代码块着色，而不是标为删除+新增
     colorMoved = default
     # zebra 模式会用不同的颜色标注掉迁出和迁入的代码块，而不是简单的红绿
     colorMoved = zebra
@@ -65,14 +60,25 @@
     # 缩进启发式：让 Diff 块尽量在空行处分割，保持代码块完整性。
     indentHeuristic = true
 
+[status]
+    # 显示子模块变更摘要
+    submoduleSummary = true
+    # 显示未跟踪文件目录（建议保持简洁）
+    showUntrackedFiles = all
+
 [merge]
     conflictstyle = zdiff3
+
+[rerere]
+    enabled = true
+    autoUpdate = true
 
 [fetch]
     # 拉取时自动清理远程已删除的分支（保持本地分支列表干净）
     prune = true
     # 自动拉取远程的 tag
     tags = true
+    parallelism = 10
 
 [pull]
     # 拉取代码时默认使用 rebase 而不是 merge，保持提交历史呈线性
@@ -85,6 +91,8 @@
     default = current
     # 极其重要的安全设置：如果是强制推送，检查本地是否包含了远程最新的提交，防止覆盖同事代码
     useForceIfIncludes = true
+    # 并行推送（提升速度，Git 2.24+）
+    parallelism = 5
 
 [rebase]
     # rebase 前自动暂存未提交的工作，结束后自动恢复（非常实用！）
