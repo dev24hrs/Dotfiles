@@ -22,7 +22,7 @@ require("aerial").setup({
     show_guides = true,
     autojump = true,
     lazy_load = true,
-    close_on_select = true,
+    close_on_select = false,
     keymaps = {
         ["o"] = "actions.jump",
         ["{"] = "actions.prev",
@@ -32,4 +32,4 @@ require("aerial").setup({
         ["h"] = "actions.tree_close",
     },
 })
-vim.keymap.set("n", "<leader>ll", "<cmd>AerialToggle<CR>", { desc = "[Aerial]: Toggle Outline" })
+vim.keymap.set("n", "<leader>ot", "<cmd>AerialToggle<CR>", { desc = "[Aerial]: Toggle Outline" })

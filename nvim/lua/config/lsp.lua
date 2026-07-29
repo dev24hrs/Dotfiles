@@ -22,64 +22,90 @@ vim.api.nvim_create_autocmd("LspAttach", {
         local bufnr = event.buf
 
         local fzf = require("fzf-lua")
+        local keymaps = {
+            { keys = "<leader>cr", func = vim.lsp.buf.rename, desc = "Rename Symbols" },
+            { keys = "K", func = vim.lsp.buf.hover, desc = "Hover Documentation" },
+            { keys = "gd", func = vim.lsp.buf.definition, desc = "Goto Definition" },
+            { keys = "gi", func = vim.lsp.buf.implementation, desc = "Goto Implementation" },
+            { keys = "gt", func = vim.lsp.buf.type_definition, desc = "Goto Type Definition" },
 
-        local function buf_map(keys, func, desc)
-            vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
+            {
+                keys = "<leader>ca",
+                func = function()
+                    fzf.lsp_code_actions()
+                end,
+                desc = "Code Action",
+            },
+            {
+                keys = "gr",
+                func = function()
+                    fzf.lsp_references()
+                end,
+                desc = "Goto References",
+            },
+            {
+                keys = "gf",
+                func = function()
+                    fzf.lsp_finder()
+                end,
+                desc = "Lsp Finder",
+            },
+            {
+                keys = "<leader>ci",
+                func = function()
+                    fzf.lsp_incoming_calls()
+                end,
+                desc = "Incoming Calls",
+            },
+            {
+                keys = "<leader>co",
+                func = function()
+                    fzf.lsp_outgoing_calls()
+                end,
+                desc = "Outgoing Calls",
+            },
+            {
+                keys = "<leader>dc",
+                func = function()
+                    fzf.diagnostics_document()
+                end,
+                desc = "Current Buffer Diagnostics",
+            },
+            {
+                keys = "<leader>dw",
+                func = function()
+                    fzf.diagnostics_workspace()
+                end,
+                desc = "Workspace Diagnostics",
+            },
+        }
+        for _, km in ipairs(keymaps) do
+            vim.keymap.set("n", km.keys, km.func, { buffer = bufnr, silent = true, nowait = true, desc = "[LSP]: " .. km.desc })
         end
 
-        -- Code actions & rename
-        buf_map("<leader>,", function()
-            fzf.lsp_code_actions()
-        end, "[Lsp]: Code Action")
-        buf_map("<leader>r", vim.lsp.buf.rename, "[Lsp]: Rename Symbols")
-
-        -- Hover & navigation
-        buf_map("K", vim.lsp.buf.hover, "[Lsp]: Hover Documentation")
-        buf_map("gd", vim.lsp.buf.definition, "[Lsp]: Goto Definition")
-        buf_map("gi", vim.lsp.buf.implementation, "[Lsp]: Goto Implementation")
-        buf_map("gt", vim.lsp.buf.type_definition, "[Lsp]: Goto Type Definition")
-
-        -- Fuzzy search
-        buf_map("gr", function()
-            fzf.lsp_references()
-        end, "[Lsp]: Goto References")
-        buf_map("gf", function()
-            fzf.lsp_finder()
-        end, "[Lsp]: Lsp Finder")
-        buf_map("<leader>li", function()
-            fzf.lsp_incoming_calls()
-        end, "[Lsp]: Incoming Calls")
-        buf_map("<leader>lo", function()
-            fzf.lsp_outgoing_calls()
-        end, "[Lsp]: Outgoing Calls")
-
-        -- Diagnostics: list
-        buf_map("<leader>ld", function()
-            fzf.diagnostics_document()
-        end, "[Lsp]: Buffer Diagnostics")
-        buf_map("<leader>lw", function()
-            fzf.diagnostics_workspace()
-        end, "[Lsp]: Workspace Diagnostics")
-
-        -- Diagnostics: jump
         local severity = vim.diagnostic.severity
         local function diag_prev(sev)
             return function()
-                vim.diagnostic.jump({ count = -1, severity = sev })
+                vim.diagnostic.jump({ count = -1, severity = sev, float = true })
             end
         end
         local function diag_next(sev)
             return function()
-                vim.diagnostic.jump({ count = 1, severity = sev })
+                vim.diagnostic.jump({ count = 1, severity = sev, float = true })
             end
         end
 
-        buf_map("[d", diag_prev(), "[Lsp]: Previous Diagnostic")
-        buf_map("]d", diag_next(), "[Lsp]: Next Diagnostic")
-        buf_map("[e", diag_prev(severity.ERROR), "[Lsp]: Previous Error")
-        buf_map("]e", diag_next(severity.ERROR), "[Lsp]: Next Error")
-        buf_map("[w", diag_prev(severity.WARN), "[Lsp]: Previous WARN")
-        buf_map("]w", diag_next(severity.WARN), "[Lsp]: Next WARN")
+        local diag_keymaps = {
+            { keys = "[d", func = diag_prev(), desc = "Previous Diagnostic" },
+            { keys = "]d", func = diag_next(), desc = "Next Diagnostic" },
+            { keys = "[e", func = diag_prev(severity.ERROR), desc = "Previous Error" },
+            { keys = "]e", func = diag_next(severity.ERROR), desc = "Next Error" },
+            { keys = "[w", func = diag_prev(severity.WARN), desc = "Previous WARN" },
+            { keys = "]w", func = diag_next(severity.WARN), desc = "Next WARN" },
+        }
+        for _, km in ipairs(diag_keymaps) do
+            vim.keymap.set("n", km.keys, km.func, { buffer = bufnr, silent = true, nowait = true, desc = "[LSP]: " .. km.desc })
+        end
 
         if client:supports_method("textDocument/documentColor") then
             vim.lsp.document_color.enable(true, { bufnr = bufnr, style = "virtual" })

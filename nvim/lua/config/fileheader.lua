@@ -47,9 +47,6 @@ local templates = {
         "--- @description desc...",
         "--- @author ${AUTHOR} <${EMAIL}>",
         "",
-        "local M = {}",
-        "",
-        "return M",
     },
     go = {
         "// Package ${FILENAME_SAFE_GO} provides desc...",
@@ -58,8 +55,6 @@ local templates = {
         "// SPDX-License-Identifier: MIT",
         "",
         -- Go package names allow only [a-zA-Z0-9_] and must not start with a digit
-        "package ${FILENAME_SAFE_GO}",
-        "",
     },
     rust = {
         "//! # ${FILENAME}",
