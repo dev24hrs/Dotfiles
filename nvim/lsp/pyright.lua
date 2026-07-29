@@ -32,11 +32,40 @@ return {
         ".git",
     },
     settings = {
+        pyright = {
+            -- Using Ruff's import organizer
+            disableOrganizeImports = true,
+        },
         python = {
             analysis = {
+                -- Ignore all files for analysis to use Ruff for linting
+                ignore = { "*" },
+                typeCheckingMode = "standard",
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
+                autoImportCompletions = true,
+                stubPath = "typings",
                 diagnosticMode = "openFilesOnly",
+                inlayHints = {
+                    variableTypes = true,
+                    functionReturnTypes = true,
+                },
+                exclude = {
+                    "**/__pycache__", -- Python 字节码缓存
+                    "**/.git", -- Git 元数据
+                    "**/.eggs", -- egg 包缓存
+                    "**/*.egg-info", -- egg 元数据
+                    "**/.mypy_cache", -- mypy 缓存（如有共存）
+                    "**/.pytest_cache", -- pytest 缓存
+                    "**/.venv", -- venv 虚拟环境
+                    "**/.venv*", -- 命名变体（.venv38 等）
+                    "**/venv", -- 传统 venv 目录
+                    "**/.tox", -- tox 测试环境
+                    "**/build", -- 构建中间产物
+                    "**/dist", -- 分发包目录
+                    "**/htmlcov", -- coverage 报告
+                    "**/node_modules", -- 前端依赖（某些 Python 项目也包含）
+                },
             },
         },
     },

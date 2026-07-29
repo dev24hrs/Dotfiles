@@ -21,7 +21,7 @@ conform.setup({
         css = { "oxfmt" },
 
         -- Python: ruff_format 已包含格式化，ruff_fix 处理 lint 修复
-        python = { "ruff_organize_imports", "ruff_format" },
+        python = { "ruff_organize_imports", "ruff_format", "ruff_fix" },
 
         sql = { "sqlfmt" },
         sh = { "shfmt" },
