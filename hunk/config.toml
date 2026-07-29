@@ -1,6 +1,6 @@
 mode = "stack"
 vcs = "git"
-watch = true
+watch = false
 exclude_untracked = true
 line_numbers = true
 wrap_lines = false
