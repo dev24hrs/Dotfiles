@@ -1,20 +1,17 @@
 # font
 font-family                 = RecMonoCasual Nerd Font Mono
 font-family                 = Source Han Sans SC VF
-font-size                   = 19
-font-thicken                = false
+font-size                   = 19.5
 font-feature                = -calt, -liga, -dlig
-font-family-italic          = true
-# adjust-cell-height          = 0.5%
 window-inherit-font-size    = true
 
 # theme
 theme                       = Gruvbox Dark
-term                        = xterm-256color
+term                        = xterm-ghostty
 
 # background-opacity          = 0.96
 # faint-opacity               = 0.96
-background-blur             = 24
+# background-blur             = 24
 
 # cursor
 cursor-style                = bar
@@ -22,7 +19,7 @@ cursor-style-blink          = true
 
 # window
 window-width                = 188
-window-height               = 58
+window-height               = 57
 window-padding-balance      = true
 window-padding-x            = 0
 window-padding-y            = 0
@@ -47,8 +44,9 @@ clipboard-trim-trailing-spaces = true
 # other
 bell-features                   = no-audio
 bell-audio-volume               = 0
-scrollback-limit                = 100000
+scrollback-limit                = 10000
 quit-after-last-window-closed   = true
+mouse-hide-while-typing         = true
 
 # Key bindings
 keybind                     = ctrl+a>r=reload_config
