@@ -1,0 +1,55 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "plugins": ["typescript", "import", "unicorn", "react", "jsx-a11y"],
+  "rules": {
+    "typescript/no-explicit-any": "warn",
+    "typescript/no-non-null-assertion": "warn",
+    "typescript/ban-ts-comment": [
+      "error",
+      {
+        "ts-ignore": "allow-with-description",
+        "ts-expect-error": "allow-with-description",
+        "ts-nocheck": true,
+        "ts-check": false
+      }
+    ],
+    "typescript/consistent-type-assertions": [
+      "error",
+      {
+        "objectLiteralTypeAssertions": "allow-as-parameter"
+      }
+    ],
+    "typescript/array-type": ["error", { "default": "array-simple" }],
+    "typescript/return-await": ["error", "in-try-catch"],
+    "import/no-cycle": "error",
+    "import/no-default-export": "error"
+  },
+  "settings": {
+    "import": { "resolver": "typescript" }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.*", "**/*.spec.*", "**/test/**", "**/tests/**", "**/__tests__/**"],
+      "rules": {
+        "typescript/no-explicit-any": "off",
+        "typescript/no-non-null-assertion": "off"
+      }
+    },
+    {
+      "files": ["*.config.{js,ts,mjs,cjs}", "*.config.*.{js,ts,mjs,cjs}"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["node_modules", "dist", "build", "out", "coverage", "*.min.js", "generated", "public", "vendor"]
+}

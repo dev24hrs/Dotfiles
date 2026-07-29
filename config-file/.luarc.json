@@ -1,0 +1,6 @@
+{
+  "diagnostics.disable": ["need-check-nil"],
+  "diagnostics.globals": ["vim"],
+  "runtime.version": "LuaJIT",
+  "workspace.checkThirdParty": false
+}
