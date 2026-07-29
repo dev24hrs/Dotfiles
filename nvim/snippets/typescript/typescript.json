@@ -83,27 +83,27 @@
   "=== FUNCTIONS ===": { "prefix": "_funcs_", "body": [], "description": "--- Functions ---" },
   "function declaration": {
     "prefix": "func",
-    "body": ["function ${1:name}(${2:params})${3:: ${4:ReturnType}} {", "\t${0}", "}"],
+    "body": ["function ${1:name}(${2:params}): ${3:ReturnType} {", "\t${0}", "}"],
     "description": "Function declaration with optional return type"
   },
   "async function": {
     "prefix": "afunc",
-    "body": ["async function ${1:name}(${2:params})${3:: Promise<${4:ReturnType}>} {", "\t${0}", "}"],
+    "body": ["async function ${1:name}(${2:params}): Promise<${3:ReturnType}> {", "\t${0}", "}"],
     "description": "Async function declaration"
   },
   "arrow function": {
     "prefix": "af",
-    "body": ["const ${1:name} = (${2:params})${3:: ${4:ReturnType}} => {", "\t${0}", "}"],
+    "body": ["const ${1:name} = (${2:params}): ${3:ReturnType} => {", "\t${0}", "}"],
     "description": "Arrow function assigned to const"
   },
   "async arrow function": {
     "prefix": "aaf",
-    "body": ["const ${1:name} = async (${2:params})${3:: Promise<${4:ReturnType}>} => {", "\t${0}", "}"],
+    "body": ["const ${1:name} = async (${2:params}): Promise<${3:ReturnType}> => {", "\t${0}", "}"],
     "description": "Async arrow function"
   },
   "generator function": {
     "prefix": "gf",
-    "body": ["function* ${1:name}(${2:params})${3:: Generator<${4:YieldType}>} {", "\t${0}", "}"],
+    "body": ["function* ${1:name}(${2:params}): Generator<${3:YieldType}> {", "\t${0}", "}"],
     "description": "Generator function"
   },
   "IIFE": {
@@ -140,12 +140,12 @@
   },
   "generic type": {
     "prefix": "typeg",
-    "body": ["type ${1:Name}<T${2: extends ${3:Constraint}}> = ${4:Type}${0}"],
+    "body": ["type ${1:Name}<${2:T}${3: extends ${4:Constraint}}> = ${5:Type}${0}"],
     "description": "Generic type alias with optional constraint"
   },
   "generic function": {
     "prefix": "fng",
-    "body": ["function ${1:name}<T${2: extends ${3:Constraint}}>(${4:arg}: T)${5:: ${6:ReturnType}} {", "\t${0}", "}"],
+    "body": ["function ${1:name}<${2:T}${3: extends ${4:Constraint}}>(${5:arg}: ${2:T}): ${6:ReturnType} {", "\t${0}", "}"],
     "description": "Generic function"
   },
   "Record type": {
@@ -437,12 +437,12 @@
   "=== REACT ===": { "prefix": "_react_", "body": [], "description": "--- React ---" },
   "React component (arrow)": {
     "prefix": "rc",
-    "body": ["export const ${1:ComponentName} = ({ ${2:prop} }${3:: ${4:Props}}) => {", "\treturn (", "\t\t${0}", "\t)", "}"],
+    "body": ["export const ${1:ComponentName} = ({ ${2:prop} }: ${3:Props}) => {", "\treturn (", "\t\t${0}", "\t)", "}"],
     "description": "React functional component — arrow style with explicit props (not React.FC)"
   },
   "React component (function)": {
     "prefix": "rcf",
-    "body": ["export function ${1:ComponentName}({ ${2:prop} }${3:: ${4:Props}}) {", "\treturn (", "\t\t${0}", "\t)", "}"],
+    "body": ["export function ${1:ComponentName}({ ${2:prop} }: ${3:Props}) {", "\treturn (", "\t\t${0}", "\t)", "}"],
     "description": "React functional component — function declaration with explicit props"
   },
   "useState hook": {
@@ -526,17 +526,17 @@
   "=== CLASSES ===": { "prefix": "_classes_", "body": [], "description": "--- Classes ---" },
   "class": {
     "prefix": "cls",
-    "body": ["class ${1:ClassName} ${2:extends ${3:BaseClass}} {", "\tconstructor(${4:params}) {", "\t\t${5:super()}", "\t}", "\t${0}", "}"],
+    "body": ["class ${1:ClassName}${2: extends ${3:BaseClass}} {", "\tconstructor(${4:params}) {", "\t\t${5:super()}", "\t}", "\t${0}", "}"],
     "description": "Class declaration with constructor"
   },
   "class method": {
     "prefix": "clsm",
-    "body": ["${1:public} ${2:methodName}(${3:params})${4:: ${5:ReturnType}} {", "\t${0}", "}"],
+    "body": ["${1:public} ${2:methodName}(${3:params}): ${4:ReturnType} {", "\t${0}", "}"],
     "description": "Class method (inside class body)"
   },
   "class property": {
     "prefix": "clsp",
-    "body": ["${1:private} ${2:propName}${3:: ${4:Type}} = ${5:value}${0}"],
+    "body": ["${1:private} ${2:propName}: ${3:Type} = ${4:value}${0}"],
     "description": "Class property declaration"
   },
 
@@ -685,7 +685,14 @@
   },
   "fetch with AbortController": {
     "prefix": "fea",
-    "body": ["const ${1:controller} = new AbortController()", "setTimeout(() => ${1:controller}.abort(), ${2:5000})", "", "const ${3:response} = await fetch(${4:url}, { signal: ${1:controller}.signal })", "if (!${3:response}.ok) throw new Error(`HTTP $${${3:response}.status}`)", "const ${5:data} = await ${3:response}.json() as ${6:Type}${0}"],
+    "body": [
+      "const ${1:controller} = new AbortController()",
+      "setTimeout(() => ${1:controller}.abort(), ${2:5000})",
+      "",
+      "const ${3:response} = await fetch(${4:url}, { signal: ${1:controller}.signal })",
+      "if (!${3:response}.ok) throw new Error(`HTTP $${${3:response}.status}`)",
+      "const ${5:data} = await ${3:response}.json() as ${6:Type}${0}"
+    ],
     "description": "fetch with AbortController timeout — cancels after N ms"
   },
   "import.meta": {
