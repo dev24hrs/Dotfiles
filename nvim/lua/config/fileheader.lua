@@ -103,7 +103,8 @@ local function add_go_safe_placeholder(ph)
 end
 
 -- 5. Shared insert logic
-local function do_insert(lines)
+local function do_insert(lines, buf)
+    buf = buf or 0
     local ph = build_placeholders()
     add_go_safe_placeholder(ph)
 
@@ -111,22 +112,36 @@ local function do_insert(lines)
         lines[i] = line:gsub("%$%{[A-Z_]+%}", ph)
     end
 
-    api.nvim_buf_set_lines(0, 0, 0, false, lines)
+    api.nvim_buf_set_lines(buf, 0, 0, false, lines)
     api.nvim_win_set_cursor(0, { #lines, 0 })
 end
 
 -- 6. Single autocmd for all filetypes
 local header_group = vim.api.nvim_create_augroup("User_FileHeader", { clear = true })
 
-api.nvim_create_autocmd("BufNewFile", {
+api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
     group = header_group,
     callback = function(args)
-        local ft = vim.filetype.match({ buf = args.buf })
-        local template = templates[ft]
-        if not template then
-            return
-        end
-        do_insert(vim.deepcopy(template))
+        local buf = args.buf
+        vim.schedule(function()
+            -- Guard: buffer may have been closed before schedule fires
+            if not api.nvim_buf_is_valid(buf) then
+                return
+            end
+            -- Use vim.bo.filetype (consistent with :FileHeader) — at schedule
+            -- time filetype detection has already run, so this is reliable.
+            local ft = vim.bo[buf].filetype
+            local template = templates[ft]
+            if not template then
+                return
+            end
+            -- Guard: don't overwrite content added by other plugins or templates
+            local first_line = api.nvim_buf_get_lines(buf, 0, 1, false)[1] or ""
+            if first_line ~= "" or api.nvim_buf_line_count(buf) > 1 then
+                return
+            end
+            do_insert(vim.deepcopy(template), buf)
+        end)
     end,
 })
 
