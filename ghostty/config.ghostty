@@ -46,7 +46,6 @@ bell-features                   = no-audio
 bell-audio-volume               = 0
 scrollback-limit                = 10000
 quit-after-last-window-closed   = true
-mouse-hide-while-typing         = true
 
 # Key bindings
 keybind                     = ctrl+a>r=reload_config
