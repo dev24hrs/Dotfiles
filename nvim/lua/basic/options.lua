@@ -63,3 +63,4 @@ vim.filetype.add({
         [".yamlfmt"] = "yaml",
     },
 })
+vim.cmd.packadd("nvim.undotree")
