@@ -12,10 +12,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
 require("fzf-lua").setup({
     winopts = {
         border = "single",
-        height = 0.70,
-        width = 0.70,
+        height = 0.55,
+        width = 0.50,
         row = 0.45,
-        col = 0.50,
+        col = 0.40,
         preview = {
             border = "single",
             horizontal = "right:60%",
@@ -50,14 +50,6 @@ end, { noremap = true, silent = true, desc = "[Fzf]: Find existing Buffers" })
 vim.keymap.set("n", "<leader>fh", function()
     require("fzf-lua").helptags()
 end, { noremap = true, silent = true, desc = "[Fzf]: Show Neovim Help Pages" })
-
-vim.keymap.set("n", "<leader>fd", function()
-    require("fzf-lua").diagnostics_document()
-end, { noremap = true, silent = true, desc = "[Fzf]: Show Diagnostics in current buffer" })
-
-vim.keymap.set("n", "<leader>fp", function()
-    require("fzf-lua").diagnostics_workspace()
-end, { noremap = true, silent = true, desc = "[Fzf]: Show Diagnostics in project" })
 
 vim.keymap.set("n", "<leader>fm", function()
     require("fzf-lua").marks()

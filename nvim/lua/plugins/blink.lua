@@ -51,7 +51,19 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                     treesitter_highlighting = true,
                 },
             },
-            signature = { enabled = true },
+            signature = {
+                enabled = true,
+                trigger = {
+                    -- Show the signature help automatically
+                    enabled = false,
+                    show_on_keyword = false,
+                    blocked_trigger_characters = {},
+                    blocked_retrigger_characters = {},
+                    show_on_trigger_character = true,
+                    show_on_insert = false,
+                    show_on_insert_on_trigger_character = true,
+                },
+            },
             sources = {
                 default = { "lsp", "snippets", "buffer", "path", "codeium" },
                 providers = {

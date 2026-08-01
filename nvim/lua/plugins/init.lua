@@ -1,7 +1,6 @@
 require("plugins.lazydev")
 require("plugins.theme")
 require("plugins.alpha")
-require("plugins.gopher")
 require("plugins.crates")
 require("plugins.aerial")
 require("plugins.windsurf")

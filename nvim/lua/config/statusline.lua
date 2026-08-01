@@ -12,7 +12,7 @@ local colors = {
 }
 
 -- Disabled filetypes (statusline hidden on these)
-local disabled_ft = { alpha = true, dashboard = true }
+local disabled_ft = { alpha = true, dashboard = true, qf = true }
 
 -- Devicons cache
 local _devicons = nil

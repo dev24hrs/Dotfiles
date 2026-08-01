@@ -1,4 +1,11 @@
 vim.pack.add({
+    { src = "https://github.com/nvim-mini/mini.pairs" },
+    { src = "https://github.com/nvim-mini/mini.surround", version = "stable" },
+})
+require("mini.pairs").setup()
+require("mini.surround").setup()
+
+vim.pack.add({
     { src = "https://github.com/numToStr/Comment.nvim" },
 })
 

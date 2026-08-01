@@ -1,8 +1,3 @@
-vim.pack.add({
-    { src = "https://github.com/nvim-mini/mini.pairs" },
-})
-require("mini.pairs").setup()
-
 vim.api.nvim_create_autocmd("PackChanged", {
     callback = function(ev)
         local name, kind = ev.data.spec.name, ev.data.kind
@@ -100,4 +95,3 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
         vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,
 })
-
