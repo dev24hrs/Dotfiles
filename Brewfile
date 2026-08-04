@@ -57,8 +57,6 @@ brew "luajit"
 brew "luarocks"
 # Bare libuv bindings for lua
 brew "luv"
-# Language Server Protocol for Markdown
-brew "marksman"
 # Unified display of technical and tag data for audio/video
 brew "media-info"
 # Deep clean and optimize your Mac
@@ -99,8 +97,6 @@ brew "tree"
 brew "tree-sitter-cli"
 # Language for application scale JavaScript development
 brew "typescript"
-# Language Server Protocol implementation for TypeScript wrapping tsserver
-brew "typescript-language-server"
 # Vi 'workalike' with many additional features
 brew "vim"
 # Internet file retriever
@@ -117,10 +113,10 @@ brew "go-musicfox/go-musicfox/go-musicfox", trusted: true
 cask "appcleaner"
 # Open source IDE for exploring and testing APIs
 cask "bruno"
+# OpenAI's official ChatGPT desktop app
+cask "chatgpt"
 # Terminal-based AI coding assistant
 cask "claude-code"
-# OpenAI's Codex desktop app for managing coding agents
-cask "codex-app"
 cask "font-symbols-only-nerd-font"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
