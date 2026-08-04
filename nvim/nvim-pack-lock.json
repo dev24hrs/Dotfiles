@@ -74,6 +74,10 @@
       "src": "https://github.com/nvim-mini/mini.surround",
       "version": "'stable'"
     },
+    "minuet-ai.nvim": {
+      "rev": "035e07136a281ca17c52722cc2201db2e08bbd3a",
+      "src": "https://github.com/milanglacier/minuet-ai.nvim"
+    },
     "noice.nvim": {
       "rev": "7bfd942445fb63089b59f97ca487d605e715f155",
       "src": "https://github.com/folke/noice.nvim"

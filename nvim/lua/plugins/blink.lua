@@ -50,6 +50,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                     auto_show = true,
                     treesitter_highlighting = true,
                 },
+                -- trigger = { prefetch_on_insert = false },
             },
             signature = {
                 enabled = true,
@@ -66,8 +67,16 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
             },
             sources = {
                 default = { "lsp", "snippets", "buffer", "path", "codeium" },
+                -- default = { "lsp", "snippets", "buffer", "path", "minuet" },
                 providers = {
                     codeium = { name = "Codeium", module = "codeium.blink", async = true },
+                    -- minuet = {
+                    --     name = "minuet",
+                    --     module = "minuet.blink",
+                    --     async = true,
+                    --     timeout_ms = 2500,
+                    --     score_offset = 50, -- Gives minuet higher priority among suggestions
+                    -- },
                     lsp = {
                         name = "LSP",
                         module = "blink.cmp.sources.lsp",

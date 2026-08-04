@@ -6,9 +6,6 @@ vim.pack.add({
 
 require("codeium").setup({
     enable_cmp_source = false, -- set false to disable nvim-cmp source for blink.cmp
-    api = {
-        host = "https://api.codeium.cn",
-    },
     virtual_text = {
         enabled = true,
         key_bindings = {
