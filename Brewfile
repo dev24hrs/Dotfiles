@@ -1,3 +1,4 @@
+tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae", trusted: true
 tap "go-musicfox/go-musicfox", "https://github.com/go-musicfox/homebrew-go-musicfox.git", trusted: true
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
@@ -23,8 +24,6 @@ brew "fzf"
 brew "gh"
 # Distributed revision control system
 brew "git"
-# Syntax-highlighting pager for git and diff output
-brew "git-delta"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
 # Open source programming language to build simple/reliable/efficient software
@@ -69,6 +68,8 @@ brew "neovim"
 brew "nginx"
 # Open-source, cross-platform JavaScript runtime environment
 brew "node"
+# Retrieves currently playing media, and simulates media actions
+brew "nowplaying-cli"
 # OpenBSD freely-licensed SSH connectivity tools
 brew "openssh"
 # Paste PNG into files
@@ -107,6 +108,8 @@ brew "yazi"
 brew "zoxide"
 # UNIX shell (command interpreter)
 brew "zsh"
+# Custom macOS statusbar with shell plugin, interaction and graph support
+brew "felixkratz/formulae/sketchybar"
 # go-musicfox是musicfox的重写版，使用Go编写的网易云音乐命令行程序。
 brew "go-musicfox/go-musicfox/go-musicfox", trusted: true
 # Application uninstaller
@@ -117,11 +120,15 @@ cask "bruno"
 cask "chatgpt"
 # Terminal-based AI coding assistant
 cask "claude-code"
+cask "font-sf-mono"
+cask "font-sf-pro"
 cask "font-symbols-only-nerd-font"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Replacement for Docker Desktop
 cask "orbstack"
+# Tool that provides consistent, highly configurable symbols for apps
+cask "sf-symbols"
 # Snip or pin screenshots
 cask "snipaste"
 # Native database client for many database types
