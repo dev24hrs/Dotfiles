@@ -18,8 +18,7 @@ return {
         or vim.list_extend(vim.list_extend(root_markers1, root_markers2), { ".git" }),
     settings = {
         Lua = {
-            runtime = { version = "LuaJIT" },
-            diagnostics = { globals = { "vim", "bit", "jit" } },
+            diagnostics = { globals = { "vim" } },
             codeLens = { enable = true },
             completion = { callSnippet = "Replace", keywordSnippet = "Replace" },
             hint = { enable = true, setType = false, paramName = "Literal", paramType = true, semicolon = "Disable" },

@@ -98,7 +98,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                             staged = "",
                             unmerged = "",
                             renamed = "",
-                            untracked = "",
+                            untracked = "󰓎",
                             deleted = "",
                             ignored = "",
                         },
