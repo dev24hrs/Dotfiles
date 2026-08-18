@@ -1,0 +1,8 @@
+{
+  "diagnostics.disable": ["need-check-nil"],
+  "diagnostics.globals": ["vim"],
+  "runtime.path": ["nvim/lua/?.lua", "nvim/lua/?/init.lua"],
+  "runtime.version": "LuaJIT",
+  "workspace.checkThirdParty": false,
+  "workspace.library": ["$VIMRUNTIME/lua"]
+}

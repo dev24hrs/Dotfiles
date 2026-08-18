@@ -1,4 +1,3 @@
-tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae", trusted: true
 tap "go-musicfox/go-musicfox", "https://github.com/go-musicfox/homebrew-go-musicfox.git", trusted: true
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
@@ -108,8 +107,6 @@ brew "yazi"
 brew "zoxide"
 # UNIX shell (command interpreter)
 brew "zsh"
-# Custom macOS statusbar with shell plugin, interaction and graph support
-brew "felixkratz/formulae/sketchybar"
 # go-musicfox是musicfox的重写版，使用Go编写的网易云音乐命令行程序。
 brew "go-musicfox/go-musicfox/go-musicfox", trusted: true
 # Application uninstaller
@@ -127,8 +124,6 @@ cask "font-symbols-only-nerd-font"
 cask "ghostty"
 # Replacement for Docker Desktop
 cask "orbstack"
-# Tool that provides consistent, highly configurable symbols for apps
-cask "sf-symbols"
 # Snip or pin screenshots
 cask "snipaste"
 # Native database client for many database types

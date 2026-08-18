@@ -39,7 +39,10 @@ make_link() {
     local backup
     backup="$(backup_path "$dest")"
     warn "backing up existing: $dest -> $backup"
-    mv "$dest" "$backup" || { err "failed to backup: $dest"; return 1; }
+    mv "$dest" "$backup" || {
+      err "failed to backup: $dest"
+      return 1
+    }
   fi
 
   # 删掉旧的错误 symlink(给出当前指向以便排障)
@@ -53,7 +56,10 @@ make_link() {
   parent="$(dirname "$dest")"
   [ -d "$parent" ] || mkdir -p "$parent"
 
-  ln -s "$src" "$dest" || { err "failed to link: $dest -> $src"; return 1; }
+  ln -s "$src" "$dest" || {
+    err "failed to link: $dest -> $src"
+    return 1
+  }
   ok "linked: $dest -> $src"
 }
 
@@ -101,7 +107,10 @@ migrate_to_dotfiles() {
       local backup
       backup="$(backup_path "$src")"
       warn "dotfiles already has: $src -> backup to $backup"
-      mv "$src" "$backup" || { err "failed to backup dotfiles entry: $src"; return 1; }
+      mv "$src" "$backup" || {
+        err "failed to backup dotfiles entry: $src"
+        return 1
+      }
     fi
 
     # 确保 Dotfiles 里父目录存在(如 git/.gitconfig 需要 git/ 已存在)
@@ -215,8 +224,8 @@ remove_config() {
 
   local dest
   case "$name" in
-    .*) dest="$HOME/$name" ;;
-    *) dest="$HOME/.config/$name" ;;
+  .*) dest="$HOME/$name" ;;
+  *) dest="$HOME/.config/$name" ;;
   esac
 
   # 安全检查:仅删除软链接,不碰真实文件/目录
@@ -230,7 +239,10 @@ remove_config() {
   fi
 
   echo "→ Removing symlink: $dest -> $(readlink "$dest")"
-  rm "$dest" || { err "failed to remove: $dest"; return 1; }
+  rm "$dest" || {
+    err "failed to remove: $dest"
+    return 1
+  }
   ok "removed: $dest"
 
   echo ""
@@ -259,6 +271,6 @@ migrate) migrate_to_dotfiles ;; # ./cfg.sh migrate
 remove)
   shift
   remove_config "$1"
-  ;;                            # ./cfg.sh remove yazi  /  remove .gitconfig
+  ;; # ./cfg.sh remove yazi  /  remove .gitconfig
 *) usage ;;
 esac
