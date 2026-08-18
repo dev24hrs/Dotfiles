@@ -1,16 +1,13 @@
-# Completions for dev — git worktree management (current repo only)
+# Completions for dev — git worktree and tmux session management
 complete -f -c dev
 
 # Top-level subcommands
 complete -f -c dev -n __fish_use_subcommand -a wt -d "Manage git worktrees"
 complete -f -c dev -n __fish_use_subcommand -a layout -d "Create tmux session with standard project layout"
 
-# After 'layout', complete with directory paths
-complete -c dev -n "__fish_seen_subcommand_from layout" -a "(__fish_complete_directories)" -d "project path"
-
 # After 'wt', complete with worktree subcommands
-complete -f -c dev -n "__fish_seen_subcommand_from wt" -a new -d "Create worktree + tmux window + launch claude"
-complete -f -c dev -n "__fish_seen_subcommand_from wt" -a remove -d "Remove worktree, branch, and tmux window"
+complete -f -c dev -n "__fish_seen_subcommand_from wt" -a new -d "Create worktree + dedicated tmux session"
+complete -f -c dev -n "__fish_seen_subcommand_from wt" -a remove -d "Remove worktree, branch, and tmux session"
 complete -f -c dev -n "__fish_seen_subcommand_from wt" -a list -d "List all worktrees in the current repo"
 complete -f -c dev -n "__fish_seen_subcommand_from wt" -a merge -d "Squash + rebase + fast-forward into target"
 complete -f -c dev -n "__fish_seen_subcommand_from wt" -a clean -d "Prune stale worktree metadata"
