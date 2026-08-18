@@ -4,6 +4,8 @@ if not set -q TMUX
     set -gx TERM xterm-256color
 end
 set -gx EDITOR nvim
+# 供 LuaLS 解析 $VIMRUNTIME/lua 运行时库
+set -gx VIMRUNTIME /opt/homebrew/share/nvim/runtime
 # 禁用less历史记录
 set -gx LESSHISTFILE -
 
