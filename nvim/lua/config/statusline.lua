@@ -36,16 +36,16 @@ function M.set_highlights()
     vim.api.nvim_set_hl(0, "StatusMode", { fg = colors.RED, bg = colors.BG, bold = true })
     vim.api.nvim_set_hl(0, "StatusModeTerm", { fg = colors.RED, bg = colors.BG, bold = true })
     -- b: git
-    vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.CYAN, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.BLUE, bg = colors.BG })
     -- b: diff
     vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.CYAN, bg = colors.BG })
     vim.api.nvim_set_hl(0, "StatusDiffChange", { fg = colors.ORANGE, bg = colors.BG })
     vim.api.nvim_set_hl(0, "StatusDiffRemove", { fg = colors.RED, bg = colors.BG })
     -- b: diagnostics (per-severity colors)
-    vim.api.nvim_set_hl(0, "DiagError", { fg = colors.RED, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "DiagWarn", { fg = colors.YELLOW, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "DiagInfo", { fg = colors.BLUE, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "DiagHint", { fg = colors.MAGENTA, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiagError", { fg = colors.RED, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiagWarn", { fg = colors.YELLOW, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiagInfo", { fg = colors.BLUE, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiagHint", { fg = colors.MAGENTA, bg = colors.BG })
     -- c: filename
     vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.MAGENTA, bg = colors.BG })
     -- x: indent, encoding, fileformat
@@ -126,10 +126,10 @@ local diag_symbols = {
     [diag_severity.HINT] = "󰌶",
 }
 local diag_hl = {
-    [diag_severity.ERROR] = "%#DiagError#",
-    [diag_severity.WARN] = "%#DiagWarn#",
-    [diag_severity.INFO] = "%#DiagInfo#",
-    [diag_severity.HINT] = "%#DiagHint#",
+    [diag_severity.ERROR] = "%#StatusDiagError#",
+    [diag_severity.WARN] = "%#StatusDiagWarn#",
+    [diag_severity.INFO] = "%#StatusDiagInfo#",
+    [diag_severity.HINT] = "%#StatusDiagHint#",
 }
 
 local function diagnostics()

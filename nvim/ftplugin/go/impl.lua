@@ -193,8 +193,7 @@ function M.impl(iface)
     end
 
     local bufnr = vim.api.nvim_get_current_buf()
-    local source_row = vim.api.nvim_win_get_cursor(0)
-    source_row = source_row[1] - 1
+    local source_row = vim.api.nvim_win_get_cursor(0)[1] - 1
     local receiver = struct_to_receiver(struct_name)
     local command = { "impl", receiver, iface }
     local source_dir = vim.fs.dirname(file) or "."

@@ -1,9 +1,10 @@
 -- highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
-    desc = "highlight copying text",
     group = vim.api.nvim_create_augroup("User_HighlightYank", { clear = true }),
+    pattern = "*",
+    desc = "highlight copying text",
     callback = function()
-        vim.hl.on_yank({ timeout = 500 })
+        vim.hl.on_yank({ timeout = 500, visual = true })
     end,
 })
 
