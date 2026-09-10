@@ -16,7 +16,8 @@ tab_size = 4
 
 [opener]
 edit = [
-  { run = '${EDITOR:-nvim} "$@"', desc = "$EDITOR", block = true, for = "unix" },
+  # { run = '${EDITOR:-nvim} "$@"', desc = "$EDITOR", block = true, for = "unix" },
+  { run = "$EDITOR %s", block = true, for = "unix" },
 ]
 
 [plugin]
