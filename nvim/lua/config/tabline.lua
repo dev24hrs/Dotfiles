@@ -11,12 +11,12 @@ local _tab_cache_key = nil
 
 function M.set_highlights()
     local bg = "#282828"
-    local red = "#FB4934"
+    local fg = "#5F87AF"
 
     vim.api.nvim_set_hl(0, "MyBufInactive", { bg = bg })
-    vim.api.nvim_set_hl(0, "MyBufActive", { fg = red, bg = bg, bold = true })
+    vim.api.nvim_set_hl(0, "MyBufActive", { fg = fg, bg = bg, bold = true })
     vim.api.nvim_set_hl(0, "MyBufSeparator", { bg = bg })
-    vim.api.nvim_set_hl(0, "MyBufModified", { fg = red, bg = bg })
+    vim.api.nvim_set_hl(0, "MyBufModified", { fg = fg, bg = bg })
 end
 
 ----------------------------------------------------------------------
