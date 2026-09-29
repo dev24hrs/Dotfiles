@@ -23,6 +23,7 @@ vim.opt.cmdheight = 1
 vim.opt.wrap = true
 vim.opt.list = true
 
+vim.opt.autoread = true
 vim.opt.conceallevel = 2
 vim.opt.winborder = "single"
 vim.opt.signcolumn = "number"

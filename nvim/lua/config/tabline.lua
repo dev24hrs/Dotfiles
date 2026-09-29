@@ -11,7 +11,8 @@ local _tab_cache_key = nil
 
 function M.set_highlights()
     local bg = "#282828"
-    local fg = "#5F87AF"
+    -- local fg = "#5F87AF"
+    local fg = "#FB4934"
 
     vim.api.nvim_set_hl(0, "MyBufInactive", { bg = bg })
     vim.api.nvim_set_hl(0, "MyBufActive", { fg = fg, bg = bg, bold = true })
