@@ -10,14 +10,16 @@ local _tab_cache = nil
 local _tab_cache_key = nil
 
 function M.set_highlights()
-    local bg = "#282828"
     -- local fg = "#5F87AF"
     local fg = "#FB4934"
 
-    vim.api.nvim_set_hl(0, "MyBufInactive", { bg = bg })
-    vim.api.nvim_set_hl(0, "MyBufActive", { fg = fg, bg = bg, bold = true })
-    vim.api.nvim_set_hl(0, "MyBufSeparator", { bg = bg })
-    vim.api.nvim_set_hl(0, "MyBufModified", { fg = fg, bg = bg })
+    -- Tabline  : keep the background same to terminal (bg = NONE)
+    vim.api.nvim_set_hl(0, "TabLine", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "TabLineFill", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "MyBufInactive", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "MyBufActive", { fg = fg, bg = "NONE", bold = true })
+    vim.api.nvim_set_hl(0, "MyBufSeparator", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "MyBufModified", { fg = fg, bg = "NONE" })
 end
 
 ----------------------------------------------------------------------

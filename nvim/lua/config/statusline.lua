@@ -8,7 +8,6 @@ local colors = {
     YELLOW = "#E5C07B",
     ORANGE = "#FE8019",
     BLUE = "#83A598",
-    BG = "#282828",
 }
 
 -- Disabled filetypes (statusline hidden on these)
@@ -32,28 +31,31 @@ end
 -- Highlight groups
 ----------------------------------------------------------------------
 function M.set_highlights()
+    -- Statusline : keep the background same to terminal (bg = NONE)
+    vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
     -- a: mode
-    vim.api.nvim_set_hl(0, "StatusMode", { fg = colors.RED, bg = colors.BG, bold = true })
-    vim.api.nvim_set_hl(0, "StatusModeTerm", { fg = colors.RED, bg = colors.BG, bold = true })
+    vim.api.nvim_set_hl(0, "StatusMode", { fg = colors.RED, bg = "NONE", bold = true })
+    vim.api.nvim_set_hl(0, "StatusModeTerm", { fg = colors.RED, bg = "NONE", bold = true })
     -- b: git
-    vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.BLUE, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.BLUE, bg = "NONE" })
     -- b: diff
-    vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.CYAN, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "StatusDiffChange", { fg = colors.ORANGE, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "StatusDiffRemove", { fg = colors.RED, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.CYAN, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiffChange", { fg = colors.ORANGE, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiffRemove", { fg = colors.RED, bg = "NONE" })
     -- b: diagnostics (per-severity colors)
-    vim.api.nvim_set_hl(0, "StatusDiagError", { fg = colors.RED, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "StatusDiagWarn", { fg = colors.YELLOW, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "StatusDiagInfo", { fg = colors.BLUE, bg = colors.BG })
-    vim.api.nvim_set_hl(0, "StatusDiagHint", { fg = colors.MAGENTA, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusDiagError", { fg = colors.RED, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiagWarn", { fg = colors.YELLOW, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiagInfo", { fg = colors.BLUE, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiagHint", { fg = colors.MAGENTA, bg = "NONE" })
     -- c: filename
-    vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.MAGENTA, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.MAGENTA, bg = "NONE" })
     -- x: indent, encoding, fileformat
-    vim.api.nvim_set_hl(0, "StatusInfo", { fg = colors.MAGENTA, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusInfo", { fg = colors.MAGENTA, bg = "NONE" })
     -- y: filetype
-    vim.api.nvim_set_hl(0, "StatusFiletype", { fg = colors.BLUE, bg = colors.BG })
+    vim.api.nvim_set_hl(0, "StatusFiletype", { fg = colors.BLUE, bg = "NONE" })
     -- z: lsp
-    vim.api.nvim_set_hl(0, "StatusLSP", { fg = colors.RED, bg = colors.BG, bold = true })
+    vim.api.nvim_set_hl(0, "StatusLSP", { fg = colors.RED, bg = "NONE", bold = true })
 end
 
 ----------------------------------------------------------------------
