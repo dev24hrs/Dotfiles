@@ -47,26 +47,9 @@ config.keys = {
 	{ key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
 	{ key = "l", mods = "LEADER", action = act.ActivatePaneDirection("Right") },
 	{ key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = false }) },
-	{ key = "m", mods = "LEADER", action = act.ToggleFullScreen },
+	{ key = "z", mods = "LEADER", action = act.ToggleFullScreen },
 	{ key = "r", mods = "LEADER", action = act.ActivateKeyTable({ name = "resize_pane", one_shot = false }) },
 }
-config.key_tables = {
-	resize_pane = {
-		{ key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
-		{ key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
-		{ key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
-		{ key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
-		{ key = "Escape", action = "PopKeyTable" },
-	},
-}
-for i = 1, 5 do
-	-- CMD + number to activate that window
-	table.insert(config.keys, {
-		key = tostring(i),
-		mods = "CMD",
-		action = act.ActivateWindow(i - 1),
-	})
-end
 config.mouse_bindings = {
 	{
 		event = { Up = { streak = 1, button = "Left" } },
