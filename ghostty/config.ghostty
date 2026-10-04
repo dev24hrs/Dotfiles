@@ -1,25 +1,26 @@
 # font
 font-family                 = RecMonoCasual Nerd Font Mono
 font-family                 = Source Han Sans SC VF
-font-size                   = 19.5
+font-size                   = 20
 font-feature                = -calt, -liga, -dlig
 window-inherit-font-size    = true
+adjust-cell-height          = 5%
 
 # theme
 theme                       = Gruvbox Dark
 term                        = xterm-ghostty
 
-# background-opacity          = 0.96
-# faint-opacity               = 0.96
-# background-blur             = 24
+background-opacity          = 0.96
+faint-opacity               = 0.96
+background-blur             = 24
 
 # cursor
 cursor-style                = bar
 cursor-style-blink          = true
 
 # window
-window-width                = 188
-window-height               = 56
+window-width                = 185
+window-height               = 55
 window-padding-balance      = true
 window-padding-x            = 0
 window-padding-y            = 0
