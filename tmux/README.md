@@ -87,7 +87,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 | :----------- | :------------------------ |
 | `prefix + g` | lazygit (80% 窗口)        |
 | `prefix + t` | fish terminal (60% 窗口)  |
-| `prefix + y` | session 弹出窗 (60% 窗口) |
+| `prefix + y` | worktree 切换/新建 (fzf, 60% 窗口) |
 
 ### Copy Mode (Vi)
 
