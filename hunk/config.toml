@@ -1,24 +1,18 @@
 mode = "stack"
 vcs = "git"
 watch = false
-exclude_untracked = true
+exclude_untracked = false
 line_numbers = true
-wrap_lines = false
+tab_width = 4
+file_gap = 1
+hunk_gap = 0
+wrap_lines = true
+hunk_headers = false
 menu_bar = false
 agent_notes = false
+animations = true
+sidebar = false
 transparent_background = true
-theme = "custom"
-
-[custom_theme]
-base = "github-dark"
-label = "Gruvbox Dark"
-accent = "#d65d0e"
-panel = "#282828"
-noteBorder = "#b16286"
-
-[custom_theme.syntax]
-keyword = "#cc241d"
-string = "#98971a"
-comment = "#928374"
-operator = "#458588"
-variable = "#d79921"
+theme = "gruvbox-dark-hard"
+copy_decorations = false
+cursor_line = "row"
