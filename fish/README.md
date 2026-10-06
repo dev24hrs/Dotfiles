@@ -28,6 +28,12 @@ fish/conf.d/apiKey.fish
 
 ```bash
 ├── completions 		          ## functions补全提示
+│ ├── dev.fish 		            ## dev: 补全现有 tmux session 名
+│ ├── wt.fish 		            ## worktrunk 官方补全
+│ ├── docker.fish 		          ## docker 官方补全
+│ ├── kubectl.fish 		          ## kubectl 官方补全
+│ ├── mole.fish / mo.fish 	    ## mole 补全(mo 为别名)
+│ ├── orbctl.fish 		          ## orbstack(orb) 官方补全
 │ ├── proxy.fish
 │ └── tool.fish
 ├── conf.d
@@ -35,6 +41,8 @@ fish/conf.d/apiKey.fish
 │ ├── apiKey.fish.example 		## deepseek api等
 │ └── lastPwd.fish 		        ## 上一次目录
 ├── functions
+│ ├── dev.fish 		            ## dev tmux: 新建/进入左右 2-pane session
+│ ├── wt.fish 		            ## worktrunk shell 集成(首次调用时 source)
 │ ├── proxy.fish 		          ## 开启/关闭/查看git代理
 │ └── tool.fish 		          ## 自定义工具
 ├── README.md
@@ -130,6 +138,15 @@ zoxide init fish | source
 ch  (查询 cheat.sh 备忘录)  dsclean  (清除当前目录下的 .DS_Store 文件)  nh  (使用 nohup 后台运行命令)
 ```
 
+`dev` 补全现有 tmux session 名:
+
+```bash
+➜ dev tmux <Tab>
+main  (tmux session)  其他 session ...
+```
+
+`wt` / `docker` / `kubectl` / `orbctl` 等为官方生成的补全文件, 直接放入 `completions/` 即可生效。
+
 ### functions
 
 自定义命令:
@@ -138,6 +155,21 @@ ch  (查询 cheat.sh 备忘录)  dsclean  (清除当前目录下的 .DS_Store �
 ➜ proxy on
 off  (关闭 Git 全局代理配置)  on  (开启 Git 代理)  show  (显示 Git 代理信息)
 ```
+
+#### dev — tmux dev session
+
+`dev tmux [session-name]` 新建(或进入)左右 2-pane 的单窗口(`dev`)session:
+
+- 无参: session 名 = `<repo>-<branch>`(branch 中 `/` 替换为 `-`), 与 worktrunk hooks 建的 session 同名共用
+- 1 参: 显式指定 session 名
+- 已存在同名 session 则直接进入; tmux 内 switch-client / tmux 外 attach; 起始目录为当前 worktree 根
+- 与 tmux 的配合见 tmux/README.md「Worktree 集成」
+
+#### wt — worktrunk 集成
+
+`wt` 为 worktrunk 的 fish shell 集成 stub: 首次调用时从二进制 source 集成(`wt config shell init fish`), 之后透传命令。
+
+配合 `worktrunk/config.toml` 的 hooks: `wt switch` 后自动确保/切入 session(命名 `<repo>-<branch>`, dev 布局), `wt remove` 后自动清理 session。
 
 ### conf.d
 
