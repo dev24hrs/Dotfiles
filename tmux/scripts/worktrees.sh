@@ -1,98 +1,88 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# worktree.sh: 列出当前 repo 的全部 worktree 分支,切换或新建同名 tmux session
+# worktrees.sh: 列出当前 repo 的全部 worktree 分支,选中后交由 worktrunk(wt) 切换/新建。
+# fzf 列表来自 `git worktree list`(含主 worktree)+ "[new branch]" 项;
+# session 创建/切换/清理全部由 wt hooks 完成(refer to worktrunk/config.toml):
+#   - new/switch 后确保 tmux session 存在并 switch-client,命名 {{ repo }}-{{ branch | sanitize }}
+#   - remove 后 kill 对应 session
+# 脚本自身不管理 tmux session、不执行 worktree add、不修改 .gitignore
+# (worktree 路径由 worktrunk 的 worktree-path 决定;.worktrees/ 已入全局 gitignore)。
 #
 # 由 tmux.conf 调用:
 #   bind y display-popup -d "#{pane_current_path}" -w 40% -h 40% \
-#     -E "$HOME/.config/tmux/scripts/worktree_switcher.sh"
-#
-# fzf 列表来自 `git worktree list`(含主 worktree)+ "[new branch]" 项;
-# 新建分支的 worktree 放在 <repo 根>/.worktrees/<分支名> 下
-# session 命名规则: <repo 名>-<分支名>(如 projecta-featurea),防止多 repo 同分支名冲突
-# tmux target 中 '.' ':' 是 window/pane 分隔符,session 名中的 . : / 空格统一替换为 _
+#     -E "$HOME/.config/tmux/scripts/worktrees.sh"
 
 start_dir="${1:-$PWD}"
-client_name="${2:-}"
 
-# 主 worktree 总是 `git worktree list` 的第一条,其路径即 repo 根
-# (在 linked worktree 内,rev-parse --show-toplevel 返回的是 worktree 根,不能直接用)
-# git 在非 repo 目录下会以 128 失败,`|| true` 保证 set -e 不提前终止,走到下面的友好提示
-repo_root=$(git -C "$start_dir" worktree list --porcelain 2>/dev/null |
-  awk '/^worktree / { print $2; exit }') || true
-if [ -z "$repo_root" ]; then
-  echo "Not inside a git repo: $start_dir"
-  read -r -p "Press enter to close..."
+# display-popup -E 在命令退出后立即关闭 popup;出错时阻塞在 read 上让信息可见
+die() {
+  if [ $# -gt 0 ]; then
+    printf '%s\n' "$*" >&2
+  fi
+  if [ -t 0 ]; then
+    read -r -p "Press enter to close..." || true
+  fi
   exit 1
-fi
-repo_name=$(basename "$repo_root")
+}
 
-git -C "$repo_root" worktree prune 2>/dev/null || true
+for cmd in git fzf wt; do
+  command -v "$cmd" >/dev/null 2>&1 || die "$cmd not found in PATH"
+done
 
-# 只列出挂在分支上的 worktree;detached HEAD 的 worktree 不参与切换
-branches=$(git -C "$repo_root" worktree list --porcelain |
-  awk '/^branch refs\/heads\// { sub(/^branch refs\/heads\//, ""); print }' | sort -u)
-selection=$(printf '%s\n[new branch]\n' "$branches" |
-  fzf --height 100% --prompt="Branch> " --header "$repo_name" --preview-window hidden --no-border)
-[ -z "$selection" ] && exit 0
+cd "$start_dir" 2>/dev/null || die "Not a directory: $start_dir"
 
-if [ "$selection" = "[new branch]" ]; then
-  read -r -p "New branch name: " branch
-  [ -z "$branch" ] && exit 0
-  is_new=true
-else
-  branch="$selection"
-  is_new=false
-fi
+# 主 worktree 是 `git worktree list` 的第一条(git 文档保证),其路径即仓库根;
+# 在 linked worktree 内 rev-parse --show-toplevel 返回的是该 worktree 根,不能用来找仓库根
+worktrees=$(git worktree list --porcelain 2>/dev/null) || true
+repo_root=$(printf '%s\n' "$worktrees" | awk '/^worktree / { print substr($0, 10); exit }')
+[ -n "$repo_root" ] || die "Not inside a git repo: $start_dir"
+repo_name=${repo_root##*/}
 
-wt_root="$repo_root/.worktrees"
-mkdir -p "$wt_root"
-if ! grep -qxF '.worktrees/' "$repo_root/.gitignore" 2>/dev/null; then
-  echo '.worktrees/' >>"$repo_root/.gitignore"
-fi
+# 清理目录已删除的 worktree 记录(默认过期策略,不误伤临时离线的卷)
+git worktree prune 2>/dev/null || true
 
-existing_path=$(git -C "$repo_root" worktree list --porcelain | awk -v b="refs/heads/$branch" '
-  /^worktree / { path=$2 }
-  $0 == "branch " b { print path }
+# 当前所在 worktree,用于列表标记(在 linked worktree 内即为该 worktree 根)
+current_root=$(git rev-parse --show-toplevel 2>/dev/null) || true
+
+# 每行:分支名;当前所在 worktree 追加 \t(current)。[new branch] 追加在末尾。
+# detached HEAD(无 branch 行)与 prunable(目录已删)条目跳过
+list=$(printf '%s\n' "$worktrees" | awk -v cur="$current_root" '
+  function flush() {
+    if (have && branch != "" && !prunable) {
+      printf "%s%s\n", branch, (path == cur ? "\t(current)" : "")
+    }
+    have = 0; branch = ""
+  }
+  /^worktree / { flush(); path = substr($0, 10); have = 1; prunable = 0; next }
+  /^branch /   { branch = substr($0, 8); sub(/^refs\/heads\//, "", branch); next }
+  /^prunable/  { prunable = 1; next }
+  /^$/         { flush(); next }
+  END          { flush(); print "[new branch]" }
 ')
 
-if [ -n "$existing_path" ]; then
-  wt_path="$existing_path"
-elif [ -e "$wt_root/$branch" ]; then
-  echo "Path exists but isn't a registered worktree: $wt_root/$branch"
-  read -r -p "Press enter to close..."
-  exit 1
-else
-  # 分支名可能含 '/',worktree add 需要父目录存在
-  mkdir -p "$(dirname "$wt_root/$branch")"
-  if [ "$is_new" = true ]; then
-    git -C "$repo_root" worktree add "$wt_root/$branch" -b "$branch" || {
-      read -r -p "Press enter to close..."
-      exit 1
-    }
-  else
-    git -C "$repo_root" worktree add "$wt_root/$branch" "$branch" || {
-      read -r -p "Press enter to close..."
-      exit 1
-    }
+selection=$(printf '%s\n' "$list" |
+  fzf --height 100% --no-border --prompt="Branch> " --header "$repo_name" \
+    --preview-window hidden) || true
+[ -n "$selection" ] || exit 0
+
+branch=${selection%%$'\t'*}
+
+if [ "$branch" = "[new branch]" ]; then
+  if ! read -r -p "New branch name: " branch; then
+    exit 0
   fi
-  wt_path="$wt_root/$branch"
-fi
+  [ -n "$branch" ] || exit 0
+  # 注意不能写成 `--branch -- "$branch"`:git 会把 -- 当作 --branch 的值直接 usage error(exit 129)
+  git check-ref-format --branch "$branch" >/dev/null 2>&1 || die "Invalid branch name: $branch"
 
-sanitized_branch=$(echo "$branch" | tr '.:/ ' '____')
-sess_name="${repo_name}-${sanitized_branch}"
-
-if ! tmux has-session -t "$sess_name" 2>/dev/null; then
-  tmux new-session -d -s "$sess_name" -c "$wt_path" || {
-    read -r -p "Press enter to close..."
-    exit 1
-  }
-fi
-
-if [ -z "${TMUX:-}" ]; then
-  tmux attach -t "$sess_name"
-elif [ -n "$client_name" ]; then
-  tmux switch-client -c "$client_name" -t "$sess_name"
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    # 分支已存在、只是还没有 worktree:普通 switch,wt 会补建 worktree(已实测)
+    wt switch "$branch" || die
+  else
+    # --create 的 base 默认为默认分支(main),与 wt 交互式行为一致
+    wt switch --create "$branch" || die
+  fi
 else
-  tmux switch-client -t "$sess_name"
+  wt switch "$branch" || die
 fi

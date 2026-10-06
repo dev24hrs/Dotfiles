@@ -32,3 +32,6 @@ __pycache__
 .env.*.local
 
 **/.claude/settings.local.json
+
+# git worktree 工作目录(dev.fish / tmux popup / worktrunk 统一约定)
+.worktrees/

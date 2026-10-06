@@ -28,14 +28,15 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 1. `tmux new -s <name>` 新建 session
 2. `prefix + r` 重命名当前 window（预填当前名）
 3. `prefix + c` 新建 window
-4. `prefix + p` / `prefix + n` / `prefix + 0-9` 切换 window
+4. `prefix + p` / `prefix + 0-9` 切换 window（`M-h` / `M-l` 无需 prefix）
 5. `prefix + -` / `prefix + =` 横向/竖向分 pane
 6. `C-h/j/k/l` 在 pane 间跳转（无需 prefix）
 7. `prefix + x` 关闭当前 pane
-8. `prefix + q` 关闭当前 window
-9. `prefix + w` 列出所有 window
-10. `prefix + d` 暂离 session
-11. `tmux a -t <name>` 重连 session
+8. `prefix + q` 关闭当前 session
+9. `prefix + s` 列出 session / window（tmux 原生树）
+10. `prefix + w` 打开 worktree 选择器（fzf，见「Worktree 集成」）
+11. `prefix + d` 暂离 session
+12. `tmux a -t <name>` 重连 session
 
 ---
 
@@ -43,27 +44,26 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 
 ### Session
 
-| Key          | Desc             |
-| :----------- | :--------------- |
-| `prefix + s` | 列出所有 session |
-| `prefix + $` | 重命名 session   |
-| `prefix + d` | detach session   |
-| `prefix + N` | 新建 session     |
-| `prefix + ,` | reload 配置文件  |
+| Key          | Desc                                             |
+| :----------- | :----------------------------------------------- |
+| `prefix + s` | 列出 session / window 树（tmux 原生 choose-tree）|
+| `prefix + y` | fzf 切换 session（当前项标 current）             |
+| `prefix + n` | 新建 session（command-prompt 输入名字）          |
+| `prefix + $` | 重命名 session                                   |
+| `prefix + q` | 关闭当前 session（kill-session）                 |
+| `prefix + d` | detach session                                   |
+| `prefix + ,` | reload 配置文件                                  |
 
 ### Window
 
-| Key             | Desc                    |
-| :-------------- | :---------------------- |
-| `prefix + w`    | 列出所有 window         |
-| `prefix + c`    | 新建 window             |
-| `prefix + r`    | 重命名 window（预填名） |
-| `prefix + q`    | 关闭当前 window         |
-| `prefix + p`    | 上一个 window           |
-| `prefix + n`    | 下一个 window           |
-| `prefix + 0-9`  | 跳到指定 window         |
-| `S-Left / M-h`  | 上一个 window           |
-| `S-Right / M-l` | 下一个 window           |
+| Key             | Desc                         |
+| :-------------- | :--------------------------- |
+| `prefix + c`    | 新建 window                  |
+| `prefix + r`    | 重命名 window（预填名）      |
+| `prefix + p`    | 上一个 window                |
+| `prefix + 0-9`  | 跳到指定 window              |
+| `S-Left / M-h`  | 上一个 window（无需 prefix） |
+| `S-Right / M-l` | 下一个 window（无需 prefix） |
 
 ### Pane
 
@@ -73,7 +73,6 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 | `prefix + -`            | 横向分 pane（保持当前目录） |
 | `prefix + =`            | 竖向分 pane（保持当前目录） |
 | `prefix + x`            | 关闭当前 pane（无需确认）   |
-| `prefix + C-l`          | 清屏（透传 C-l 给 shell）   |
 
 **Pane 标题栏**: 顶部显示，由 `pane_starship.sh` 脚本渲染（显示路径、git branch 等信息）。
 
@@ -83,11 +82,27 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 
 ### Popup
 
-| Key          | Desc                      |
-| :----------- | :------------------------ |
-| `prefix + g` | lazygit (80% 窗口)        |
-| `prefix + t` | fish terminal (60% 窗口)  |
-| `prefix + y` | worktree 切换/新建 (fzf, 60% 窗口) |
+| Key          | Desc                                             |
+| :----------- | :----------------------------------------------- |
+| `prefix + g` | lazygit (80%)                                    |
+| `prefix + h` | hunk diff (80%)                                  |
+| `prefix + t` | fish terminal (60%)                              |
+| `prefix + w` | worktree 切换 / 新建（fzf, 40%，委托 worktrunk） |
+| `prefix + y` | session 切换（fzf, 40%）                         |
+
+### Worktree 集成
+
+`prefix + w` 打开 `scripts/worktrees.sh`（fzf）：列出当前 repo 的全部 worktree 分支（主 worktree 在内，当前所在标记 `(current)`，末尾 `[new branch]` 新建），选中后交由 worktrunk（`wt`）执行：
+
+- `wt switch <branch>` — 切换已有分支；worktree 不存在时自动补建
+- `wt switch --create <branch>` — 新建分支（base 为默认分支）
+- session 的创建 / 切换 / 清理由 `worktrunk/config.toml` 的 hooks 完成：
+  - 切换后确保 tmux session `<repo>-<branch>` 存在（branch 中 `/` 替换为 `-`）并 switch-client；布局为单窗口 `dev` + 左右 2 pane
+  - `wt remove` 后自动 kill 对应 session
+- worktree 目录：`<repo>/.worktrees/<branch>`（已入全局 .gitignore）
+- 手动入口：fish 命令 `dev tmux [session-name]`，与 hooks 使用同一命名规则（见 fish/README.md）
+
+依赖：`git`、`fzf`、`wt`（worktrunk）。
 
 ### Copy Mode (Vi)
 
