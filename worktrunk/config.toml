@@ -1,0 +1,27 @@
+worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"
+
+# 导航交由下方 tmux hook 完成:发起切换的 shell 原地不动(--cd 可单次覆盖)
+[switch]
+cd = false
+
+# tmux 集成:session 命名 <repo>-<branch>。
+# post-switch 每次切换(后台):session 不存在则建(session + 左右 2-pane 工作区),然后切入
+# post-remove remove 后清理该 session
+# 会话创建用 post-*(后台)而非 pre-*:pre-* 前台执行会回显命令正文,后台只留一行状态、正文进日志
+# post-* hook 无 TTY → 只能 switch-client(需 wt 在 tmux 内运行),无法 attach。
+[post-switch]
+tmux = '''
+S={{ repo }}-{{ branch | sanitize }}
+W={{ worktree_path }}
+if ! tmux has-session -t "$S" 2>/dev/null; then
+  left=$(tmux new-session -d -s "$S" -c "$W" -n dev -P -F '#{pane_id}')
+  tmux split-window -h -t "$left" -c "$W"
+  tmux select-pane -t "$left"
+fi
+if [ -n "${TMUX:-}" ]; then
+  tmux switch-client -t "$S"
+fi
+'''
+
+[post-remove]
+tmux = 'tmux kill-session -t {{ repo }}-{{ branch | sanitize }} 2>/dev/null || true'

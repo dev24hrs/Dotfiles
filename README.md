@@ -26,13 +26,11 @@ cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
 
 相关使用场景:
 
-- 脚本里维护数据集
+- 数据集维护在 `config.map`(单一数据源, 被 cfg.sh / setup.sh 共享)
 
 ```bash
-# 单一数据源,格式: <dotfiles 内的相对路径>:<目标绝对路径>
+# config.map — 格式: <dotfiles 内的相对路径>:<目标绝对路径>
 # setup_symlinks 和 migrate_to_dotfiles 都基于这个清单工作
-DOTFILES_DIR="$HOME/Documents/Dotfiles"
-
 CONFIG_MAP=(
   "tmux:$HOME/.config/tmux"
   "fish:$HOME/.config/fish"
@@ -46,6 +44,8 @@ CONFIG_MAP=(
   "wezterm:$HOME/.config/wezterm"
   "yazi:$HOME/.config/yazi"
   "go-musicfox:$HOME/.config/go-musicfox"
+  "hunk:$HOME/.config/hunk"
+  "worktrunk:$HOME/.config/worktrunk"
 )
 ```
 
@@ -360,6 +360,69 @@ brew install --cask wezterm@nightly
 
 config refer to [tmux dotfiles](https://github.com/dev24hrs/dotfiles/tree/main/tmux)
 
+## Worktrunk
+
+[worktrunk](https://worktrunk.dev) 提供 `wt` 命令管理 git worktree; 本仓库用它把 worktree 与 tmux session 打通:
+
+- `wt switch` 切换/新建 worktree 后, hook 自动确保对应 session 存在(`<repo>-<branch>`, 单窗口 `dev` + 左右 2 pane)并切入
+- `wt remove` 删除 worktree 后, hook 自动清理该 session
+
+配置: [worktrunk/config.toml](https://github.com/dev24hrs/Dotfiles/blob/main/worktrunk/config.toml)(已加入 config.map, symlink 到 `~/.config/worktrunk/`)
+
+### 安装
+
+```bash
+brew install worktrunk
+```
+
+### 配置(config.toml)
+
+```toml
+# worktree 统一放在 <repo>/.worktrees/<branch>(已入全局 .gitignore)
+worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"
+
+# 导航交由 tmux hook 完成: 发起切换的 shell 原地不动(--cd 可单次覆盖)
+[switch]
+cd = false
+
+# post-switch 每次切换(后台): session 不存在则建(左右 2-pane 工作区), 然后切入
+# post-remove: remove 后清理该 session
+[post-switch]
+tmux = '''
+S={{ repo }}-{{ branch | sanitize }}
+W={{ worktree_path }}
+if ! tmux has-session -t "$S" 2>/dev/null; then
+  left=$(tmux new-session -d -s "$S" -c "$W" -n dev -P -F '#{pane_id}')
+  tmux split-window -h -t "$left" -c "$W"
+  tmux select-pane -t "$left"
+fi
+if [ -n "${TMUX:-}" ]; then
+  tmux switch-client -t "$S"
+fi
+'''
+
+[post-remove]
+tmux = 'tmux kill-session -t {{ repo }}-{{ branch | sanitize }} 2>/dev/null || true'
+```
+
+### 命令使用
+
+```bash
+wt switch <branch>            # 切换已有分支(worktree 不存在时自动补建), 并切入对应 session
+wt switch --create <branch>   # 新建分支 + worktree(base 默认 main), 同样自动建 session
+wt switch --branches          # 交互式 picker, 包含尚无 worktree 的分支
+wt list                       # 列出所有 worktree 及状态
+wt remove [branch]            # 删除 worktree(已合并则删分支)并清理 session
+wt merge [target]             # squash + rebase + fast-forward 合并进 target
+```
+
+fish 的补全与 shell 集成: `fish/functions/wt.fish`、`fish/completions/wt.fish`。
+
+### 相关流程
+
+- tmux 内: `prefix + w` 打开 fzf worktree 选择器(`tmux/scripts/worktrees.sh`), 选中后交由 `wt switch` / `wt switch --create`(见 tmux/README.md「Worktree 集成」)
+- 手动: fish 命令 `dev tmux [session-name]` 新建/进入同款 session(命名规则与 hooks 一致, 见 fish/README.md)
+
 ## Neovim
 
 config refer to [nvim dotfiles](https://github.com/dev24hrs/dotfiles/tree/main/nvim)
@@ -371,79 +434,6 @@ Refer to [vimrc](https://github.com/dev24hrs/Dotfiles/blob/main/vimrc/vimrc)
 ## Rime 输入法
 
 Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
-
-## Mole
-
-[Mole](https://github.com/tw93/Mole) 是一个开源的 macOS CLI 工具箱，集成了 CleanMyMac + AppCleaner + DaisyDisk + iStat Menus 的核心功能。
-
-### 安装
-
-```bash
-brew install mole
-```
-
-### 只读操作
-
-```bash
-mo status                       # 实时系统仪表盘 — CPU/内存/磁盘/网络/电池健康
-mo status --json                # JSON 输出，可管道给 jq
-mo analyze                      # 交互式磁盘空间分析（方向键/Vim键浏览）
-mo analyze /Volumes             # 分析外接磁盘
-mo history                      # 查看历史操作日志
-```
-
-### 预览（推荐先用 --dry-run 审查）
-
-```bash
-mo clean --dry-run              # 预览垃圾清理
-mo uninstall --dry-run          # 预览卸载结果
-mo purge --dry-run              # 预览构建产物清理
-mo installer --dry-run          # 预览安装包清理
-mo optimize --dry-run           # 预览系统优化操作
-```
-
-### 白名单管理
-
-```bash
-mo clean --whitelist            # 交互式配置清理白名单
-mo optimize --whitelist         # 交互式配置优化白名单
-```
-
-配置文件：`~/.config/mole/whitelist`，支持 glob 模式。
-
-### 执行操作
-
-```bash
-mo clean                        # 深度垃圾清理（缓存/日志/浏览器/Temp）
-mo uninstall                    # 智能卸载 + 12+ 路径残留扫描
-mo optimize                     # 系统优化（重建缓存/刷新DNS/修复Spotlight）
-mo purge                        # 清理 node_modules/target/dist 等构建产物
-mo installer                    # 清理残留 .dmg/.pkg 安装包
-mo touchid                      # 配置 Touch ID for sudo
-mo completion                   # 安装 shell 自动补全
-mo update                       # 更新 Mole
-mo remove                       # 卸载 Mole
-```
-
-### 典型场景
-
-```bash
-# 每周日常维护
-mo clean
-
-# 卸载应用后清残留
-mo uninstall
-
-# 磁盘不够 — 先分析再清理
-mo analyze
-mo installer
-
-# 系统卡顿 — 一键优化
-mo optimize
-
-# 开发者 — 清构建产物（7天内修改的项目自动跳过）
-mo purge
-```
 
 ## Golang
 
@@ -546,17 +536,20 @@ rustup update
 
   ```bash
   {
-   "ignored_packages":
-   [
-    "Vintage",
-   ],
-   "color_scheme": "ayu-light.sublime-color-scheme",
-   "theme": "ayu-light.sublime-theme",
-   "always_prompt_for_file_reload": true,
-   "font_size": 16,
-   "remember_open_files": true,
-   "update_check": false,
-   "font_face": "RecMonoCasual Nerd Font",
+  	"ignored_packages":
+  	[
+  		"Vintage",
+  	],
+  	"color_scheme": "ayu-light.sublime-color-scheme",
+  	"theme": "ayu-light.sublime-theme",
+  	"always_prompt_for_file_reload": true,
+  	"font_size": 17,
+  	"tab_size": 4,
+  	"remember_open_files": false,
+  	"hot_exit": false,
+  	"update_check": false,
+  	"font_face": "RecMonoCasual Nerd Font Mono",
+  	"index_files": true,
   }
   ```
 
