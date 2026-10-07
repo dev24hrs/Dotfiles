@@ -1,4 +1,4 @@
-# Go Development Standards & Skills
+# Go Development Standards
 
 Help Claude write readable and maintainable Go code that conforms to Go community conventions. This skill integrates the core guidelines of [Effective Go](https://go.dev/doc/effective_go) & [Google Go Style Guide](https://google.github.io/styleguide/go/) & [Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md).
 
@@ -51,87 +51,18 @@ Users provide Go code, a description of their requirements, or a problem, and yo
 - **Readability:** Prefer clarity over cleverness. Add comments for complex logic.
 - **Scalability:** Organize code into modules and packages so new features can be added without major refactoring.
 
-### Modern Go: Stdlib-First Idioms
+### 6.1 Modern Go: Stdlib-First Idioms
 
-Prefer modern standard-library APIs over legacy patterns. Below is a concrete before/after reference.
+Prefer modern standard-library APIs over legacy patterns. When generating code , the following priority applies:
 
-#### Slices & Maps
-
-| Legacy (avoid)                                   | Modern (prefer)                                                | Since   |
-| ------------------------------------------------ | -------------------------------------------------------------- | ------- |
-| `for i := range s { if s[i] == v { ... } }`      | `slices.Contains(s, v)`                                        | Go 1.21 |
-| `for _, v := range s { if v == target { ... } }` | `slices.Index(s, target)`                                      | Go 1.21 |
-| manual loop to clone a slice                     | `slices.Clone(s)`                                              | Go 1.21 |
-| manual loop to copy a map                        | `maps.Clone(m)`                                                | Go 1.21 |
-| `m[k] = v; m[k] = v2; delete(m, old)` in batch   | `maps.Copy(dst, src)`                                          | Go 1.21 |
-| `for k := range m { delete(m, k) }`              | `clear(m)`                                                     | Go 1.21 |
-| `s = s[:0]` to reset a slice                     | `clear(s)`                                                     | Go 1.21 |
-| `for i, v := range s { s[i] = f(v) }`            | `slices.Replace(s, 0, len(s), f(v))` or collect into new slice | Go 1.22 |
-
-#### Sort
-
-| Legacy (avoid)                                                    | Modern (prefer)                                                       | Since   |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------- | ------- |
-| `sort.Ints(x)`                                                    | `slices.Sort(x)`                                                      | Go 1.22 |
-| `sort.Strings(x)`                                                 | `slices.Sort(x)`                                                      | Go 1.22 |
-| `sort.Float64s(x)`                                                | `slices.Sort(x)`                                                      | Go 1.22 |
-| `sort.Sort(sort.IntSlice(x))`                                     | `slices.Sort(x)`                                                      | Go 1.22 |
-| `sort.Sort(sort.StringSlice(x))`                                  | `slices.Sort(x)`                                                      | Go 1.22 |
-| `sort.Slice(x, func(i, j int) bool { return x[i] < x[j] })`       | `slices.Sort(x)`                                                      | Go 1.22 |
-| `sort.Slice(x, func(i, j int) bool { return less(x[i], x[j]) })`  | `slices.SortFunc(x, less)`                                            | Go 1.22 |
-| `sort.SliceStable(x, func(i, j int) bool { return ... })`         | `slices.SortStableFunc(x, cmp)`                                       | Go 1.22 |
-| `sort.Reverse(sort.IntSlice(x))` + `sort.Sort(...)`               | `slices.SortFunc(x, func(a, b int) int { return cmp.Compare(b, a) })` | Go 1.22 |
-| `sort.IntsAreSorted(x)`                                           | `slices.IsSorted(x)`                                                  | Go 1.22 |
-| `sort.StringsAreSorted(x)`                                        | `slices.IsSorted(x)`                                                  | Go 1.22 |
-| `sort.Float64sAreSorted(x)`                                       | `slices.IsSorted(x)`                                                  | Go 1.22 |
-| `sort.IsSorted(sort.StringSlice(x))`                              | `slices.IsSorted(x)`                                                  | Go 1.22 |
-| `sort.Search(n, func(i int) bool { return x[i] >= target })`      | `slices.BinarySearch(x, target)`                                      | Go 1.22 |
-| `sort.Search(n, func(i int) bool { return cond(x[i]) })` (custom) | `slices.BinarySearchFunc(x, target, cmp)`                             | Go 1.22 |
-
-#### Builtins & Language
-
-| Legacy (avoid)                            | Modern (prefer)                    | Since   |
-| ----------------------------------------- | ---------------------------------- | ------- |
-| `interface{}`                             | `any`                              | Go 1.18 |
-| `if x > y { max = x } else { max = y }`   | `max(x, y)`                        | Go 1.21 |
-| `if x < y { min = x } else { min = y }`   | `min(x, y)`                        | Go 1.21 |
-| `fmt.Sprintf("%s/%s", a, b)` in hot paths | `strings.Builder` or `fmt.Appendf` | Go 1.19 |
-
-#### Strings
-
-| Legacy (avoid)                                      | Modern (prefer)                           | Since   |
-| --------------------------------------------------- | ----------------------------------------- | ------- |
-| `strings.SplitN(s, sep, 2)` to get two parts        | `strings.Cut(s, sep)`                     | Go 1.18 |
-| `strings.TrimPrefix` + `strings.TrimSuffix` chained | `strings.CutPrefix` / `strings.CutSuffix` | Go 1.20 |
-
-#### Errors
-
-| Legacy (avoid)                                       | Modern (prefer)                  | Since   |
-| ---------------------------------------------------- | -------------------------------- | ------- |
-| `err1.Error() + ": " + err2.Error()`                 | `errors.Join(err1, err2)`        | Go 1.20 |
-| manual loop to collect multiple errors               | `errors.Join(errs...)`           | Go 1.20 |
-| hand-rolled context cancellation cause               | `context.WithCancelCause(ctx)`   | Go 1.20 |
-| `fmt.Errorf("context: %s", err)` (loses error chain) | `fmt.Errorf("context: %w", err)` | Go 1.13 |
-
-#### HTTP
-
-| Legacy (avoid)                           | Modern (prefer)                                      | Since   |
-| ---------------------------------------- | ---------------------------------------------------- | ------- |
-| `http.NewRequest(method, url, body)`     | `http.NewRequestWithContext(ctx, method, url, body)` | Go 1.13 |
-| `http.Get(url)` (no context propagation) | `http.NewRequestWithContext` + `client.Do`           | Go 1.13 |
-
-#### Concurrency
-
-| Legacy (avoid)                                            | Modern (prefer)                                              | Since   |
-| --------------------------------------------------------- | ------------------------------------------------------------ | ------- |
-| `var once sync.Once; once.Do(func() { ... })` for a value | `sync.OnceValue(f)` / `sync.OnceValues(f)`                   | Go 1.21 |
-| `var mu sync.Mutex` + manual Lock/Unlock around a map     | `sync.RWMutex` or consider `sync.Map` for specific use-cases | —       |
-
-#### Guideline
-
-- When both old and new forms exist, **always prefer the newer form** unless the project's `go.mod` version doesn't support it.
-- Check the project's `go.mod` `go` directive before using any feature marked above — never use a feature from a version higher than the module declares.
-- The Go compatibility promise means stdlib additions are safe: code that compiles with Go 1.N will compile with Go 1.N+1. Prefer stdlib over a third-party dependency that wraps the same functionality.
+1. **Standard library first**: Prefer the standard library over third-party dependencies when the stdlib provides an adequate solution. Introducing a new dependency requires justification (the stdlib solution is missing, buggy, or prohibitively verbose).
+2. **Modern idioms over legacy patterns**: Use the language's modern/recommended idioms rather than legacy patterns from earlier versions. This includes but is not limited to:
+   - Function declarations (arrow functions, concise method syntax, etc.)
+   - Collection operations (declarative/functional APIs over manual loops when readable)
+   - HTTP / I/O operations (modern client APIs over deprecated ones)
+   - Error handling (language-native patterns over hand-rolled workarounds)
+   - Type system (newer type constructs over `any`/`Object`/`void*` escape hatches)
+3. **Version awareness**: Target the language version specified in the project's toolchain/config file (e.g., `go.mod`, `pyproject.toml`, `.nvmrc`). Do not use features from versions newer than the project target, and do not use patterns already deprecated in the project's target version.
 
 ## 7.Performance
 

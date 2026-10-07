@@ -1,5 +1,23 @@
 {
-  "disableDeepLinkRegistration": "disable",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "api-key",
+    "ANTHROPIC_BASE_URL": "https:/api.deepseek.com/anthropic",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_MODEL": "deepseek-flash[1m]",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "786432",
+    "DISABLE_INSTALLATION_CHECKS": "1"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline.sh",
+    "padding": 2
+  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
@@ -7,40 +25,20 @@
     "skill-creator@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "understand-anything@understand-anything": true
-  },
-  "env": {
-    "ANTHROPIC_AUTH_TOKEN": "<deepseek-api-key>",
-    "ANTHROPIC_BASE_URL": "https:/api.deepseek.com/anthropic",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-v4-flash",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-v4-pro[1m]",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-v4-pro[1m]",
-    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",
-    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
-    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
-    "CLAUDE_CODE_EFFORT_LEVEL": "max",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-v4-flash",
-    "DISABLE_INSTALLATION_CHECKS": "1"
+    "code-review@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
-        "repo": "anthropics/claude-plugins-official",
-        "source": "github"
-      }
-    },
-    "understand-anything": {
-      "source": {
-        "repo": "Lum1104/Understand-Anything",
-        "source": "github"
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
       }
     }
   },
   "showThinkingSummaries": true,
-  "statusLine": {
-    "command": "$HOME/.claude/statusline.sh",
-    "padding": 2,
-    "type": "command"
-  },
-  "theme": "auto"
+  "theme": "auto",
+  "disableDeepLinkRegistration": "disable"
 }
