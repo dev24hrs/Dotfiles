@@ -10,7 +10,7 @@ return {
         end
         return vim.lsp.rpc.start({ cmd, "--stdio" }, dispatchers)
     end,
-    filetypes = { "yaml", "yaml.docker-compose" },
+    filetypes = { "yaml" },
     root_markers = { ".git" },
     settings = {
         -- https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting

@@ -3,12 +3,25 @@ vim.pack.add({
 })
 
 require("spectre").setup({
+    -- 固定宽度60
+    -- options.lua:51 : vim.opt.splitright = true
+    -- (默认false),在右侧打开
+    open_cmd = function()
+        vim.cmd("vnew")
+        vim.api.nvim_win_set_width(0, 60)
+        vim.opt_local.winfixwidth = true
+    end,
     color_devicons = true,
-    live_update = true,
+    live_update = false,
     lnum_for_results = true,
     line_sep_start = "┌-----------------------------------------",
     result_padding = "¦  ",
     line_sep = "└-----------------------------------------",
+    highlight = {
+        ui = "String",
+        search = "DiffChange",
+        replace = "DiffDelete",
+    },
     mapping = {
         ["tab"] = {
             map = "<Tab>",

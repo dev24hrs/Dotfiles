@@ -93,4 +93,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 -- 创建 :H 命令，在新的竖屏中打开 help
 vim.api.nvim_create_user_command("H", function(opts)
     vim.cmd("vertical help " .. (opts.args ~= "" and opts.args or ""))
+    vim.api.nvim_win_set_width(0, 80)
+    vim.opt_local.winfixwidth = true
 end, { nargs = "*", complete = "help" })

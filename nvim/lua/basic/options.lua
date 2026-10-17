@@ -48,7 +48,7 @@ vim.opt.autoindent = true
 vim.opt.smartindent = false
 
 -- Others
-vim.opt.splitright = false
+vim.opt.splitright = true
 vim.g.markdown_folding = 1
 
 -- 文件类型映射
