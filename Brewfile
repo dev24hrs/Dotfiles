@@ -115,8 +115,6 @@ brew "go-musicfox/go-musicfox/go-musicfox", trusted: true
 cask "appcleaner"
 # Open source IDE for exploring and testing APIs
 cask "bruno"
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
 # Terminal-based AI coding assistant
 cask "claude-code"
 cask "font-sf-mono"
@@ -150,5 +148,6 @@ go "github.com/tmc/json-to-struct"
 go "olexsmir.xyz/json2go/cmd/json2go"
 go "go.uber.org/mock/mockgen"
 go "honnef.co/go/tools/cmd/staticcheck"
+npm "@earendil-works/pi-coding-agent"
 npm "neovim"
-npm "tree-sitter-cli"
+npm "wrangler"
