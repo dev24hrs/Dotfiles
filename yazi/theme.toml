@@ -1,6 +1,7 @@
 [flavor]
 dark = "gruvbox-material"
 light = "gruvbox-material"
+
 [git]
 unknown_sign = "?"
 untracked_sign = "󰓎"
