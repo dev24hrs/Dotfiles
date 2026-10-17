@@ -9,9 +9,8 @@ vim.lsp.enable({
     "fish_lsp",
     "sqls",
     "marksman",
-    "taplo",
+    "tombi",
     "sourcekit", -- swift
-    "tsgo",
     "oxlint",
 })
 

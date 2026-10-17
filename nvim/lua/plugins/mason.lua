@@ -26,7 +26,6 @@ local opts = {
         "sqls", -- SQL LSP
         "marksman", -- Markdown LSP
         "pyright", -- Python LSP
-        "tsgo", -- TypeScript LSP
 
         -- Formatters (for conform.nvim and general use)
         "stylua", -- Lua
@@ -37,7 +36,7 @@ local opts = {
         "ruff", -- Python
         "shfmt", -- Shell
         "yamlfmt", -- YAML
-        "taplo", -- Formatters & LSP
+        "tombi", -- Formatters & LSP
 
         -- -- Linters
         "golangci-lint", -- Go
