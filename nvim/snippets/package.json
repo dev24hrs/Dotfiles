@@ -40,7 +40,7 @@
       },
       {
         "language": "dockerfile",
-        "path": "./docker/docker_file.json"
+        "path": "./docker/docker-file.json"
       },
       {
         "language": "yaml",

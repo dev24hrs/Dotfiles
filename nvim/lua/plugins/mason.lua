@@ -17,6 +17,7 @@ local opts = {
             use brew install
             "lua-language-server", -- Lua LSP lua_ls
             "gopls", -- Go LSP
+            "golangci-lint", -- Go
             "rust-analyzer", -- Rust LSP
         ]]
         "yaml-language-server", -- YAML LSP yamlls
@@ -39,7 +40,6 @@ local opts = {
         "tombi", -- Formatters & LSP
 
         -- -- Linters
-        "golangci-lint", -- Go
         "oxlint", -- TypeScript
         "selene", -- Lua
         "shellcheck", -- Shell

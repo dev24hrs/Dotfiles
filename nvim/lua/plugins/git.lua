@@ -30,16 +30,11 @@ require("gitsigns").setup({
             vim.keymap.set(mode, l, r, opts)
         end
         -- Navigation
-        map("n", "]h", function()
+        map("n", "]g", function()
             gitsigns.nav_hunk("next")
         end, { desc = "[Gitsigns]: Next Hunk" })
-        map("n", "[h", function()
+        map("n", "[g", function()
             gitsigns.nav_hunk("prev")
         end, { desc = "[Gitsigns]: Previous Hunk" })
-
-        map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "[Gitsigns]: Preview Hunk" })
-        map("n", "<leader>hb", function()
-            gitsigns.blame_line({ full = true })
-        end, { desc = "[Gitsigns]: Show Blame Line" })
     end,
 })

@@ -48,7 +48,7 @@ dashboard.section.header.val = header_art
 dashboard.section.buttons.val = {
     dashboard.button("f", "󰈞  Find file", ":FzfLua files<CR>"),
     dashboard.button("r", "  Recent", ":FzfLua oldfiles<CR>"),
-    dashboard.button("h", "  Dotfiles", ":FzfLua :FzfLua files cwd=~/.config/nvim<CR>"),
+    dashboard.button("h", "  Dotfiles", ":FzfLua files cwd=~/.config/nvim<CR>"),
     dashboard.button("q", "󰈆  Quit Nvim", ":qa<CR>"),
 }
 

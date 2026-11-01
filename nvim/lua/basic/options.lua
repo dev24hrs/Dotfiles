@@ -18,7 +18,7 @@ vim.opt.relativenumber = true
 
 vim.opt.showmode = false
 -- vim.opt.laststatus = 3   -- set in lua/config/statusline.lua:293
-vim.opt.cmdheight = 1
+vim.opt.cmdheight = 0
 
 vim.opt.wrap = true
 vim.opt.list = true

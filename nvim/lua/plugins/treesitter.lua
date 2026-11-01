@@ -92,6 +92,14 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
                 fn(query, "textobjects")
             end, { desc = "Move to " .. qstr })
         end
-        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("User_TreesitterIndent", { clear = true }),
+    callback = function(args)
+        if vim.treesitter.get_parser(args.buf, nil, { error = false }) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
     end,
 })

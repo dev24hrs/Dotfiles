@@ -1,5 +1,7 @@
+require("config.ui2_cmd")
+require("config.ui2_lsp")
+require("config.ui2_notify")
 require("config.lsp")
-require("config.lsptool")
 require("config.diagnostic")
 require("config.folding")
 require("config.langIndent")

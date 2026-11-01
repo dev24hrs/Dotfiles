@@ -53,11 +53,13 @@ vim.keymap.set({ "n", "v" }, "<leader>w", function()
             return
         end
         vim.schedule(function()
+            -- `silent` keeps the built-in "written" message out of the ui2 msg
+            -- window; the notification below is the user-facing feedback.
             if vim.bo.modified then
-                vim.cmd("update")
+                vim.cmd("silent update")
                 vim.notify("Formatted & Saved", vim.log.levels.INFO, { title = "Conform" })
             else
-                vim.cmd("update")
+                vim.cmd("silent update")
             end
         end)
     end)

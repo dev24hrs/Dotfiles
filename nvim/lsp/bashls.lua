@@ -8,7 +8,7 @@ return {
             -- 跨文件符号搜索，dotfiles 等多脚本仓库场景实用
             includeAllWorkspaceSymbols = true,
             -- hover 到 shell 命令时显示 explainshell.com 的参数说明
-            explainshellEndpoint = true,
+            explainshellEndpoint = "https://explainshell.com",
             -- 后台分析文件数上限（默认 1000，大仓库可调大避免分析截断）
             backgroundAnalysisMaxFiles = 2000,
             -- 日志级别：warning 减少冗余输出

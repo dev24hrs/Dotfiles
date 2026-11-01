@@ -132,21 +132,21 @@ return {
                 },
                 run = { enable = true },
                 updateTest = { enable = true },
-                -- https://rust-analyzer.github.io/book/other_editors.html#nvim-lsp
-                imports = {
-                    granularity = {
-                        group = "module",
-                    },
-                    prefix = "self",
+            },
+            -- https://rust-analyzer.github.io/book/other_editors.html#nvim-lsp
+            imports = {
+                granularity = {
+                    group = "module",
                 },
-                cargo = {
-                    buildScripts = {
-                        enable = true,
-                    },
-                },
-                procMacro = {
+                prefix = "self",
+            },
+            cargo = {
+                buildScripts = {
                     enable = true,
                 },
+            },
+            procMacro = {
+                enable = true,
             },
         },
     },

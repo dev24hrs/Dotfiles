@@ -16,9 +16,6 @@ require("image").setup({
     },
 })
 
-vim.api.nvim_set_hl(0, "RenderMarkdownH3Bg", { bg = "#3e4934" })
-vim.api.nvim_set_hl(0, "RenderMarkdownH4Bg", { bg = "#49503b" })
-
 require("render-markdown").setup({
     file_types = { "markdown" },
     latex = { enabled = false },
@@ -30,7 +27,8 @@ require("render-markdown").setup({
         style = "language",
     },
     heading = {
-        icons = { "", "", "", "", "", "" },
+        sign = true,
+        icons = { "󰬺 ", "󰬻 ", "󰬼 ", "󰬽 ", "󰬾 ", "󰬿 " },
         position = "inline",
         border = false,
         render_modes = true, -- keep rendering while inserting
