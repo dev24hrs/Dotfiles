@@ -44,15 +44,15 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 
 ### Session
 
-| Key          | Desc                                             |
-| :----------- | :----------------------------------------------- |
-| `prefix + s` | 列出 session / window 树（tmux 原生 choose-tree）|
-| `prefix + y` | fzf 切换 session（当前项标 current）             |
-| `prefix + n` | 新建 session（command-prompt 输入名字）          |
-| `prefix + $` | 重命名 session                                   |
-| `prefix + q` | 关闭当前 session（kill-session）                 |
-| `prefix + d` | detach session                                   |
-| `prefix + ,` | reload 配置文件                                  |
+| Key          | Desc                                              |
+| :----------- | :------------------------------------------------ |
+| `prefix + s` | 列出 session / window 树（tmux 原生 choose-tree） |
+| `prefix + y` | fzf 切换 session（当前项标 current）              |
+| `prefix + n` | 新建 session（command-prompt 输入名字）           |
+| `prefix + $` | 重命名 session                                    |
+| `prefix + q` | 关闭当前 session（kill-session）                  |
+| `prefix + d` | detach session                                    |
+| `prefix + ,` | reload 配置文件                                   |
 
 ### Window
 
@@ -115,6 +115,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 | `y`          | 复制到系统剪贴板 |
 | `Y`          | 复制整行         |
 | `Escape`     | 取消选择         |
+| `C-r`        | 切换自动刷新     |
 
 ### Session CLI
 
