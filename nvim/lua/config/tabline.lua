@@ -33,11 +33,11 @@ local function get_icon(filename, name)
         _devicons = ok and mod or false
     end
     if _devicons == false or not name or name == "" then
-        return ""
+        return "", nil
     end
     local ext = vim.fn.fnamemodify(name, ":e")
-    local icon = _devicons.get_icon(filename, ext, { default = true })
-    return icon and (icon .. " ") or ""
+    local icon, hl = _devicons.get_icon(filename, ext, { default = true })
+    return (icon and (icon .. " ")) or "", hl
 end
 
 ----------------------------------------------------------------------
@@ -84,27 +84,20 @@ local function render_buf(bufnr, current)
     local name = vim.api.nvim_buf_get_name(bufnr)
     local display_name = get_display_name(name)
     local filename = (name ~= "" and vim.fn.fnamemodify(name, ":t")) or NO_NAME
-    local icon = get_icon(filename, name)
+    local icon, icon_hl = get_icon(filename, name)
     local modified = vim.bo[bufnr].modified and ("%#MyBufModified#" .. MODIFIED .. " ") or ""
-    local content = icon .. display_name .. " " .. modified
+    local hl = bufnr == current and "MyBufActive" or "MyBufInactive"
+    -- Keep the devicon's own color, then switch back to the buffer highlight group
+    local icon_part = (icon ~= "" and icon_hl) and ("%#" .. icon_hl .. "#" .. icon .. "%#" .. hl .. "#") or icon
+    local content = icon_part .. display_name .. " " .. modified
 
-    if bufnr == current then
-        return table.concat({
-            "%" .. bufnr .. "@v:lua.tabline_click@",
-            "%#MyBufActive# ",
-            content,
-            "%#MyBufSeparator#",
-            SEP,
-        })
-    else
-        return table.concat({
-            "%" .. bufnr .. "@v:lua.tabline_click@",
-            "%#MyBufInactive# ",
-            content,
-            "%#MyBufSeparator#",
-            SEP,
-        })
-    end
+    return table.concat({
+        "%" .. bufnr .. "@v:lua.tabline_click@",
+        "%#" .. hl .. "# ",
+        content,
+        "%#MyBufSeparator#",
+        SEP,
+    })
 end
 
 ----------------------------------------------------------------------

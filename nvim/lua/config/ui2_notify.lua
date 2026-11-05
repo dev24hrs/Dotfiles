@@ -10,7 +10,9 @@
 --- not share ui2's msg window with the LSP progress in lsp_progress.lua. Each
 --- notification has its own timer, newest first, and the window hides when the
 --- last one expires. Messages are not added to |:messages|: echoing them would
---- also display them in the ui2 msg window.
+--- also display them in the ui2 msg window. Native |:undo| and |:redo| messages
+--- (ui2 message kind "undo") are intercepted from ui2's msg_show() so they show
+--- here instead of in that window.
 
 local api = vim.api
 local levels = vim.log.levels
@@ -186,13 +188,17 @@ local function render()
     end
 end
 
-local function remove(note)
+local function stop_timer(note)
     local timer = note.timer
     note.timer = nil
     if timer and not timer:is_closing() then
         timer:stop()
         timer:close()
     end
+end
+
+local function remove(note)
+    stop_timer(note)
 
     for i, item in ipairs(notes) do
         if item == note then
@@ -222,21 +228,29 @@ local function notify(msg, level, opts)
         return
     end
 
+    -- A tag coalesces repeated notifications: replace any note with the same
+    -- tag instead of stacking a new line for every update.
+    local tag = type(opts.tag) == "string" and opts.tag or nil
+    if tag then
+        for i = #notes, 1, -1 do
+            if notes[i].tag == tag then
+                stop_timer(table.remove(notes, i))
+            end
+        end
+    end
+
     local note = {
         msg = tostring(msg),
         level = level,
         title = type(opts.title) == "string" and opts.title or nil,
         icon = type(opts.icon) == "string" and opts.icon or nil,
+        tag = tag,
         timeout = type(opts.timeout) == "number" and math.max(1, opts.timeout) or level_timeout(level),
     }
 
     table.insert(notes, 1, note)
     if #notes > config.max_notes then
-        local oldest = table.remove(notes)
-        if oldest and oldest.timer and not oldest.timer:is_closing() then
-            oldest.timer:stop()
-            oldest.timer:close()
-        end
+        stop_timer(table.remove(notes))
     end
 
     render()
@@ -246,6 +260,29 @@ local function notify(msg, level, opts)
 end
 
 vim.notify = notify
+
+-- Native |:undo| and |:redo| messages carry the "undo" message kind and would
+-- otherwise be rendered in ui2's bottom-right msg window. Route them to the
+-- notifier instead. ui2 looks the handler up from this module on every event,
+-- so wrapping it here takes effect even after enable() has run.
+local ok, ui2_messages = pcall(require, "vim._core.ui2.messages")
+if ok and type(ui2_messages.msg_show) == "function" then
+    local msg_show = ui2_messages.msg_show
+    ui2_messages.msg_show = function(kind, content, ...)
+        if kind == "undo" then
+            local chunks = {}
+            for _, chunk in ipairs(content) do
+                chunks[#chunks + 1] = chunk[2]
+            end
+            local text = table.concat(chunks)
+            if text ~= "" then
+                notify(text, levels.INFO, { tag = "undo", timeout = 2000 })
+            end
+            return
+        end
+        return msg_show(kind, content, ...)
+    end
+end
 
 local group = api.nvim_create_augroup("User_Notify", { clear = true })
 
