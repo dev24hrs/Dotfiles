@@ -1,7 +1,6 @@
 vim.pack.add({
     { src = "https://github.com/saghen/blink.cmp", version = vim.version.range("1.*") },
     -- { src = "https://github.com/rafamadriz/friendly-snippets" },
-    { src = "https://github.com/Exafunction/windsurf.nvim" },
 })
 vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
     pattern = "*",
@@ -66,17 +65,8 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                 },
             },
             sources = {
-                default = { "lsp", "snippets", "buffer", "path", "codeium" },
-                -- default = { "lsp", "snippets", "buffer", "path", "minuet" },
+                default = { "lsp", "snippets", "buffer", "path" },
                 providers = {
-                    codeium = { name = "Codeium", module = "codeium.blink", async = true },
-                    -- minuet = {
-                    --     name = "minuet",
-                    --     module = "minuet.blink",
-                    --     async = true,
-                    --     timeout_ms = 2500,
-                    --     score_offset = 50, -- Gives minuet higher priority among suggestions
-                    -- },
                     lsp = {
                         name = "LSP",
                         module = "blink.cmp.sources.lsp",

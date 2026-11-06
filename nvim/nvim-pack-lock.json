@@ -21,10 +21,6 @@
       "rev": "016802de402556da54c36bd7359b441266b01cdd",
       "src": "https://github.com/stevearc/conform.nvim"
     },
-    "crates.nvim": {
-      "rev": "7039bc1d130e424232a7aa64ceddb170a154ff5b",
-      "src": "https://github.com/saecki/crates.nvim"
-    },
     "flash.nvim": {
       "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
       "src": "https://github.com/folke/flash.nvim"
@@ -100,10 +96,6 @@
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
     },
-    "render-markdown.nvim": {
-      "rev": "8e8795368391036643b622875a6da6a51bcd33f4",
-      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
-    },
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "https://github.com/folke/todo-comments.nvim"
@@ -111,10 +103,6 @@
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
       "src": "https://github.com/folke/which-key.nvim"
-    },
-    "windsurf.nvim": {
-      "rev": "821b570b526dbb05b57aa4ded578b709a704a38a",
-      "src": "https://github.com/Exafunction/windsurf.nvim"
     }
   }
 }
