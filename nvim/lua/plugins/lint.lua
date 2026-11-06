@@ -4,7 +4,9 @@ vim.pack.add({
 
 local configured = false
 
-vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+-- BufReadPost fires before filetype detection on startup (ft is empty)
+-- add FileType to load lint on startup
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "FileType" }, {
     group = vim.api.nvim_create_augroup("User_LintInit", { clear = true }),
     callback = function()
         local lint = require("lint")
@@ -27,6 +29,21 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
                 "lint",
                 "--format=json",
                 "--dialect=mysql",
+            }
+            -- markdownlint 是按 linter 进程的 cwd 查找配置文件，因此需要显式传 '--config'
+            -- 指向nvim 配置目录下的 .markdownlint.json
+            lint.linters.markdownlint.args = {
+                "--stdin",
+                "--config",
+                vim.fs.joinpath(vim.fn.stdpath("config"), ".markdownlint.json"),
+            }
+            -- selene 也只从进程 cwd 查找 selene.toml，显式指定配置路径
+            lint.linters.selene.args = {
+                "--display-style",
+                "json",
+                "--config",
+                vim.fs.joinpath(vim.fn.stdpath("config"), "selene.toml"),
+                "-",
             }
             configured = true
         end

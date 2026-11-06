@@ -12,7 +12,7 @@ consistent_quotes = "allow"
 # 允许局部变量覆盖上层变量 (local vim = vim)
 shadowing_variable = "allow"
 # 未使用的变量 设置为警告
-unused_variable = { level = "warn" }
+unused_variable = "warn"
 # 允许使用某些可能“不够优雅”但有效的逻辑 (if x == true then ...)
 bool_comparison = "allow"
 # 允许空的 if/else 分支
