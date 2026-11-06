@@ -1,4 +1,4 @@
-#Tmux
+# Tmux
 
 ![](https://github.com/dev24hrs/Dotfiles/blob/main/img/tmux_with_pane.png?raw=true)
 
@@ -74,12 +74,6 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 | `prefix + =`            | 竖向分 pane（保持当前目录） |
 | `prefix + x`            | 关闭当前 pane（无需确认）   |
 
-**Pane 标题栏**: 顶部显示，由 `pane_starship.sh` 脚本渲染（显示路径、git branch 等信息）。
-
-活跃 pane 边框为紫色 (`#b294bb`)，非活跃为灰色。
-
-- 路径、git branch 等信息通过 `pane_starship.sh` & `starship-tmux.toml` 渲染获取
-
 ### Popup
 
 | Key          | Desc                                             |
@@ -92,7 +86,8 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 
 ### Worktree 集成
 
-`prefix + w` 打开 `scripts/worktrees.sh`（fzf）：列出当前 repo 的全部 worktree 分支（主 worktree 在内，当前所在标记 `(current)`，末尾 `[new branch]` 新建），选中后交由 worktrunk（`wt`）执行：
+`prefix + w` 打开 `scripts/worktrees.sh`（fzf）：列出当前 repo 的全部 worktree 分支,当前所在标记 `(current)`,末尾 `[new branch]` 新建,
+选中后交由 worktrunk（`wt`）执行：
 
 - `wt switch <branch>` — 切换已有分支；worktree 不存在时自动补建
 - `wt switch --create <branch>` — 新建分支（base 为默认分支）
