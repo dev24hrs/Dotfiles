@@ -10,23 +10,311 @@
 
 ---
 
-## setup.sh & cfg.sh
-
-### setup.sh
-
-新mac: 无任何配置
+## Enhance terminal
 
 ```bash
-git clone https://github.com/dev24hrs/Dotfiles.git ~/Documents/Dotfiles
-cd ~/Documents/Dotfiles && chmod +x setup.sh && ./setup.sh
-# setup.sh 脚本会执行dotfiles的所有配置
+#  Disable press-and-hold for keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+# Set a blazingly fast keyboard repeat rate
+defaults write NSGlobalDomain KeyRepeat -int 1  # default 2，recommend 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# mac app id
+osascript -e 'id of app "app name"'
+# e.g
+osascript -e 'id of app "Wezterm"'
 ```
 
-### cfg.sh
+> [!NOTE]
+>
+> 相关配置全部存放于Dotfiles目录, 通过`ln -s` 软链接到 `~/.config`,git版本管理
+
+## Homebrew
+
+install [homebrew](https://brew.sh/)
+
+```bash
+# 让当前 shell 能立即用 brew
+eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
+```
+
+## Fish shell
+
+- install [fish shell](https://fishshell.com/)
+
+```bash
+brew install fish
+```
+
+- set fish shell default
+
+```bash
+echo "$HOMEBREW_PREFIX/bin/fish" | sudo tee -a /etc/shells >/dev/null
+
+# 切换默认shell为fish
+chsh -s "$HOMEBREW_PREFIX/bin/fish"
+```
+
+- add homebrew to fish
+
+```bash
+# add to config.fish
+# homebrew
+eval (/opt/homebrew/bin/brew shellenv)
+
+source ~/.config/fish/config.fish
+```
+
+## Git
+
+- install [git](https://git-scm.com/install/mac)
+
+```bash
+brew install git
+
+# 使 brew git 优先于系统 git
+export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+```
+
+- config git
+
+refer to [git config](https://github.com/dev24hrs/Dotfiles/tree/main/git)
+
+```bash
+ln -s "git/.gitconfig" "$HOME/.gitconfig"
+ln -s "git/.gitignore_global" "$HOME/.gitignore_global"
+```
+
+## Font
+
+- english: recursive & fira
+
+  ```bash
+  brew install --cask font-recursive-mono-nerd-font
+  brew install --cask font-fira-mono-nerd-font
+  ```
+
+- symbols
+
+  ```bash
+  brew install --cask font-symbols-only-nerd-font
+  ```
+
+- chinese simple : source-han-sans
+
+  ```bash
+  brew install --cask font-source-han-sans-vf
+  ```
+
+## Ghostty
+
+- install [Ghostty](https://ghostty.org/docs)
+
+```bash
+brew install --cask ghostty
+```
+
+- config refer to [ghostty config](https://github.com/dev24hrs/Dotfiles/tree/main/ghostty)
+
+## FzF
+
+- install [fzf](https://junegunn.github.io/fzf/installation/)
+
+```bash
+brew install fzf
+```
+
+- config refer to [fzf config](https://github.com/dev24hrs/Dotfiles/blob/main/fish/config.fish)
+
+```bash
+# add to config.fish
+# fzf
+fzf --fish | source
+set -gx FZF_DEFAULT_COMMAND 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
+set -gx FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+
+set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --preview 'bat --style=numbers --color=always --line-range :500 {}' --preview-window 'right,60%,border-left'"
+set -gx FZF_CTRL_R_OPTS "--preview-window hidden"
+```
+
+## Neovim
+
+- install [neovim](https://neovim.io/doc/install/)
+
+```bash
+brew install neovim
+```
+
+- config refer to [neovim config](https://github.com/dev24hrs/Dotfiles/tree/main/nvim)
+
+## Tmux
+
+- install [tmux](https://github.com/tmux/tmux/wiki)
+
+```bash
+brew install tmux
+```
+
+- config refer to [tmux config](https://github.com/dev24hrs/Dotfiles/tree/main/tmux)
+
+## Zoxide
+
+- install [zoxide](https://github.com/ajeetdsouza/zoxide)
+
+```bash
+brew install zoxide
+```
+
+- config with fish
+
+```bash
+# add to config.fish
+zoxide init fish | source
+```
+
+## Eza
+
+- install [eza](https://github.com/eza-community/eza)
+
+```bash
+brew install eza
+```
+
+- config with [abbrs.fish](https://github.com/dev24hrs/Dotfiles/blob/main/fish/abbrs.fish)
+
+```bash
+# add to abbrs.fish
+alias ls='eza -a --icons --group-directories-first'
+alias la='eza -la --icons --group-directories-first'
+alias lt='eza -aT --icons --group-directories-first --git-ignore'
+```
+
+## Fd & RipGrep
+
+- install [fd](https://github.com/sharkdp/fd)
+- install [ripgrep](https://github.com/BurntSushi/ripgrep)
+
+```bash
+brew install fd
+brew install ripgrep
+```
+
+## Starship
+
+- install [starship](https://starship.rs/guide/)
+
+```bash
+brew install starship
+```
+
+- config refer to [starship config](https://github.com/dev24hrs/dotfiles/blob/main/starship.toml)
+
+- with fish
+
+```bash
+starship init fish | source
+```
+
+## Bat
+
+- install [bat](https://github.com/sharkdp/bat)
+
+```bash
+brew install bat
+```
+
+- config refer to [bat config](https://github.com/dev24hrs/Dotfiles/tree/main/bat)
+
+```bash
+# config
+bat --generate-config-file
+# add to ~/.config/bat/config
+--paging=never
+--theme="gruvbox-dark"
+--style="numbers,changes,header,snip,rule"
+```
+
+- with fish
+
+```bash
+# add to config.fish
+alias cat='bat'
+```
+
+## LazyGit
+
+- install [lazygit](https://github.com/jesseduffield/lazygit)
+
+```bash
+brew install lazygit
+```
+
+- config refer to [config](https://github.com/dev24hrs/dotfiles/blob/main/lazygit/config.yml)
+
+- with fish
+
+```bash
+alias lg='lazygit'
+```
+
+## Go-musicfox
+
+- install [go-musicfox](https://github.com/go-musicfox/go-musicfox)
+
+```bash
+brew install anhoder/go-musicfox/go-musicfox
+```
+
+- config refer to [musicfox config](https://github.com/dev24hrs/Dotfiles/tree/main/go-musicfox)
+
+- with fish
+
+```bash
+alias mu='musicfox'
+```
+
+## Yazi
+
+- install [yazi](https://yazi-rs.github.io/docs/installation/)
+
+```bash
+brew install yazi ffmpeg-full sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick-full font-symbols-only-nerd-font
+brew link ffmpeg-full imagemagick-full -f --overwrite
+```
+
+- config refer to [yazi config](https://github.com/dev24hrs/Dotfiles/tree/main/yazi)
+
+- with fish
+
+```bash
+# yazi
+function y
+    set tmp (mktemp -t "yazi-cwd.XXXXXX")
+    command yazi $argv --cwd-file="$tmp"
+    if read -z cwd <"$tmp"; and [ "$cwd" != "$PWD" ]; and test -d "$cwd"
+        builtin cd -- "$cwd"
+    end
+    command rm -f -- "$tmp"
+end
+```
+
+## Worktrunk
+
+config refer to [worktrunk](https://github.com/dev24hrs/Dotfiles/tree/main/worktrunk)
+
+## Vimrc
+
+Refer to [vimrc](https://github.com/dev24hrs/Dotfiles/blob/main/vimrc/vimrc)
+
+## Rime 输入法
+
+Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
+
+## cfg.sh
 
 相关使用场景:
 
-- 数据集维护在 `config.map`(单一数据源, 被 cfg.sh / setup.sh 共享)
+- 数据集维护在 config.map(单一数据源, 被 cfg.sh / setup.sh 共享)
 
 ```bash
 # config.map — 格式: <dotfiles 内的相对路径>:<目标绝对路径>
@@ -49,7 +337,7 @@ CONFIG_MAP=(
 )
 ```
 
-- `./cfg.sh symlinks`: 当前mac环境,之前手动维护 `~/.config` & `dotfiles`,现在改成symlink方式
+- `./cfg.sh symlinks`: 之前手动维护 ~/.config & dotfiles,现在改成symlink方式
 
 ```bash
 # 在Dotfiles目录执行 ./cfg.sh symlinks
@@ -57,7 +345,7 @@ CONFIG_MAP=(
 # 同时备份之前手动管理的配置
 ```
 
-- `./cfg.sh add `: 假如后续想安装某个/某些软件,在`Dotfiles`目录下配置之后
+- `./cfg.sh add`: 假如后续想安装某个/某些软件,在`Dotfiles`目录下配置之后
 
 ```bash
 # 比如新安装了yazi,则在Dotfiles目录下执行
@@ -92,359 +380,26 @@ brew bundle install --file=~/Dotfiles/Brewfile
 brew bundle check --file=~/Dotfiles/Brewfile
 ```
 
-- 清理本机有但 Brewfile 里没有的包（同步删除）
+## r2-upload-images.sh & cleanup-typora-images.sh
 
-```bash
-brew bundle cleanup --file=~/Dotfiles/Brewfile
-# 加 --force 才会真正删除，不加只是预览
-brew bundle cleanup --file=~/Dotfiles/Brewfile --force
-```
+- 使用typora写md文档时,调用`wrangler`自动上传图片到cloudflare R2
 
-## Enhance terminal
-
-> [!NOTE]
->
-> 已存在于 [setup.sh](https://github.com/dev24hrs/Dotfiles/blob/main/setup.sh) 自动配置
-
-```bash
-#  Disable press-and-hold for keys in favor of key repeat
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-# Set a blazingly fast keyboard repeat rate
-defaults write NSGlobalDomain KeyRepeat -int 1  # default 2，recommend 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
-
-# mac app id
-osascript -e 'id of app "app name"'
-# e.g
-osascript -e 'id of app "Wezterm"'
-```
-
-## Git Config
-
-refer to [git config](https://github.com/dev24hrs/Dotfiles/tree/main/git)
-
-## Homebrew
-
-Use pkg to install [homebrew](https://github.com/Homebrew/brew/releases/), but need to config `config.fish`
-
-```bash
-# add to config.fish
-# homebrew
-eval (/opt/homebrew/bin/brew shellenv)
-
-# set ustc mirrors
-# export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"
-# export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
-# export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
-# then
-source ~/.config/fish/config.fish
-
-brew update
-# if unistall
-# then brew autoremove
-# brew cleanup
-# brew cleanup --prune=all
-```
-
-## Font
-
-### brew install
-
-- english: recursive & fira
-
-  ```bash
-  brew install --cask font-recursive-mono-nerd-font
-  brew install --cask font-fira-mono-nerd-font
-  ```
-
-- symbols
-
-  ```bash
-  brew install --cask font-symbols-only-nerd-font
-  ```
-
-- chinese simple : source-han-sans
-
-  ```bash
-  brew install --cask font-source-han-sans-vf
-  ```
-
-### manual install (Recommend)
-
-> [!NOTE]
->
-> The brew method installs many unnecessary fonts. For example, when installing Source Han Sans,
-> brew will automatically install Japanese, Korean, and Traditional Chinese fonts, but I only need Simplified Chinese.
-
-- english
-
-  ```bash
-  ## recursive & fira
-  https://www.nerdfonts.com/font-downloads
-  ```
-
-- chinese simple
-
-  ```bash
-  ## chinese simple otf
-  https://github.com/adobe-fonts/source-han-sans/releases
-  ```
-
-## Fish Shell
-
-refer to [fish config](https://github.com/dev24hrs/Dotfiles/tree/main/fish)
-
-## Cli Tools
-
-### Starship
-
-refer to [starship config](https://github.com/dev24hrs/dotfiles/blob/main/starship.toml)
-
-- install [starship](https://starship.rs/guide/)
-
-```bash
-brew install starship
-```
-
-- with fish
-
-```bash
-starship init fish | source
-
-# config
-# use preset & restart terminal starship preset nerd-font-symbols -o ~/.config/starship/starship.toml
-# or can refer to github dotfiles
-```
-
-### Bat
-
-- install [bat](https://github.com/sharkdp/bat)
-
-```bash
-brew install bat
-```
-
-- config
-
-```bash
-# config
-bat --generate-config-file
-# add to ~/.config/bat/config
---paging=never
---theme="gruvbox-dark"
---style="numbers,changes,header,snip,rule"
-```
-
-- with fish
-
-```bash
-# add to config.fish
-alias cat='bat'
-```
-
-### Fzf
-
-- install [fzf](https://github.com/junegunn/fzf)
-
-```bash
-brew install fzf
-```
-
-- with fish
-
-```bash
-# add to config.fish
-# FZF
-fzf --fish | source
-set -gx FZF_DEFAULT_COMMAND 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
-set -gx FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
-set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --preview 'bat --style=numbers --color=always --line-range :500 {}' --preview-window 'right,60%,border-left'"
-set -gx FZF_CTRL_R_OPTS "--preview-window hidden"
-```
-
-### Zoxide
-
-- install [zoxide](https://github.com/ajeetdsouza/zoxide)
-
-```bash
-brew install zoxide
-```
-
-- with fish
-
-```bash
-zoxide init fish | source
-```
-
-### Eza
-
-- install [eza](https://github.com/eza-community/eza)
-
-  ```bash
-  brew install eza
-  ```
-
-- with fish
-
-  ```bash
-  alias ls='eza -a --icons --group-directories-first'
-  alias la='eza -la --icons --group-directories-first'
-  alias lt='eza -aT --icons --group-directories-first --git-ignore'
-  ```
-
-### Fd & RipGrep
-
-- install [fd](https://github.com/sharkdp/fd)
-- install [ripgrep](https://github.com/BurntSushi/ripgrep)
-
-```bash
-brew install fd
-brew install ripgrep
-```
-
-### LazyGit
-
-refer to [config](https://github.com/dev24hrs/dotfiles/blob/main/lazygit/config.yml) or [default config](https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md)
-
-- install [lazygit](https://github.com/jesseduffield/lazygit)
-
-```bash
-brew install lazygit
-```
-
-- with fish
-
-```bash
-alias lg='lazygit'
-```
-
-### Cheat.sh
-
-- install [cheat.sh](https://github.com/chubin/cheat.sh)
-
-```bash
-# add to config.fish
-function ch --description 'curl cheat.sh'
-    curl cheat.sh/$argv[1]
-end
-
-# use
-ch go chan
-```
-
-### Go-musicbox
-
-- install [go-musicfox](https://github.com/go-musicfox/go-musicfox)
-
-```bash
-brew install anhoder/go-musicfox/go-musicfox
-```
-
-- with fish
-
-```bash
-alias mu='musicfox'
-```
-
-## WezTerm
-
-refer to [wezterm config](https://github.com/dev24hrs/dotfiles/tree/main/wezterm)
-
-- install [wezterm](https://wezterm.org/install/macos.html#homebrew)
-
-```bash
-brew install --cask wezterm@nightly
-```
-
-## Tmux
-
-config refer to [tmux dotfiles](https://github.com/dev24hrs/dotfiles/tree/main/tmux)
-
-## Worktrunk
-
-[worktrunk](https://worktrunk.dev) 提供 `wt` 命令管理 git worktree; 本仓库用它把 worktree 与 tmux session 打通:
-
-- `wt switch` 切换/新建 worktree 后, hook 自动确保对应 session 存在(`<repo>-<branch>`, 单窗口 `dev` + 左右 2 pane)并切入
-- `wt remove` 删除 worktree 后, hook 自动清理该 session
-
-配置: [worktrunk/config.toml](https://github.com/dev24hrs/Dotfiles/blob/main/worktrunk/config.toml)(已加入 config.map, symlink 到 `~/.config/worktrunk/`)
-
-### 安装
-
-```bash
-brew install worktrunk
-```
-
-### 配置(config.toml)
-
-```toml
-# worktree 统一放在 <repo>/.worktrees/<branch>(已入全局 .gitignore)
-worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"
-
-# 导航交由 tmux hook 完成: 发起切换的 shell 原地不动(--cd 可单次覆盖)
-[switch]
-cd = false
-
-# post-switch 每次切换(后台): session 不存在则建(左右 2-pane 工作区), 然后切入
-# post-remove: remove 后清理该 session
-[post-switch]
-tmux = '''
-S={{ repo }}-{{ branch | sanitize }}
-W={{ worktree_path }}
-if ! tmux has-session -t "$S" 2>/dev/null; then
-  left=$(tmux new-session -d -s "$S" -c "$W" -n dev -P -F '#{pane_id}')
-  tmux split-window -h -t "$left" -c "$W"
-  tmux select-pane -t "$left"
-fi
-if [ -n "${TMUX:-}" ]; then
-  tmux switch-client -t "$S"
-fi
-'''
-
-[post-remove]
-tmux = 'tmux kill-session -t {{ repo }}-{{ branch | sanitize }} 2>/dev/null || true'
-```
-
-### 命令使用
-
-```bash
-wt switch <branch>            # 切换已有分支(worktree 不存在时自动补建), 并切入对应 session
-wt switch --create <branch>   # 新建分支 + worktree(base 默认 main), 同样自动建 session
-wt switch --branches          # 交互式 picker, 包含尚无 worktree 的分支
-wt list                       # 列出所有 worktree 及状态
-wt remove [branch]            # 删除 worktree(已合并则删分支)并清理 session
-wt merge [target]             # squash + rebase + fast-forward 合并进 target
-```
-
-fish 的补全与 shell 集成: `fish/functions/wt.fish`、`fish/completions/wt.fish`。
-
-### 相关流程
-
-- tmux 内: `prefix + w` 打开 fzf worktree 选择器(`tmux/scripts/worktrees.sh`), 选中后交由 `wt switch` / `wt switch --create`(见 tmux/README.md「Worktree 集成」)
-- 手动: fish 命令 `dev tmux [session-name]` 新建/进入同款 session(命名规则与 hooks 一致, 见 fish/README.md)
-
-## Neovim
-
-config refer to [nvim dotfiles](https://github.com/dev24hrs/dotfiles/tree/main/nvim)
-
-## Vimrc
-
-Refer to [vimrc](https://github.com/dev24hrs/Dotfiles/blob/main/vimrc/vimrc)
-
-## Rime 输入法
-
-Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
+- 手动cleanup执行清除typora的本地images副本
 
 ## Golang
 
-- install
+- install [golang](https://golang.google.cn/doc/)
 
 ```bash
 # brew install
 brew install go
 go version
 brew upgrade go
+```
 
+- config golang
+
+```bash
 # set env
 mkdir -p $HOME/Documents/Tools/GoPath/pkg
 mkdir -p $HOME/Documents/Tools/GoPath/bin
@@ -473,9 +428,7 @@ fish_add_path $GOPATH/bin
 - Go 语言设计与实现 <https://draveness.me/golang/>
 - Go 语言高级编程 <https://chai2010.cn/advanced-go-programming-book/index.html>
 
-## Rust
-
-### Setup
+## Setup
 
 Refer to [set up](https://www.rust-lang.org/learn/get-started)
 
@@ -505,11 +458,9 @@ rustup update
 
 - Rust 嵌入式 <https://github.com/rust-embedded/awesome-embedded-rust>
 
-## Apps
+## Apps & Extensions
 
 - [AlDente](https://apphousekitchen.com/) -- charge limiter app
-
-- [lemon](https://lemon.qq.com/) -- mac clean app
 
 - [Chrome](https://www.google.com/intl/zh-CN/chrome/) -- browser
 
@@ -519,7 +470,7 @@ rustup update
 
 - [vlc](https://www.videolan.org/vlc/) -- video player
 
-- [Vimium](https://github.com/philc/vimium) -- Chrome & Arc extension for Vim
+- [Vimium](https://github.com/philc/vimium) -- Chrome extension for Vim
 
   ```bash
   # config Custom key
@@ -553,17 +504,27 @@ rustup update
   }
   ```
 
-- [PicGo](https://picgo.github.io/PicGo-Doc/zh/guide/) -- upload images to GitHub
+- [UBlacklit](https://chromewebstore.google.com/detail/ublacklist/pncfbmialoiaghdehhbnbhkkgmjanfhe) -- Chrome extension
 
-  > if u forget your GitHub tokens, u cant find it in the blew file `data.json`
+  ```bash
+  # ---------- 1. 域名规则（最可靠，建议保留） ----------
+  # CSDN 主域及所有子域：blog.csdn.net、so.csdn.net、download.csdn.net …
+  *://*.csdn.net/*
 
-  ```json
-  // the data.json saved all the uploaded imgs info
-  // this is vscode settings
-  "picgo.dataPath": "$home/Library/Application Support/picgo/data.json",
+  # GitCode 主域及所有子域
+  *://*.gitcode.com/*
+
+  # GitCode 旧域名（可选）
+  *://*.gitcode.net/*
+
+  # ---------- 2. URL 关键词规则（兜底） ----------
+  # 结果 URL 中包含关键词就屏蔽；可覆盖镜像站、跳转链接、带参数链接
+  url *= "csdn.net"
+  url *= "gitcode.com"
+  url *= "gitcode.net"
   ```
 
-  If use typora & picgo app, when u pasted images in typora,it will cached images in the path`$home/Library/Application\ Support/typora-user-images`,so u need clean it.
+- [沉浸式翻译](https://chromewebstore.google.com/detail/immersive-translate-ai-we/bpoadfkcbjbfhfodiogcnhhhpibjhbnh) -- Chrome extension
 
 # LICENSE
 

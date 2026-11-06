@@ -23,10 +23,10 @@ pbcopy < ~/.ssh/id_ed25519.pub
 # then add to your github settings->ssh key
 ```
 
-2. git config
+1. git config
    `~/.gitconfig` 或 `~/.config/git/config`
 
-3. gitignore
+2. gitignore
 
 ```bash
 # macOS
@@ -63,7 +63,7 @@ __pycache__
 .env.*.local
 ```
 
-4. git abbr
+1. git abbr
 
 ```bash
 # gs gb gl rewrite by git.fish
