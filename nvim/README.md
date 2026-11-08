@@ -175,14 +175,14 @@ and `whichKey.lua`. It is also used directly by the custom statusline and tablin
 
 #### plenary.nvim
 
-[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — a Lua utility dependency for alpha-nvim, nvim-spectre, todo-comments.nvim search, and windsurf.nvim.
+[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — a Lua utility dependency for alpha-nvim, nvim-spectre, and todo-comments.nvim search.
 No keymaps or commands.
 
 ### Completion & Editing
 
 #### blink.cmp
 
-[blink.cmp](https://github.com/saghen/blink.cmp) — defined in `lua/plugins/blink.lua`. Completion engine with LSP, snippets, buffer, path, and Codeium sources.
+[blink.cmp](https://github.com/saghen/blink.cmp) — defined in `lua/plugins/blink.lua`. Completion engine with LSP, snippets, buffer, and path sources.
 Setup is deferred until `InsertEnter`, `CmdlineEnter`, or `LspAttach` (once). Ghost text, signature help on trigger characters, and cmdline completion are
 enabled.
 
@@ -199,7 +199,7 @@ enabled.
 | cmdline | `<Space>`          | Select and accept                                     |
 
 Commands: `:BlinkCmp status`, `:BlinkCmp build`, `:BlinkCmp build-log`. `:BlinkCmp build` builds the optional Rust fuzzy matcher. The snippet source reads
-`snippets/` only; friendly-snippets is disabled. The `codeium` source requires authentication through windsurf.nvim. `lua/basic/keymaps.lua` also maps
+`snippets/` only; friendly-snippets is disabled. `lua/basic/keymaps.lua` also maps
 insert-mode `<S-Tab>` to outdent; while the completion menu is open, blink uses it to select the previous item instead.
 
 #### friendly-snippets
@@ -259,20 +259,6 @@ The visual-mode mapping still formats the whole buffer, not only the selection. 
 [nvim-lint](https://github.com/mfussenegger/nvim-lint) — defined in `lua/plugins/lint.lua`. Runs on `BufReadPost` and `BufWritePost` and configures async
 linters per filetype: `golangcilint`, `selene`, `shellcheck`, `yamllint`, `jsonlint`, `sqlfluff`, `ruff`, `markdownlint`, and `fish`. No custom keymaps. A
 manual pass is available with `:lua require("lint").try_lint()`.
-
-#### windsurf.nvim
-
-[windsurf.nvim](https://github.com/Exafunction/windsurf.nvim) — defined in `lua/plugins/windsurf.lua`. Provides Codeium AI completions through the blink.cmp
-`codeium` source and inline virtual text. Run `:Codeium Auth` before first use.
-
-| Context      | Key     | Action              |
-| ------------ | ------- | ------------------- |
-| virtual text | `<C-,>` | Accept suggestion   |
-| virtual text | `<C-;>` | Next suggestion     |
-| virtual text | `<C-'>` | Previous suggestion |
-
-Commands: `:Codeium Auth`, `:Codeium Chat`, `:Codeium Toggle`. The virtual-text keys only apply while a suggestion is displayed. `enable_cmp_source = false`
-affects nvim-cmp only; the blink source is active.
 
 ### Search & Navigation
 
