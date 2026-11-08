@@ -1,6 +1,6 @@
 [flavor]
-dark = "gruvbox-material"
-light = "gruvbox-material"
+dark = "gruvbox"
+light = "gruvbox"
 
 [git]
 unknown_sign = "?"

@@ -23,7 +23,12 @@ use = "boydaihungst/mediainfo"
 rev = "f1cec0b"
 hash = "ffbb236e6407c9fc2451325d00bcf326"
 
+[[plugin.deps]]
+use = "yazi-rs/plugins:no-status"
+rev = "c0529fc"
+hash = "3e023d31f29201efdac2a6ae35fedb78"
+
 [[flavor.deps]]
-use = "matt-dong-123/gruvbox-material"
-rev = "e0fd2d8"
-hash = "8f46ca96c0bbe1bdfb4fa201dd5eed4b"
+use = "dev24hrs/gruvbox"
+rev = "b2c4ef7"
+hash = "27f1cba6ef276bc97fc63f32eafdb1d3"
