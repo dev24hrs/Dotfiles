@@ -23,10 +23,10 @@ config.adjust_window_size_when_changing_font_size = false
 
 -- --- 颜色与特效 ---
 config.color_scheme = "Gruvbox Dark (Gogh)"
-config.macos_window_background_blur = 25
--- 若需要开启透明度，取消下面注释：
-config.window_background_opacity = 0.96
-config.text_background_opacity = 0.96
+config.macos_window_background_blur = 24
+-- 开启透明度
+config.window_background_opacity = 0.95
+config.text_background_opacity = 0.95
 config.term = "xterm-256color"
 
 config.window_padding = {
