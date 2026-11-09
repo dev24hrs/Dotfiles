@@ -27,7 +27,7 @@ conform.setup({
         sh = { "shfmt" },
         bash = { "shfmt" },
         toml = { "tombi" },
-        rust = { "rustfmt", lsp_format = "fallback" }, -- comes with Rust installation
+        rust = { "rustfmt" }, -- comes with Rust installation
         fish = { "fish_indent" }, -- comes with Fish installation
         ["_"] = { "trim_whitespace" },
     },

@@ -22,6 +22,7 @@ return {
             codeLens = { enable = true },
             completion = { callSnippet = "Replace", keywordSnippet = "Replace" },
             hint = { enable = true, setType = false, paramName = "Literal", paramType = true, semicolon = "Disable" },
+            runtime = { pathStrict = true },
             telemetry = { enable = false },
         },
     },

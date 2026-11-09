@@ -4,24 +4,7 @@
 --- @module 'markdown'
 --- @author dev24hrs <asang24dev@gmail.com>
 --- @date 2026-11-06
---- @description Treesitter-based markdown renderer (headings, bullets, quotes, callouts, tables, links) with inline images via image.nvim
-
-vim.pack.add({
-    { src = "https://github.com/3rd/image.nvim" },
-})
-require("image").setup({
-    backend = "kitty",
-    kitty_method = "normal",
-    processor = "magick_cli",
-    ignore_download_error = true, -- don't throw on remote image download failures
-    integrations = {
-        markdown = {
-            enabled = true,
-            clear_in_insert_mode = true,
-            download_remote_images = true,
-        },
-    },
-})
+--- @description Treesitter-based markdown renderer (headings, bullets, quotes, callouts, tables, links)
 
 local function npcall(fn, ...)
     local ok, res = pcall(fn, ...)
@@ -535,7 +518,13 @@ function handlers.table(ctx, node)
 
     -- The border belongs to the row it is drawn against; the filter drops it
     -- together with that row when the row is shown as source.
-    mark(ctx, rows[1].row, table_col, { virt_lines = { { { ruled("┌", "┬", "┐"), "RenderMarkdownTableHead" } } }, virt_lines_above = true }, "table_border")
+    mark(
+        ctx,
+        rows[1].row,
+        table_col,
+        { virt_lines = { { { ruled("┌", "┬", "┐"), "RenderMarkdownTableHead" } } }, virt_lines_above = true },
+        "table_border"
+    )
     mark(ctx, rows[#rows].row, table_col, { virt_lines = { { { ruled("└", "┴", "┘"), "RenderMarkdownTableRow" } } } }, "table_border")
 end
 
@@ -987,37 +976,3 @@ api.nvim_create_autocmd("BufWipeout", {
         end
     end,
 })
-
--- Markdown preview use cli mdserve
-local mdserve_job = nil
-vim.keymap.set("n", "<leader>mp", function()
-    if mdserve_job then
-        vim.fn.jobstop(mdserve_job) -- stop previous mdserve
-    end
-
-    local file = vim.fn.expand("%:p")
-    if file == "" then
-        vim.notify("No file to preview", vim.log.levels.WARN)
-        return
-    end
-    mdserve_job = vim.fn.jobstart({ "mdserve", file, "--port", "1337", "--open" }, { detach = true })
-end, { desc = "Markdown preview (mdserve)" })
-
--- Clean up mdserve process when exiting nvim
-vim.api.nvim_create_autocmd("VimLeavePre", {
-    callback = function()
-        if mdserve_job then
-            vim.fn.jobstop(mdserve_job)
-        end
-    end,
-})
-
-vim.keymap.set("n", "<leader>um", function()
-    enabled = not enabled
-    for _, buf in ipairs(api.nvim_list_bufs()) do
-        api.nvim_buf_clear_namespace(buf, ns, 0, -1)
-        cache[buf] = nil
-        schedule_build(buf, 0)
-    end
-    vim.notify("Markdown rendering " .. (enabled and "on" or "off"))
-end, { desc = "Toggle render markdown" })
