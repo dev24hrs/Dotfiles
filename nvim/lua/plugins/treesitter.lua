@@ -22,7 +22,9 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     callback = function()
         require("nvim-treesitter").setup({})
         require("nvim-treesitter").install({
-            -- default: lua vim & vimdoc & markdown & markdown_inline in 0.12 version
+            -- default parsers (lua vim & vimdoc & markdown & markdown_inline) are bundled with
+            -- Neovim 0.12, but their queries are not: install lua to link indents/highlights queries
+            "lua",
             "bash",
             "fish",
             "go",
@@ -98,7 +100,10 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("User_TreesitterIndent", { clear = true }),
     callback = function(args)
-        if vim.treesitter.get_parser(args.buf, nil, { error = false }) then
+        local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+        -- The treesitter indentexpr returns 0 (o/<CR> indent to column 0) for languages
+        -- without an indents query, so only enable it when the query exists
+        if vim.treesitter.get_parser(args.buf, nil, { error = false }) and lang and #vim.treesitter.query.get_files(lang, "indents") > 0 then
             vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end
     end,

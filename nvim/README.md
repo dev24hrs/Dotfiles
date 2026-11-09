@@ -175,16 +175,15 @@ and `whichKey.lua`. It is also used directly by the custom statusline and tablin
 
 #### plenary.nvim
 
-[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — a Lua utility dependency for alpha-nvim, nvim-spectre, and todo-comments.nvim search.
-No keymaps or commands.
+[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — a Lua utility dependency for alpha-nvim, nvim-spectre, and todo-comments.nvim search. No keymaps or
+commands.
 
 ### Completion & Editing
 
 #### blink.cmp
 
-[blink.cmp](https://github.com/saghen/blink.cmp) — defined in `lua/plugins/blink.lua`. Completion engine with LSP, snippets, buffer, and path sources.
-Setup is deferred until `InsertEnter`, `CmdlineEnter`, or `LspAttach` (once). Ghost text, signature help on trigger characters, and cmdline completion are
-enabled.
+[blink.cmp](https://github.com/saghen/blink.cmp) — defined in `lua/plugins/blink.lua`. Completion engine with LSP, snippets, buffer, and path sources. Setup is
+deferred until `InsertEnter`, `CmdlineEnter`, or `LspAttach` (once). Ghost text, signature help on trigger characters, and cmdline completion are enabled.
 
 | Mode    | Key                | Action                                                |
 | ------- | ------------------ | ----------------------------------------------------- |
@@ -199,8 +198,8 @@ enabled.
 | cmdline | `<Space>`          | Select and accept                                     |
 
 Commands: `:BlinkCmp status`, `:BlinkCmp build`, `:BlinkCmp build-log`. `:BlinkCmp build` builds the optional Rust fuzzy matcher. The snippet source reads
-`snippets/` only; friendly-snippets is disabled. `lua/basic/keymaps.lua` also maps
-insert-mode `<S-Tab>` to outdent; while the completion menu is open, blink uses it to select the previous item instead.
+`snippets/` only; friendly-snippets is disabled. `lua/basic/keymaps.lua` also maps insert-mode `<S-Tab>` to outdent; while the completion menu is open, blink
+uses it to select the previous item instead.
 
 #### friendly-snippets
 

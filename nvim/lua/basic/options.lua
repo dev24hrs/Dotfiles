@@ -24,7 +24,7 @@ vim.opt.wrap = true
 vim.opt.list = true
 
 vim.opt.autoread = true
-vim.opt.conceallevel = 2
+vim.opt.conceallevel = 0
 vim.opt.winborder = "single"
 vim.opt.signcolumn = "number"
 vim.opt.inccommand = "nosplit"
@@ -51,6 +51,10 @@ vim.opt.smartindent = false
 vim.opt.splitright = true
 vim.g.markdown_folding = 1
 
+-- 避免checkhealth perl & ruby warning
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+
 -- 文件类型映射
 vim.filetype.add({
     extension = {
@@ -64,4 +68,3 @@ vim.filetype.add({
         [".yamlfmt"] = "yaml",
     },
 })
-vim.cmd.packadd("nvim.undotree")
