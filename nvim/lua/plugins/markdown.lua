@@ -42,11 +42,11 @@ local hl_links = {
     H5 = "@markup.heading.5.markdown",
     H6 = "@markup.heading.6.markdown",
     H1Bg = "DiffText",
-    H2Bg = "DiffAdd",
+    H2Bg = "DiffChange",
     H3Bg = "DiffChange",
-    H4Bg = "FloatShadow",
-    H5Bg = "Visual",
-    H6Bg = "CursorColumn",
+    H4Bg = "DiffChange",
+    H5Bg = "DiffChange",
+    H6Bg = "DiffChange",
     Bullet = "Normal",
     Dash = "LineNr",
     Quote = "@markup.quote",
@@ -192,29 +192,32 @@ local function line(ctx, row)
     return text
 end
 
-local function mark(ctx, row, col, opts)
-    -- A span render repaints the rows it was asked about and no others, so a mark
-    -- outside them is dropped rather than written. Without this a block quote
-    -- that starts on the cursor row is handed back whole and redraws its bar
-    -- down all twenty rows it spans, once per cursor move, and extmarks are not
-    -- deduplicated: reading a document would grow a copy of it per key pressed.
-    -- The rows outside the span keep what the last full render gave them, which
-    -- is right, because what a handler draws on a row comes from that row's own
-    -- nodes and does not depend on where the cursor is.
+-- Marks are collected here and written by the display pass, which decides
+-- which of them are visible for the cursor row, the mode and the selection.
+-- A handler therefore never has to ask where the cursor is.
+--
+-- anti is the filter category: false or nil keeps the mark on a row shown as
+-- source, a string can be exempted through anti_ignore, and anything else is
+-- hidden on such a row.
+local function mark(ctx, row, col, opts, anti)
+    -- Handlers can be handed a node that straddles the built range, so a row
+    -- outside it is dropped rather than written.
     if ctx.top and (row < ctx.top or row > ctx.bot) then
         return
     end
-    opts.strict = false
-    npcall(api.nvim_buf_set_extmark, ctx.buf, ns, row, col, opts)
+    ctx.marks[#ctx.marks + 1] = {
+        row = row,
+        col = col,
+        opts = opts,
+        anti = anti,
+    }
 end
 
-local function conceal(ctx, row, col, len, char, hl)
-    mark(ctx, row, col, { end_col = col + len, conceal = char, hl_group = hl })
-end
-
----@return boolean selected true when the selection reaches this row
-local function row_is_selected(ctx, row)
-    return ctx.selection ~= nil and row >= ctx.selection[1] and row <= ctx.selection[2]
+local function conceal(ctx, row, col, len, char, hl, anti)
+    if anti == nil then
+        anti = true
+    end
+    mark(ctx, row, col, { end_col = col + len, conceal = char, hl_group = hl }, anti)
 end
 
 -- Last row a block node covers: block nodes end at column 0 of the next row.
@@ -248,10 +251,14 @@ function handlers.heading(ctx, node)
         end_col = col + level,
         conceal = heading_icons[level],
         hl_group = hl .. "Icon",
+    }, "head_icon")
+    -- The line background and sign are decoration rather than replaced source,
+    -- so they stay while the row is shown as source.
+    mark(ctx, row, col, {
         line_hl_group = hl .. "Bg",
         sign_text = heading_sign,
         sign_hl_group = hl,
-    })
+    }, "sign")
 end
 
 -- Fenced code blocks are intentionally left as source, so this capture has
@@ -261,13 +268,10 @@ function handlers.code() end
 
 function handlers.dash(ctx, node)
     local row, col = node:start()
-    if row == ctx.cur then
-        return
-    end
     mark(ctx, row, col, {
         virt_text = { { string.rep("─", ctx.width - col), "RenderMarkdownDash" } },
         virt_text_pos = "overlay",
-    })
+    }, "dash")
 end
 
 function handlers.bullet(ctx, node)
@@ -281,10 +285,10 @@ function handlers.bullet(ctx, node)
     local box = checkboxes[key or ""]
     local after = be and rest:sub(be + 1, be + 1)
     if box and bs and rest:sub(1, bs - 1):match("^%s*$") and (after == "" or after == " ") then
-        return conceal(ctx, row, col, mend + be - col, box[1], box[2])
+        return conceal(ctx, row, col, mend + be - col, box[1], box[2], "bullet")
     end
     local level = depth(node, "list")
-    conceal(ctx, row, col, 1, bullets[(level - 1) % #bullets + 1], "RenderMarkdownBullet")
+    conceal(ctx, row, col, 1, bullets[(level - 1) % #bullets + 1], "RenderMarkdownBullet", "bullet")
 end
 
 function handlers.quote(ctx, node)
@@ -296,11 +300,9 @@ function handlers.quote(ctx, node)
     local callout = key and callouts[key:lower()]
     if callout then
         hl = "RenderMarkdown" .. callout[2]
-        conceal(ctx, srow, #prefix, #key + 3, "", hl)
-        if srow ~= ctx.cur then
-            local title = key:sub(1, 1):upper() .. key:sub(2):lower()
-            mark(ctx, srow, #prefix, { virt_text = { { callout[1] .. " " .. title, hl } }, virt_text_pos = "inline" })
-        end
+        conceal(ctx, srow, #prefix, #key + 3, "", hl, "callout")
+        local title = key:sub(1, 1):upper() .. key:sub(2):lower()
+        mark(ctx, srow, #prefix, { virt_text = { { callout[1] .. " " .. title, hl } }, virt_text_pos = "inline" }, "callout")
     end
     -- replace the ">" belonging to this quote level on every row
     for row = srow, erow do
@@ -308,7 +310,7 @@ function handlers.quote(ctx, node)
         for col in line(ctx, row):match("^[%s>]*"):gmatch("()>") do
             n = n + 1
             if n == level then
-                conceal(ctx, row, col - 1, 1, "▋", hl)
+                conceal(ctx, row, col - 1, 1, "▋", hl, "quote")
                 break
             end
         end
@@ -521,34 +523,25 @@ function handlers.table(ctx, node)
     end
 
     for _, r in ipairs(rows) do
-        -- the grid replaces the source text, so it is only safe on the cursor line
-        -- when 'concealcursor' hides that line as well, and never on a line a
-        -- selection reaches, because the grid would hide the selection
-        if ctx.conceal and (r.row ~= ctx.cur or ctx.conceal_cur) and not row_is_selected(ctx, r.row) then
-            local group = r.type == "pipe_table_row" and "RenderMarkdownTableRow" or "RenderMarkdownTableHead"
-            local text = line(ctx, r.row)
-            conceal(ctx, r.row, table_col, #text - table_col, "", group)
-            mark(ctx, r.row, table_col, {
-                virt_text = { { row_text(r), group } },
-                virt_text_pos = "overlay",
-                hl_mode = "replace",
-            })
-        end
+        local group = r.type == "pipe_table_row" and "RenderMarkdownTableRow" or "RenderMarkdownTableHead"
+        local text = line(ctx, r.row)
+        conceal(ctx, r.row, table_col, #text - table_col, "", group, "table")
+        mark(ctx, r.row, table_col, {
+            virt_text = { { row_text(r), group } },
+            virt_text_pos = "overlay",
+            hl_mode = "replace",
+        }, "table")
     end
 
-    -- the border belongs to the row it is drawn against, so a selected row
-    -- takes its border with it rather than framing a line of source text
-    if not row_is_selected(ctx, rows[1].row) then
-        mark(ctx, rows[1].row, table_col, { virt_lines = { { { ruled("┌", "┬", "┐"), "RenderMarkdownTableHead" } } }, virt_lines_above = true })
-    end
-    if not row_is_selected(ctx, rows[#rows].row) then
-        mark(ctx, rows[#rows].row, table_col, { virt_lines = { { { ruled("└", "┴", "┘"), "RenderMarkdownTableRow" } } } })
-    end
+    -- The border belongs to the row it is drawn against; the filter drops it
+    -- together with that row when the row is shown as source.
+    mark(ctx, rows[1].row, table_col, { virt_lines = { { { ruled("┌", "┬", "┐"), "RenderMarkdownTableHead" } } }, virt_lines_above = true }, "table_border")
+    mark(ctx, rows[#rows].row, table_col, { virt_lines = { { { ruled("└", "┴", "┘"), "RenderMarkdownTableRow" } } } }, "table_border")
 end
 
 function handlers.link(ctx, node)
     local row, col = node:start()
-    if row == ctx.cur or (ctx.table_rows and ctx.table_rows[row]) then
+    if ctx.table_rows and ctx.table_rows[row] then
         return
     end
     local type, icon = node:type(), link_default
@@ -571,7 +564,7 @@ function handlers.link(ctx, node)
             end
         end
     end
-    mark(ctx, row, col, { virt_text = { { icon, "RenderMarkdownLink" } }, virt_text_pos = "inline" })
+    mark(ctx, row, col, { virt_text = { { icon, "RenderMarkdownLink" } }, virt_text_pos = "inline" }, "link")
 end
 
 -- [[page]] parses as a shortcut link wrapped in one more pair of brackets
@@ -585,11 +578,9 @@ function handlers.wiki(ctx, node)
     if col == 0 or text:sub(col, col) ~= "[" or text:sub(ecol + 1, ecol + 1) ~= "]" then
         return
     end
-    conceal(ctx, row, col - 1, 1, "", "RenderMarkdownWikiLink")
-    conceal(ctx, row, ecol, 1, "", "RenderMarkdownWikiLink")
-    if row ~= ctx.cur then
-        mark(ctx, row, col - 1, { virt_text = { { link_wiki, "RenderMarkdownWikiLink" } }, virt_text_pos = "inline" })
-    end
+    conceal(ctx, row, col - 1, 1, "", "RenderMarkdownWikiLink", "link")
+    conceal(ctx, row, ecol, 1, "", "RenderMarkdownWikiLink", "link")
+    mark(ctx, row, col - 1, { virt_text = { { link_wiki, "RenderMarkdownWikiLink" } }, virt_text_pos = "inline" }, "link")
 end
 
 ---The letter 'concealcursor' and the renderer both spell a selection with: all
@@ -616,7 +607,8 @@ end
 -- lines around it showed the selection. Nothing on the extmark recovers it:
 -- hl_mode = "combine" on the overlay and dropping the highlight from the
 -- conceal both leave the row exactly as it was. The row has to be drawn as
--- source, which is what the cursor row already does.
+-- source, which is what the display filter does for a selection and for the
+-- cursor row in a mode where 'concealcursor' reveals it.
 ---@return integer[]? rows the first and last selected row, 0 indexed
 local function selected_rows()
     if not selection_mode() then
@@ -641,26 +633,69 @@ local function conceals_cursor_line(win)
     return cocu:find(mode, 1, true) ~= nil
 end
 
--- A cursor move changes the drawing of the two rows the cursor was on and is on,
--- and of no other row: every handler here decides what to draw on a row from
--- that row's own nodes, and from whether the row is the cursor row (ctx.cur).
--- Everything else in the window is already drawn the way it should be, so
--- clearing the namespace and walking the whole visible range again is work for
--- nothing. Measured in .auto/md_render_shape.lua, a cursor move in a document
--- costs 2.2 to 3.0ms and almost all of it is the capture iteration
--- (.auto/md_render_parts.lua: iter_captures 2.17ms, parse 0.03ms, getwininfo
--- 0.08ms, clear_namespace 0.002ms), over a range of about 220 rows.
---
--- So the range and the cleared rows are both the span the cursor crossed, which
--- is one row for a key held down and whatever :from and % the user typed for a
--- jump. A jump that crosses more rows than this goes the long way round, because
--- clearing a hundred rows and redrawing only the two ends of them would leave
--- the hundred unmarked.
-local CURSOR_RENDER_SPAN = 8
+-- The rows shown as source. In a mode where 'concealcursor' keeps the cursor
+-- line concealed the whole buffer is rendered, so there is nothing to reveal.
+-- Otherwise (insert, visual, select) the cursor line is shown as source, and a
+-- selection takes its whole range with it.
+---@return integer[]? range first and last row shown as source, 0 indexed
+local function reveal_range(ctx)
+    if ctx.selection then
+        return ctx.selection
+    end
+    if ctx.cur < 0 or ctx.conceal_cur then
+        return nil
+    end
+    return { ctx.cur, ctx.cur }
+end
 
--- The two halves of a render, so both callers walk the tree the same way: build
--- the context for the window showing the buffer, then run every handler over
--- the captures that touch [top, bot].
+-- Categories that stay visible even on a row shown as source.
+local anti_ignore = {
+    sign = true,
+}
+
+local function hidden(m, range)
+    if not range or m.row < range[1] or m.row > range[2] then
+        return false
+    end
+    local anti = m.anti
+    if anti == nil or anti == false then
+        return false
+    end
+    return not (type(anti) == "string" and anti_ignore[anti])
+end
+
+---@param a integer[]?
+---@param b integer[]?
+local function same_range(a, b)
+    if a == nil or b == nil then
+        return a == b
+    end
+    return a[1] == b[1] and a[2] == b[2]
+end
+
+-- Marks are kept between renders with the id of their extmark, so a cursor move
+-- only deletes and re-adds the handful whose visibility changed. Clearing the
+-- namespace on every move would work, but it throws away the ids and rewrites
+-- every mark in the visible range for no reason.
+local function apply_marks(buf, marks, range)
+    for _, m in ipairs(marks) do
+        if hidden(m, range) then
+            if m.id then
+                npcall(api.nvim_buf_del_extmark, buf, ns, m.id)
+                m.id = nil
+            end
+        elseif not m.id then
+            m.opts.strict = false
+            local id = npcall(api.nvim_buf_set_extmark, buf, ns, m.row, m.col, m.opts)
+            if id then
+                m.id = id
+            end
+        end
+    end
+end
+
+-- Walk every capture that touches [top, bot] and let its handler add marks to
+-- the context. Nothing is written to the buffer here.
 local function draw(parser, buf, top, bot, ctx)
     local qs = get_queries()
     parser:for_each_tree(function(tree, ltree)
@@ -689,12 +724,29 @@ local function window_of(buf)
     return vim.tbl_contains(wins, cur_win) and cur_win or wins[1], wins
 end
 
-local function context(buf, win)
+local cache = {}
+
+local function visible_range(wins)
+    local top, bot = math.huge, 0
+    for _, w in ipairs(wins) do
+        local info = vim.fn.getwininfo(w)[1]
+        top, bot = math.min(top, info.topline - 1), math.max(bot, info.botline)
+    end
+    -- only the visible rows of every window showing the buffer, plus a margin
+    return math.max(top - 100, 0), bot + 100
+end
+
+---The context a build runs with: line cache, mark list, the cursor and the
+---selection the filter will use, and the range the marks are built for.
+local function context(buf, win, top, bot)
     local info = vim.fn.getwininfo(win)[1]
     local cur_win = api.nvim_get_current_win()
     return {
         buf = buf,
         lines = {},
+        marks = {},
+        top = top,
+        bot = bot,
         cur = win == cur_win and api.nvim_win_get_cursor(win)[1] - 1 or -1,
         selection = win == cur_win and selected_rows() or nil,
         width = info.width - info.textoff,
@@ -703,95 +755,103 @@ local function context(buf, win)
     }
 end
 
-local function render(buf)
+---Only what the filter needs: no line cache and no marks.
+local function filter_context(buf, win)
+    local cur_win = api.nvim_get_current_win()
+    return {
+        buf = buf,
+        cur = win == cur_win and api.nvim_win_get_cursor(win)[1] - 1 or -1,
+        selection = win == cur_win and selected_rows() or nil,
+        conceal_cur = win == cur_win and conceals_cursor_line(win),
+    }
+end
+
+local function needs_build(buf, win, wins, entry)
+    if entry.tick ~= api.nvim_buf_get_changedtick(buf) then
+        return true
+    end
+    if entry.conceallevel ~= vim.wo[win].conceallevel then
+        return true
+    end
+    local info = vim.fn.getwininfo(win)[1]
+    if entry.width ~= info.width - info.textoff then
+        return true
+    end
+    local top, bot = visible_range(wins)
+    return top < entry.top or bot > entry.bot
+end
+
+local function build(buf)
     if not api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype ~= "markdown" then
         return
     end
-    api.nvim_buf_clear_namespace(buf, ns, 0, -1)
     local win, wins = window_of(buf)
     if not win then
+        api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+        cache[buf] = nil
         return
     end
     local parser = vim.treesitter.get_parser(buf, "markdown", { error = false })
     if not parser then
+        api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+        cache[buf] = nil
         return
     end
-    -- only the visible rows of every window showing the buffer, plus a margin
-    local top, bot = math.huge, 0
-    for _, w in ipairs(wins) do
-        local info = vim.fn.getwininfo(w)[1]
-        top, bot = math.min(top, info.topline - 1), math.max(bot, info.botline)
-    end
-    top, bot = math.max(top - 100, 0), bot + 100
+    local top, bot = visible_range(wins)
     parser:parse({ top, bot })
-    draw(parser, buf, top, bot, context(buf, win))
+    local ctx = context(buf, win, top, bot)
+    draw(parser, buf, top, bot, ctx)
+    api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+    local range = reveal_range(ctx)
+    cache[buf] = {
+        marks = ctx.marks,
+        top = top,
+        bot = bot,
+        width = ctx.width,
+        conceallevel = vim.wo[win].conceallevel,
+        tick = api.nvim_buf_get_changedtick(buf),
+        range = range,
+    }
+    apply_marks(buf, ctx.marks, range)
 end
 
--- The rows between the two cursor positions, drawn again, and nothing else.
---
--- Cleared and drawn directly rather than through a scratch namespace: the clip in
--- mark() is what keeps a handler from writing outside the span, and the
--- alternative (draw into a scratch namespace, read the marks back and copy them
--- over) needs the read-back details to be valid set_extmark options, and they
--- are not: get_extmarks returns ns_id, virt_text_hide and virt_text_repeat_linebreak,
--- which set_extmark rejects, and the pcall that hid that from the first version
--- is why it looked like nothing was drawn.
-local function render_span(buf, from, to)
-    local win = window_of(buf)
+-- A display pass reuses the marks of the last build and only toggles the ones
+-- whose visibility changed, which is what a cursor move, a mode change and a
+-- selection need. Anything that changes the text, the visible range or the
+-- layout needs a build instead, which needs_build() recognizes.
+local function display(buf)
+    if not api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype ~= "markdown" then
+        return
+    end
+    local win, wins = window_of(buf)
     if not win then
+        api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+        cache[buf] = nil
         return
     end
-    local parser = vim.treesitter.get_parser(buf, "markdown", { error = false })
-    if not parser then
+    local entry = cache[buf]
+    if not entry or needs_build(buf, win, wins, entry) then
+        build(buf)
         return
     end
-    local lo, hi = math.min(from, to), math.max(from, to)
-    local ctx = context(buf, win)
-    ctx.top, ctx.bot = lo, hi
-    api.nvim_buf_clear_namespace(buf, ns, lo, hi + 1)
-    draw(parser, buf, lo, hi, ctx)
+    local range = reveal_range(filter_context(buf, win))
+    if same_range(entry.range, range) then
+        return
+    end
+    entry.range = range
+    apply_marks(buf, entry.marks, range)
 end
 
 local pending_timers = {}
-local pending_scheduled = {}
-local pending_spans = {}
+local pending_build = {}
+local pending_display = {}
 
--- A cursor move that crossed only a few rows, held until the next tick like a
--- full render is, so a key held down does one render per tick rather than one
--- per row. Spans that arrive before it runs are merged into one, because two
--- adjacent cursor moves are one redraw of the rows between them.
---
--- A pending full render makes this one unnecessary and a pending span is
--- dropped when a full render is asked for, so the two never draw over each
--- other in an order neither was queued in.
-local function schedule_span(buf, from, to)
-    -- A full render that is already queued makes this one unnecessary: it covers
-    -- the span and everything else, and two of them in one tick can only fight
-    -- over the same rows.
-    if pending_scheduled[buf] or pending_timers[buf] then
-        return
-    end
-    local span = pending_spans[buf]
-    if span then
-        pending_spans[buf] = { math.min(span[1], from, to), math.max(span[2], from, to) }
-        return
-    end
-    pending_spans[buf] = { from, to }
-    vim.schedule(function()
-        local s = pending_spans[buf]
-        if not s then
-            return
-        end
-        pending_spans[buf] = nil
-        if not api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype ~= "markdown" or pending_scheduled[buf] then
-            return
-        end
-        render_span(buf, s[1], s[2])
-    end)
-end
-
-local function schedule(buf, delay)
-    if not vim.api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype ~= "markdown" then
+-- A build reparses the visible range and rewrites the mark list; a display
+-- only filters the cached marks. A build makes a queued display redundant, so
+-- a display is skipped while one is pending, and two events in one tick are
+-- coalesced into one pass.
+local function schedule_build(buf, delay)
+    if not api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype ~= "markdown" then
         return
     end
     local timer = pending_timers[buf]
@@ -800,54 +860,74 @@ local function schedule(buf, delay)
         timer:close()
         pending_timers[buf] = nil
     end
-    pending_spans[buf] = nil
-    if delay == 0 then
-        pending_scheduled[buf] = true
-        vim.schedule(function()
-            if pending_scheduled[buf] then
-                pending_scheduled[buf] = nil
-                render(buf)
-            end
-        end)
+    pending_build[buf] = true
+    pending_display[buf] = nil
+    if delay and delay > 0 then
+        pending_timers[buf] = vim.defer_fn(function()
+            pending_timers[buf] = nil
+            pending_build[buf] = nil
+            build(buf)
+        end, delay)
         return
     end
+    vim.schedule(function()
+        if not pending_build[buf] then
+            return
+        end
+        pending_build[buf] = nil
+        build(buf)
+    end)
+end
 
-    pending_scheduled[buf] = nil
-    pending_timers[buf] = vim.defer_fn(function()
-        pending_timers[buf] = nil
-        render(buf)
-    end, delay or 150)
+local function schedule_display(buf)
+    if not api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype ~= "markdown" then
+        return
+    end
+    if pending_build[buf] or pending_display[buf] then
+        return
+    end
+    pending_display[buf] = true
+    vim.schedule(function()
+        pending_display[buf] = nil
+        if pending_build[buf] then
+            return
+        end
+        display(buf)
+    end)
 end
 
 local render_group = api.nvim_create_augroup("md-render", { clear = true })
-local cursor_rows = {}
 
 set_hls()
 api.nvim_create_autocmd("ColorScheme", { group = render_group, callback = set_hls })
 
--- WinEnter is here with FileType and BufWinEnter because entering a window is
--- the only event that makes this buffer the one with the cursor, and the cursor
--- row is drawn as source text: the render that ran while the cursor was in
--- another buffer drew it as a rendered row, so the row recorded in cursor_rows
--- is the row that is now raw, not the row that is now the cursor row.
-api.nvim_create_autocmd({ "FileType", "BufWinEnter", "InsertLeave", "WinEnter" }, {
+-- FileType is where a markdown buffer is built for the first time, and where
+-- the treesitter patterns that hide code fences are disabled. The empty buffer
+-- nvim starts with raises BufWinEnter before any file has been read, so the
+-- filetype is what says there is a markdown buffer to compile a query for.
+api.nvim_create_autocmd("FileType", {
     group = render_group,
     callback = function(ev)
-        -- The empty buffer that nvim starts with raises BufWinEnter before any
-        -- file has been read, so the filetype is what says there is a markdown
-        -- buffer to compile a query for.
         if vim.bo[ev.buf].filetype == "markdown" then
             fence_conceal_off()
-            cursor_rows[ev.buf] = nil
+            schedule_build(ev.buf, 0)
         end
-        schedule(ev.buf, 0)
+    end,
+})
+
+-- Entering a window changes which buffer has the cursor, but the marks are
+-- already built: re-filtering is enough.
+api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
+    group = render_group,
+    callback = function(ev)
+        schedule_display(ev.buf)
     end,
 })
 
 api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
     group = render_group,
     callback = function(ev)
-        schedule(ev.buf, 150)
+        schedule_build(ev.buf, 150)
     end,
 })
 
@@ -861,80 +941,44 @@ api.nvim_create_autocmd({ "WinScrolled", "WinResized", "OptionSet" }, {
         elseif ev.event == "WinScrolled" then
             -- Only the window that scrolled can be showing different rows now.
             -- WinScrolled names it: <amatch> and <afile> are both the window id
-            -- and the pattern is matched against it. Rendering every other
-            -- window's buffer here repaints a document nobody moved, and the
-            -- picture is thrown away before it is seen: measured at 1.98ms a
-            -- scroll of one line in the code file with a document open above it,
-            -- against 0.02ms for the same scroll with the document in another
-            -- tabpage. Only md-render/WinScrolled's own 0.006ms of that is the
-            -- handler, the rest is the render it asked for.
-            --
-            -- A window id that is not in this tabpage means nothing here
-            -- changed, so that is the end of it rather than a fallback to every
-            -- window: a scroll in another tabpage cannot move a row in this one.
+            -- and the pattern is matched against it. A window id that is not in
+            -- this tabpage means nothing here changed, so that is the end of it
+            -- rather than a fallback to every window: a scroll in another
+            -- tabpage cannot move a row in this one. The display pass turns
+            -- into a build if the new rows fall outside the cached range.
             local id = tonumber(ev.match)
             local win = id and api.nvim_win_is_valid(id) and id or nil
             if not win or vim.fn.win_id2win(win) == 0 then
                 return
             end
-            schedule(api.nvim_win_get_buf(win), 0)
+            schedule_display(api.nvim_win_get_buf(win))
             return
         end
         -- WinResized and a change to conceallevel or concealcursor: every window
         -- is a different size or every row is drawn differently, so all of them.
         for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
-            schedule(api.nvim_win_get_buf(win), 0)
+            schedule_display(api.nvim_win_get_buf(win))
         end
     end,
 })
 
--- Re-render when the cursor changes row, to reveal the new cursor line. Two rows
--- are what changes: the one the cursor left and the one it is on, and only
--- those. See CURSOR_RENDER_SPAN above for why a jump goes the long way round.
-api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+-- A cursor move changes which row is the cursor row, and a mode change starts
+-- or ends a selection or changes whether the cursor line is concealed. All of
+-- that is decided by the filter over the cached marks, so neither event needs
+-- a tree parse or a rewrite of the namespace.
+api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "ModeChanged" }, {
     group = render_group,
     callback = function(ev)
-        if vim.bo[ev.buf].filetype ~= "markdown" then
-            return
-        end
-        local row = api.nvim_win_get_cursor(0)[1] - 1
-        local prev = cursor_rows[ev.buf]
-        if prev == row then
-            return
-        end
-        cursor_rows[ev.buf] = row
-        if prev == nil or math.abs(row - prev) > CURSOR_RENDER_SPAN then
-            schedule(ev.buf, 0)
-            return
-        end
-        schedule_span(ev.buf, prev, row)
-    end,
-})
-
--- A mode change is what starts and ends a selection, and a selected row is
--- drawn as source text where every other row is a grid, so every row that was
--- drawn one way has to be drawn the other: the whole buffer, not the two rows a
--- cursor move redraws. render-markdown registers ModeChanged for the same
--- reason. The recorded row is dropped with it, so the next cursor move takes
--- the long way round rather than a two row span from a row this render no
--- longer drew.
-api.nvim_create_autocmd("ModeChanged", {
-    group = render_group,
-    callback = function(ev)
-        if vim.bo[ev.buf].filetype ~= "markdown" then
-            return
-        end
-        cursor_rows[ev.buf] = nil
-        schedule(ev.buf, 0)
+        schedule_display(ev.buf)
     end,
 })
 
 api.nvim_create_autocmd("BufWipeout", {
     group = render_group,
     callback = function(ev)
-        cursor_rows[ev.buf] = nil
-        pending_scheduled[ev.buf] = nil
-        pending_spans[ev.buf] = nil
+        cache[ev.buf] = nil
+        pending_build[ev.buf] = nil
+        pending_display[ev.buf] = nil
         local timer = pending_timers[ev.buf]
         if timer then
             timer:stop()
@@ -972,7 +1016,8 @@ vim.keymap.set("n", "<leader>um", function()
     enabled = not enabled
     for _, buf in ipairs(api.nvim_list_bufs()) do
         api.nvim_buf_clear_namespace(buf, ns, 0, -1)
-        schedule(buf)
+        cache[buf] = nil
+        schedule_build(buf, 0)
     end
     vim.notify("Markdown rendering " .. (enabled and "on" or "off"))
 end, { desc = "Toggle render markdown" })
