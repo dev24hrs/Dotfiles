@@ -8,8 +8,6 @@ which keys/commands it exposes.
 
 ![Neovim](https://github.com/dev24hrs/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
 
-Last verified against `nvim-pack-lock.json`: 2026-11-01 (Neovim 0.12.6, 29 installed plugins).
-
 ## Overview
 
 - **Native plugin management** — `vim.pack.add()` installs and loads plugins; `nvim-pack-lock.json` pins revisions. `:PackUI` opens a floating manager for
@@ -38,8 +36,9 @@ Plugins and LSPs are not the only dependencies. Install the editor-level tools f
 | `git`                 | `brew install git`                 | `vim.pack`, gitsigns                       |
 | `ripgrep`             | `brew install ripgrep`             | `grepprg`, fzf-lua live grep               |
 | `fzf`                 | `brew install fzf`                 | fzf-lua                                    |
-| `imagemagick`         | `brew install imagemagick`         | image.nvim `magick_cli` processor          |
+| `imagemagick`         | `brew install imagemagick`         | image.nvim `magick_cli`; img-clip resize   |
 | `curl`                | `brew install curl`                | image.nvim remote image downloads          |
+| `wrangler`            | `npm i -g wrangler`                | img-clip R2 uploads (`wrangler login`)     |
 | `go`                  | `brew install go`                  | Go tooling, `go install`                   |
 | `gopls`               | `brew install gopls`               | Go LSP (intentionally not Mason-managed)   |
 | `lua-language-server` | `brew install lua-language-server` | Lua LSP (intentionally not Mason-managed)  |
@@ -412,26 +411,24 @@ Neovim and plugin APIs resolve correctly. Command: `:LazyDev`. No custom keymaps
 
 ### Language-Specific
 
-#### crates.nvim
-
-[crates.nvim](https://github.com/saecki/crates.nvim) — defined in `lua/plugins/crates.lua`, pinned to the `stable` tag. Adds Cargo.toml completions, crate
-documentation, version info, and inline actions through Neovim's built-in LSP. Setup is deferred until a `Cargo.toml` buffer loads. No custom keymaps.
-
-Command: `:Crates <subcommand>`, e.g. `:Crates show`, `:Crates update`, `:Crates upgrade_crate`, `:Crates open_documentation`.
-
-#### render-markdown.nvim
-
-[render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) — defined in `lua/plugins/markdown.lua`. Renders Markdown in the editor:
-headings, bullet icons, checkboxes, pipe tables, link icons, and code-block signs. LaTeX rendering is disabled; anti-conceal is disabled in normal mode. No
-custom keymaps.
-
-Command: `:RenderMarkdown [enable|disable|toggle|buf_enable|buf_disable|buf_toggle|preview]`.
-
 #### image.nvim
 
-[image.nvim](https://github.com/3rd/image.nvim) — defined in `lua/plugins/markdown.lua`. Inline image rendering for Markdown using the Kitty graphics protocol
-(`backend = "kitty"`, `kitty_method = "normal"`) and ImageMagick (`processor = "magick_cli"`). Remote images are downloaded with curl. Command: `:ImageReport`.
-No custom keymaps. Rendering requires a compatible terminal; images are cleared in insert mode.
+[image.nvim](https://github.com/3rd/image.nvim) — defined in `lua/plugins/image.lua`. Inline image rendering for Markdown using the Kitty graphics protocol
+(`backend = "kitty"`, `kitty_method = "normal"`) and ImageMagick (`processor = "magick_cli"`). Remote images are downloaded with curl, and download failures are
+ignored (`ignore_download_error = true`). No custom keymaps. Rendering requires a compatible terminal; images are cleared in insert mode.
+
+#### img-clip.nvim
+
+[img-clip.nvim](https://github.com/HakonHarnes/img-clip.nvim) — defined in `lua/plugins/image.lua`. Pastes clipboard images into the buffer with `<leader>mp`
+(`:PasteImage`). Images are resized to 50% with ImageMagick (`convert - -resize 50% -`), saved as PNG files in `stdpath("cache")/img-clip` with a timestamp
+name, and inserted with an absolute path, so a failed upload still links to a readable local file.
+
+In Markdown buffers, each pasted image is also uploaded to Cloudflare R2 by `r2-upload-images.sh` at the dotfiles repository root (resolved from
+`stdpath("config")` in `setup_r2_upload()` in the same file). The local path is inserted immediately; when the upload finishes, the path is replaced in place
+with the public URL. Uploads run one at a time, in pasting order, each from a snapshot copy (the timestamp filename has one-second resolution); a failed upload
+keeps the local path and shows a warning. The script requires `wrangler login`, uploads to the `blog-images` bucket under `blog/<YYYY-MM-DD>-<sha256-16>.<ext>`,
+and returns `https://images.dev24hrs.top/<key>` with a one-year immutable cache. `setup_r2_upload({ script, filetypes, title })` overrides the script path, the
+uploaded filetypes (default `{ "markdown" }`), and the notification title.
 
 ## Custom Configuration
 
@@ -469,7 +466,7 @@ Core autocommands and `:H`:
 - `TextYankPost` highlights yanked text for 500 ms.
 - A global `FileType` hook removes `c`, `r`, and `o` from `formatoptions`, stopping automatic comment continuation.
 - `BufReadPost` restores the last cursor position.
-- Markdown buffers get `textwidth = 120`, wrapping, and `conceallevel = 0`.
+- Markdown buffers get `textwidth = 120`, wrapping, `linebreak`, `conceallevel = 2`, and `concealcursor = "n"`.
 - Help, quickfix, checkhealth, spectre, undotree, and similar buffers become unlisted and close with `q`.
 - Files larger than 1.5 MB disable folds, spell, list, swap, and persistent undo; attached LSP clients are stopped.
 
@@ -590,6 +587,17 @@ or commands.
 
 Overrides `vim.notify` with a borderless top-right floating stack. It shows a level icon and title, stacks up to 10 notifications newest-first, caps width at 60
 columns, and uses per-level timeouts (3 s default, 4 s warning, 5 s error). Notifications are intentionally not written to `:messages`. No keymaps or commands.
+
+### lua/plugins/markdown.lua
+
+Custom Markdown renderer built on treesitter queries and extmarks; it only changes the display, never buffer text, and defines no commands or keymaps. It
+renders ATX headings (icons, line background, sign), thematic breaks, nested bullets and task lists (`[ ]`, `[x]`, `[-]`), block quotes, Obsidian-style callouts
+(`> [!NOTE]`), pipe tables as box-drawing grids with aligned columns, and inline icons for links, images, emails, and `[[wiki]]` links. Fenced code blocks stay
+as source; the treesitter `conceal_lines` patterns are disabled so fences remain visible when `conceallevel` is positive.
+
+Rendering covers only the visible range of on-screen Markdown buffers and is cached per buffer; cursor moves, mode changes, scrolling, and resizes only
+re-filter visibility, while text changes rebuild after 150 ms. `conceallevel = 2` and `concealcursor = "n"` show the cursor line as source in insert, visual,
+and select modes, and a selection reveals its whole range. Highlights are `RenderMarkdown*` groups re-applied on `ColorScheme`.
 
 ## Go Tooling (ftplugin/go)
 

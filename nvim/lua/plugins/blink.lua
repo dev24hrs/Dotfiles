@@ -49,7 +49,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                     auto_show = true,
                     treesitter_highlighting = true,
                 },
-                -- trigger = { prefetch_on_insert = false },
+                trigger = { prefetch_on_insert = false },
             },
             signature = {
                 enabled = true,
@@ -65,8 +65,14 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
                 },
             },
             sources = {
-                default = { "lsp", "snippets", "buffer", "path" },
+                -- default = { "lsp", "snippets", "buffer", "path" },
+                default = { "lsp", "path", "buffer", "snippets", "minuet" },
                 providers = {
+                    minuet = {
+                        name = "minuet",
+                        module = "minuet.blink",
+                        score_offset = 8,
+                    },
                     lsp = {
                         name = "LSP",
                         module = "blink.cmp.sources.lsp",
