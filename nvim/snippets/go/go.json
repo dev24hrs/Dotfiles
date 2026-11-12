@@ -3,11 +3,11 @@
     "prefix": "hea",
     "body": [
       "/*",
-      "* Copyright (c) $CURRENT_YEAR dev24hrs. All Rights Reserved.",
+      "* Copyright (c) $CURRENT_YEAR x3m4g63. All Rights Reserved.",
       "* The source code is released under the MIT License.",
       "* License that can be found in the LICENSE file.",
       "",
-      "* AUTHOR : dev24hrs",
+      "* AUTHOR : x3m4g63",
       "* TIME : $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE",
       "",
       "*/",

@@ -1,6 +1,6 @@
 # Git Config
 
-refer to [git config](https://github.com/dev24hrs/Dotfiles/tree/main/git)
+refer to [git config](https://github.com/x3m4g63/Dotfiles/tree/main/git)
 
 1. git init
    refer to [new ssh key](https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)

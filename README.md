@@ -6,7 +6,7 @@
 
 ---
 
-![](https://github.com/dev24hrs/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
+![](https://github.com/x3m4g63/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
 
 ---
 
@@ -78,7 +78,7 @@ export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
 - config git
 
-refer to [git config](https://github.com/dev24hrs/Dotfiles/tree/main/git)
+refer to [git config](https://github.com/x3m4g63/Dotfiles/tree/main/git)
 
 ```bash
 ln -s "git/.gitconfig" "$HOME/.gitconfig"
@@ -114,7 +114,7 @@ ln -s "git/.gitignore_global" "$HOME/.gitignore_global"
 brew install --cask ghostty
 ```
 
-- config refer to [ghostty config](https://github.com/dev24hrs/Dotfiles/tree/main/ghostty)
+- config refer to [ghostty config](https://github.com/x3m4g63/Dotfiles/tree/main/ghostty)
 
 ## FzF
 
@@ -124,7 +124,7 @@ brew install --cask ghostty
 brew install fzf
 ```
 
-- config refer to [fzf config](https://github.com/dev24hrs/Dotfiles/blob/main/fish/config.fish)
+- config refer to [fzf config](https://github.com/x3m4g63/Dotfiles/blob/main/fish/config.fish)
 
 ```bash
 # add to config.fish
@@ -145,7 +145,7 @@ set -gx FZF_CTRL_R_OPTS "--preview-window hidden"
 brew install neovim
 ```
 
-- config refer to [neovim config](https://github.com/dev24hrs/Dotfiles/tree/main/nvim)
+- config refer to [neovim config](https://github.com/x3m4g63/Dotfiles/tree/main/nvim)
 
 ## Tmux
 
@@ -155,7 +155,7 @@ brew install neovim
 brew install tmux
 ```
 
-- config refer to [tmux config](https://github.com/dev24hrs/Dotfiles/tree/main/tmux)
+- config refer to [tmux config](https://github.com/x3m4g63/Dotfiles/tree/main/tmux)
 
 ## Zoxide
 
@@ -180,7 +180,7 @@ zoxide init fish | source
 brew install eza
 ```
 
-- config with [abbrs.fish](https://github.com/dev24hrs/Dotfiles/blob/main/fish/abbrs.fish)
+- config with [abbrs.fish](https://github.com/x3m4g63/Dotfiles/blob/main/fish/abbrs.fish)
 
 ```bash
 # add to abbrs.fish
@@ -207,7 +207,7 @@ brew install ripgrep
 brew install starship
 ```
 
-- config refer to [starship config](https://github.com/dev24hrs/dotfiles/blob/main/starship.toml)
+- config refer to [starship config](https://github.com/x3m4g63/dotfiles/blob/main/starship.toml)
 
 - with fish
 
@@ -223,7 +223,7 @@ starship init fish | source
 brew install bat
 ```
 
-- config refer to [bat config](https://github.com/dev24hrs/Dotfiles/tree/main/bat)
+- config refer to [bat config](https://github.com/x3m4g63/Dotfiles/tree/main/bat)
 
 ```bash
 # config
@@ -249,7 +249,7 @@ alias cat='bat'
 brew install lazygit
 ```
 
-- config refer to [config](https://github.com/dev24hrs/dotfiles/blob/main/lazygit/config.yml)
+- config refer to [config](https://github.com/x3m4g63/dotfiles/blob/main/lazygit/config.yml)
 
 - with fish
 
@@ -265,7 +265,7 @@ alias lg='lazygit'
 brew install anhoder/go-musicfox/go-musicfox
 ```
 
-- config refer to [musicfox config](https://github.com/dev24hrs/Dotfiles/tree/main/go-musicfox)
+- config refer to [musicfox config](https://github.com/x3m4g63/Dotfiles/tree/main/go-musicfox)
 
 - with fish
 
@@ -282,7 +282,7 @@ brew install yazi ffmpeg-full sevenzip jq poppler fd ripgrep fzf zoxide resvg im
 brew link ffmpeg-full imagemagick-full -f --overwrite
 ```
 
-- config refer to [yazi config](https://github.com/dev24hrs/Dotfiles/tree/main/yazi)
+- config refer to [yazi config](https://github.com/x3m4g63/Dotfiles/tree/main/yazi)
 
 - with fish
 
@@ -300,15 +300,15 @@ end
 
 ## Worktrunk
 
-config refer to [worktrunk](https://github.com/dev24hrs/Dotfiles/tree/main/worktrunk)
+config refer to [worktrunk](https://github.com/x3m4g63/Dotfiles/tree/main/worktrunk)
 
 ## Vimrc
 
-Refer to [vimrc](https://github.com/dev24hrs/Dotfiles/blob/main/vimrc/vimrc)
+Refer to [vimrc](https://github.com/x3m4g63/Dotfiles/blob/main/vimrc/vimrc)
 
 ## Rime 输入法
 
-Refer to [rime 输入法](https://github.com/dev24hrs/Dotfiles/blob/main/Rime.md)
+Refer to [rime 输入法](https://github.com/x3m4g63/Dotfiles/blob/main/Rime.md)
 
 ## cfg.sh
 

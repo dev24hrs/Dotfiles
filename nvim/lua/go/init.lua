@@ -1,9 +1,9 @@
--- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- Copyright (c) 2026 x3m4g63. All rights reserved.
 -- SPDX-License-Identifier: MIT
 --
 --- @module 'go'
 --- @description Entry point for the Go tooling modules
---- @author dev24hrs <asang24dev@gmail.com>
+--- @author x3m4g63  <asang24dev@gmail.com>
 
 local M = {}
 

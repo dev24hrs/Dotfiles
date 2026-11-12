@@ -5,7 +5,7 @@
 - `wt switch` 切换/新建 worktree 后, hook 自动确保对应 session 存在(`<repo>-<branch>`, 单窗口 `dev` + 左右 2 pane)并切入
 - `wt remove` 删除 worktree 后, hook 自动清理该 session
 
-配置: [worktrunk/config.toml](https://github.com/dev24hrs/Dotfiles/blob/main/worktrunk/config.toml)(已加入 config.map, symlink 到 `~/.config/worktrunk/`)
+配置: [worktrunk/config.toml](https://github.com/x3m4g63/Dotfiles/blob/main/worktrunk/config.toml)(已加入 config.map, symlink 到 `~/.config/worktrunk/`)
 
 ### 安装
 

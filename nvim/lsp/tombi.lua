@@ -1,4 +1,4 @@
--- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- Copyright (c) 2026 x3m4g63. All rights reserved.
 -- SPDX-License-Identifier: MIT
 
 ---@brief

@@ -1,21 +1,21 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "9166202"
-hash = "f281261ff04ad7ec867c3f802a50835f"
+rev = "1ef5fe0"
+hash = "17ebde15c4349f90aedbc45984b98db2"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "9166202"
+rev = "1ef5fe0"
 hash = "347cc6b190eb0c2fd60513cc7ae37412"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
-rev = "9166202"
+rev = "1ef5fe0"
 hash = "187cc58ba7ac3befd49c342129e6f1b6"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-paste"
-rev = "9166202"
+rev = "1ef5fe0"
 hash = "5be02722d97561b6f7aec22429aa00be"
 
 [[plugin.deps]]
@@ -25,10 +25,10 @@ hash = "ffbb236e6407c9fc2451325d00bcf326"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:no-status"
-rev = "c0529fc"
+rev = "1ef5fe0"
 hash = "3e023d31f29201efdac2a6ae35fedb78"
 
 [[flavor.deps]]
-use = "dev24hrs/gruvbox"
-rev = "b2c4ef7"
-hash = "27f1cba6ef276bc97fc63f32eafdb1d3"
+use = "x3m4g63/gruvbox"
+rev = "55ff657"
+hash = "6997d999b38acdf9e0a8b66153876253"

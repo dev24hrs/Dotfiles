@@ -1,8 +1,8 @@
--- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- Copyright (c) 2026 x3m4g63. All rights reserved.
 -- The source code is released under the MIT License.
 --
 --- @module 'image'
---- @author dev24hrs <asang24dev@gmail.com>
+--- @author x3m4g63 <asang24dev@gmail.com>
 --- @date 2026-11-09
 --- @description Paste images with automatic R2 upload and URL backfill; uploads run serially and local copies live in the cache directory
 

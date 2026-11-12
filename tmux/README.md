@@ -1,6 +1,6 @@
 # Tmux
 
-![](https://github.com/dev24hrs/Dotfiles/blob/main/img/tmux_with_pane.png?raw=true)
+![](https://github.com/x3m4g63/Dotfiles/blob/main/img/tmux_with_pane.png?raw=true)
 
 ## Install
 

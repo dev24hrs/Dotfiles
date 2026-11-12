@@ -1,8 +1,8 @@
--- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- Copyright (c) 2026 x3m4g63. All rights reserved.
 -- The source code is released under the MIT License.
 --
 --- @module 'fileheader'
---- @author dev24hrs <asang24dev@gmail.com>
+--- @author x3m4g63 <asang24dev@gmail.com>
 --- @date 2026-11-12
 --- @description Automatic copyright headers and the :FileHeader command
 
@@ -132,19 +132,30 @@ local function do_insert(lines, buf)
     end
 
     api.nvim_buf_set_lines(buf, 0, 0, false, lines)
-    api.nvim_win_set_cursor(0, { #lines, 0 })
+    -- BufReadPost may fire for a background buffer; only move the cursor when
+    -- the buffer is actually displayed in the current window.
+    if api.nvim_get_current_buf() == buf then
+        api.nvim_win_set_cursor(0, { #lines, 0 })
+    end
 end
 
 -- 6. Single autocmd for all filetypes
+-- BufNewFile: editing a path that does not exist yet.
+-- BufReadPost: files created on disk first (e.g. nvim-tree's `a` uses
+-- uv.fs_open before opening the buffer), so BufNewFile never fires.
 local header_group = vim.api.nvim_create_augroup("User_FileHeader", { clear = true })
 
-api.nvim_create_autocmd("BufNewFile", {
+api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
     group = header_group,
     callback = function(args)
         local buf = args.buf
         vim.schedule(function()
             -- Guard: buffer may have been closed before schedule fires
             if not api.nvim_buf_is_valid(buf) then
+                return
+            end
+            -- Guard: only real file buffers (BufReadPost fires for more cases)
+            if vim.bo[buf].buftype ~= "" then
                 return
             end
             -- Use vim.bo.filetype (consistent with :FileHeader) — at schedule

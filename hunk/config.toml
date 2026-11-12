@@ -1,4 +1,4 @@
-mode = "stack"
+mode = "unified"
 vcs = "git"
 watch = false
 exclude_untracked = false
@@ -13,6 +13,7 @@ agent_notes = false
 animations = true
 sidebar = false
 transparent_background = true
-theme = "gruvbox-dark-hard"
+# theme = "gruvbox-dark-hard"
 copy_decorations = false
 cursor_line = "row"
+theme = "github-dark-default"

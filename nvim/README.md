@@ -6,14 +6,14 @@ Markdown.
 The simplest way to understand any plugin is still to read its own `README.md`. This document describes how **this configuration** wires plugins together and
 which keys/commands it exposes.
 
-![Neovim](https://github.com/dev24hrs/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
+![Neovim](https://github.com/x3m4g63/Dotfiles/blob/main/img/nvim_tmux.png?raw=true)
 
 ## Overview
 
 - **Native plugin management** — `vim.pack.add()` installs and loads plugins; `nvim-pack-lock.json` pins revisions. `:PackUI` opens a floating manager for
   updates, lockfile sync, and removal.
-- **Native Neovim 0.12 UI** — `vim._core.ui2` provides the centered cmdline and message window; LSP progress is rendered natively, and notifications use a custom
-  floating stack.
+- **Native Neovim 0.12 UI** — `vim._core.ui2` provides the centered cmdline and message window; LSP progress is rendered natively, and notifications use a
+  custom floating stack.
 - **Custom statusline and tabline** — written from scratch in `lua/config/statusline.lua` and `lua/config/tabline.lua`; they are not plugins.
 - **Per-server LSP configs** — 13 servers in `lsp/`, enabled through `vim.lsp.enable()`; no `nvim-lspconfig` dependency.
 - **Custom Go tooling** — benchmarks, coverage, mocks, and struct tags live in `lua/go/`.
@@ -382,9 +382,9 @@ Command: `:Gitsigns <action>`, e.g. `:Gitsigns preview_hunk`, `:Gitsigns stage_h
 ### nvim-treesitter
 
 [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) — defined in `lua/plugins/treesitter.lua`, pinned to the `main` branch. A `PackChanged`
-hook runs `:TSUpdate` after plugin updates. Setup and parser installation are deferred until the first buffer. Configured parsers: `bash`, `fish`, `go`, `gomod`,
-`gosum`, `gowork`, `gotmpl`, `rust`, `sql`, `python`, `typescript`, `javascript`, `tsx`, `json`, `toml`, `html`, `yaml`, `dockerfile` (plus the Neovim 0.12
-bundled Vim, Vimdoc, and Markdown parsers; Lua queries are installed explicitly). Commands: `:TSInstall`, `:TSUpdate`, `:TSUninstall`, `:TSLog`. No
+hook runs `:TSUpdate` after plugin updates. Setup and parser installation are deferred until the first buffer. Configured parsers: `bash`, `fish`, `go`,
+`gomod`, `gosum`, `gowork`, `gotmpl`, `rust`, `sql`, `python`, `typescript`, `javascript`, `tsx`, `json`, `toml`, `html`, `yaml`, `dockerfile` (plus the Neovim
+0.12 bundled Vim, Vimdoc, and Markdown parsers; Lua queries are installed explicitly). Commands: `:TSInstall`, `:TSUpdate`, `:TSUninstall`, `:TSLog`. No
 project-specific keymaps in this file. The Treesitter `indentexpr` is set only when both a parser and an `indents` query exist; other buffers keep their
 existing indentation.
 
@@ -434,15 +434,14 @@ Neovim and plugin APIs resolve correctly. Command: `:LazyDev`. No custom keymaps
 
 [image.nvim](https://github.com/3rd/image.nvim) — defined in `lua/plugins/image.lua`. Inline image rendering for Markdown using the Kitty graphics protocol
 (`backend = "kitty"`, `kitty_method = "normal"`) and ImageMagick (`processor = "magick_cli"`). Remote images are downloaded with curl, and download failures are
-ignored (`ignore_download_error = true`). Setup is deferred until the first Markdown/Vimwiki/HTML buffer. No custom keymaps. Rendering requires a
-compatible terminal; images are cleared in insert mode.
+ignored (`ignore_download_error = true`). Setup is deferred until the first Markdown/Vimwiki/HTML buffer. No custom keymaps. Rendering requires a compatible
+terminal; images are cleared in insert mode.
 
 ### img-clip.nvim
 
 [img-clip.nvim](https://github.com/HakonHarnes/img-clip.nvim) — defined in `lua/plugins/image.lua`. Setup is deferred until the first Markdown/Vimwiki/HTML
-buffer or `<leader>mp`. Pastes clipboard images with `<leader>mp` (`:PasteImage`). Images are resized to 50% with ImageMagick
-(`convert - -resize 50% -`), saved as PNG files in `stdpath("cache")/img-clip` with a timestamp name, and inserted with an absolute path, so a failed upload
-still links to a readable local file.
+buffer or `<leader>mp`. Pastes clipboard images with `<leader>mp` (`:PasteImage`). Images are resized to 50% with ImageMagick (`convert - -resize 50% -`), saved
+as PNG files in `stdpath("cache")/img-clip` with a timestamp name, and inserted with an absolute path, so a failed upload still links to a readable local file.
 
 In Markdown buffers, each pasted image is also uploaded to Cloudflare R2 by `r2-upload-images.sh` at the dotfiles repository root (resolved from
 `stdpath("config")` in `setup_r2_upload()` in the same file). The local path is inserted immediately; when the upload finishes, the path is replaced in place
@@ -502,8 +501,8 @@ virtual text with source/code, and `E`/`W`/`I`/`H` signs (error/warning signs al
 ### lua/config/fileheader.lua
 
 Inserts a copyright/author header into empty buffers. Templates exist for Lua, Go, Rust, TypeScript, and Python. Placeholders are filled from the date,
-filename, and `git config user.name`/`user.email`. The `BufNewFile` autocmd only acts on empty buffers; existing files are never modified on open. Go
-filenames are sanitized into valid identifiers. Command: `:FileHeader` (manual insertion). No keymaps.
+filename, and `git config user.name`/`user.email`. The `BufNewFile` autocmd only acts on empty buffers; existing files are never modified on open. Go filenames
+are sanitized into valid identifiers. Command: `:FileHeader` (manual insertion). No keymaps.
 
 ### lua/config/folding.lua
 
@@ -622,8 +621,8 @@ and select modes, and a selection reveals its whole range. Highlights are `Rende
 ## Go Tooling (lua/go)
 
 `ftplugin/go.lua` is sourced automatically for Go buffers and calls `require("go").setup()`, which requires the modules in `lua/go/` once and re-installs their
-buffer-local keymaps for each Go buffer. All commands are global once created; all keymaps are buffer-local and exist only in Go buffers. Each command saves
-the buffer before running its external tool asynchronously and guards against concurrent runs.
+buffer-local keymaps for each Go buffer. All commands are global once created; all keymaps are buffer-local and exist only in Go buffers. Each command saves the
+buffer before running its external tool asynchronously and guards against concurrent runs.
 
 ### lua/go/benchmark.lua
 
@@ -683,21 +682,21 @@ afterwards. Requires `gomodifytags` (`go install github.com/fatih/gomodifytags@l
 `lua/config/lsp.lua` enables these servers by filename; each file below is picked up automatically by Neovim's `lsp/` runtime directory. All servers share the
 buffer-local keymaps documented in `lua/config/lsp.lua`:
 
-| File | Server |
-| ---- | ------ |
-| `bashls.lua` | bash-language-server |
-| `fish_lsp.lua` | fish-lsp |
-| `gopls.lua` | gopls |
-| `jsonls.lua` | vscode-json-language-server |
-| `lua_ls.lua` | lua-language-server |
-| `marksman.lua` | marksman |
-| `oxlint.lua` | oxlint |
-| `pyright.lua` | pyright |
-| `rust_analyzer.lua` | rust-analyzer |
-| `sourcekit.lua` | sourcekit-lsp |
-| `sqls.lua` | sqls |
-| `tombi.lua` | tombi |
-| `yamlls.lua` | yaml-language-server |
+| File                | Server                      |
+| ------------------- | --------------------------- |
+| `bashls.lua`        | bash-language-server        |
+| `fish_lsp.lua`      | fish-lsp                    |
+| `gopls.lua`         | gopls                       |
+| `jsonls.lua`        | vscode-json-language-server |
+| `lua_ls.lua`        | lua-language-server         |
+| `marksman.lua`      | marksman                    |
+| `oxlint.lua`        | oxlint                      |
+| `pyright.lua`       | pyright                     |
+| `rust_analyzer.lua` | rust-analyzer               |
+| `sourcekit.lua`     | sourcekit-lsp               |
+| `sqls.lua`          | sqls                        |
+| `tombi.lua`         | tombi                       |
+| `yamlls.lua`        | yaml-language-server        |
 
 Server-specific commands: `LspPyrightOrganizeImports`, `LspPyrightSetPythonPath`, `LspOxlintFixAll`, and `LspCargoReload`.
 
