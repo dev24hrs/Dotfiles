@@ -1,4 +1,13 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'spectre'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Project-wide search and replace
+
 vim.pack.add({
+    { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/nvim-pack/nvim-spectre" },
 })
 

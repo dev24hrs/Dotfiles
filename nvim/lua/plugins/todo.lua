@@ -1,6 +1,22 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'todo'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description TODO/FIXME highlighting and quick list
+
 vim.pack.add({
     { src = "https://github.com/folke/todo-comments.nvim" },
 })
+
+local todo = require("todo-comments")
+
+todo.setup({
+    signs = false,
+})
+
+vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<CR>", { desc = "[Todo]: Show Todo comments" })
 
 vim.api.nvim_create_autocmd({ "BufReadPre", "BufReadPost", "BufNewFile" }, {
     group = vim.api.nvim_create_augroup("User_TodoInit", { clear = true }),
@@ -10,11 +26,6 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufReadPost", "BufNewFile" }, {
             return
         end
 
-        local todo = require("todo-comments")
-        todo.setup({
-            signs = false,
-        })
-
         vim.keymap.set("n", "]t", function()
             todo.jump_next()
         end, { desc = "[Todo]: Next Todo comment" })
@@ -22,8 +33,6 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufReadPost", "BufNewFile" }, {
         vim.keymap.set("n", "[t", function()
             todo.jump_prev()
         end, { desc = "[Todo]: Previous Todo comment" })
-
-        vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<CR>", { desc = "[Todo]: Show Todo comments" })
     end,
 })
 

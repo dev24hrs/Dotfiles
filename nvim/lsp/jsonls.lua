@@ -20,11 +20,6 @@ return {
             format = { enable = true },
             -- 补全/折叠/大纲等结果的返回上限
             resultLimit = 5000,
-            -- 自动从 schemastore.org 下载常见文件的 schema，按需缓存到本地
-            schemaDownload = {
-                enable = true,
-                cachePath = vim.fn.stdpath("cache") .. "/jsonls-schemas",
-            },
             -- 手动映射文件匹配模式到自定义 schema URL
             schemas = {
                 {

@@ -22,6 +22,8 @@ vim.opt.cmdheight = 0
 
 vim.opt.wrap = true
 vim.opt.list = true
+-- 用两个空格渲染 Tab（省略 tab: 会显示 ^I）；行尾空格/不断行空格仍可见
+vim.opt.listchars = "tab:  ,trail:-,nbsp:+"
 
 vim.opt.autoread = true
 vim.opt.conceallevel = 0
@@ -51,20 +53,21 @@ vim.opt.smartindent = false
 vim.opt.splitright = true
 vim.g.markdown_folding = 1
 
--- 避免checkhealth perl & ruby warning
-vim.g.loaded_ruby_provider = 0
-vim.g.loaded_perl_provider = 0
-
 -- 文件类型映射
 vim.filetype.add({
     extension = {
         gotmpl = "gotmpl",
         mdx = "markdown",
-        tsx = "typescript",
     },
     filename = {
         ["LICENSE"] = "license",
         [".yamllint"] = "yaml",
         [".yamlfmt"] = "yaml",
+    },
+    pattern = {
+        [".*/docker%-compose[^/]*%.yml"] = "yaml.docker-compose",
+        [".*/docker%-compose[^/]*%.yaml"] = "yaml.docker-compose",
+        [".*/compose[^/]*%.yml"] = "yaml.docker-compose",
+        [".*/compose[^/]*%.yaml"] = "yaml.docker-compose",
     },
 })

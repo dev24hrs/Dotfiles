@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'flash'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Flash-style jump motions
+
 vim.pack.add({
     { src = "https://github.com/folke/flash.nvim" },
 })

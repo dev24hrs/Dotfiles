@@ -62,6 +62,8 @@ local function cmd_window()
     end
 end
 
+local last_geometry = { win = nil, row = -1, col = -1, width = -1 }
+
 local function reposition()
     local win = cmd_window()
     if not win then
@@ -76,13 +78,16 @@ local function reposition()
     local row = math.max(0, parse_dimension(config.position.y, vim.o.lines - height - inset * 2))
     local col = math.max(0, parse_dimension(config.position.x, vim.o.columns - width - inset * 2))
 
-    api.nvim_win_set_config(win, {
-        relative = "editor",
-        row = row,
-        col = col,
-        width = width,
-        border = border,
-    })
+    if last_geometry.win ~= win or last_geometry.row ~= row or last_geometry.col ~= col or last_geometry.width ~= width then
+        api.nvim_win_set_config(win, {
+            relative = "editor",
+            row = row,
+            col = col,
+            width = width,
+            border = border,
+        })
+        last_geometry = { win = win, row = row, col = col, width = width }
+    end
 
     -- ui2 leaves FloatBorder unmapped, so the border would follow the global
     -- group. Append a per-window mapping: ui2's Normal/search mappings survive

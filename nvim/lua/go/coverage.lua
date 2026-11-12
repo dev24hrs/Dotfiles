@@ -1,11 +1,14 @@
 -- Copyright (c) 2026 dev24hrs. All rights reserved.
--- SPDX-License-Identifier: MIT
+-- The source code is released under the MIT License.
 --
---- @module 'go.coverage'
---- @description test-coverage: sign column + floating stats window
+--- @module 'coverage'
 --- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description test-coverage: sign column + floating stats window
 
 local M = {}
+
+local util = require("go.util")
 
 -- =============================================================================
 -- Coverage — go test -coverprofile + sign column + float window
@@ -18,11 +21,8 @@ local JOB_VAR = "go_coverage_job"
 local PROFILE_VAR = "go_coverage_profile"
 local GENERATION_VAR = "go_coverage_generation"
 
---- Coverage float window state (singleton).
-local coverage_float = {
-    win = nil,
-    buf = nil,
-}
+--- Coverage float window state (shared across Go buffers).
+local coverage_float = util.floats.coverage
 
 local function notify(message, level)
     vim.notify(message, level or vim.log.levels.INFO, { title = "Go Coverage" })
@@ -90,39 +90,6 @@ local function define_coverage_signs()
     })
 end
 
---- Walk up from start_dir until go.mod is found.
---- @param start_dir string
---- @return string|nil
-local function find_module_root(start_dir)
-    local dir = vim.fn.resolve(start_dir)
-    while true do
-        if vim.fn.filereadable(dir .. "/go.mod") == 1 then
-            return dir
-        end
-        local parent = vim.fn.fnamemodify(dir, ":h")
-        if parent == dir then
-            break
-        end
-        dir = parent
-    end
-    return nil
-end
-
-local function relative_to_root(path, root)
-    if path == "" then
-        return ""
-    end
-    if path == root then
-        return "."
-    end
-
-    local prefix = root .. "/"
-    if vim.startswith(path, prefix) then
-        return path:sub(#prefix + 1)
-    end
-    return path
-end
-
 --- Parse a Go coverage profile file.
 --- Returns a map: { [file_path] = { [line_num] = boolean } }
 --- @param profile_path string
@@ -158,9 +125,9 @@ local function parse_coverage(profile_path)
                 local prev = result[file][l]
                 if prev == nil then
                     result[file][l] = covered
-                elseif prev then
+                else
                     -- keep false if any block on this line is uncovered
-                    result[file][l] = covered
+                    result[file][l] = prev and covered
                 end
             end
         end
@@ -170,7 +137,38 @@ local function parse_coverage(profile_path)
     return result
 end
 
+local module_name_cache = {}
+
+--- Read the module path from go.mod (cached per module root).
+--- @param root string
+--- @return string|nil
+local function module_name(root)
+    local cached = module_name_cache[root]
+    if cached ~= nil then
+        return cached or nil
+    end
+
+    local name = nil
+    local f = io.open(root .. "/go.mod", "r")
+    if f then
+        for line in f:lines() do
+            local value = line:match("^%s*module%s+(.+)$")
+            if value then
+                value = vim.trim(value):gsub("%s*//.*$", ""):gsub('^"(.*)"$', "%1")
+                name = value
+                break
+            end
+        end
+        f:close()
+    end
+
+    module_name_cache[root] = name or false
+    return name
+end
+
 --- Match a buffer path against coverage profile entries.
+--- Profiles store import paths (`module.example/pkg/file.go`), so compare the
+--- go.mod module path plus the buffer's module-relative path.
 --- @param buf_path string absolute path
 --- @param profile_data table parsed coverage data
 --- @return table|nil line coverage data for the matching file
@@ -180,30 +178,33 @@ local function match_buffer(buf_path, profile_data)
     end
 
     buf_path = vim.fn.fnamemodify(buf_path, ":p")
+    local module_root = util.find_module_root(vim.fs.dirname(buf_path))
+    local relative = module_root and util.relative_to_root(buf_path, module_root) or nil
+    local module = module_root and module_name(module_root) or nil
+    local import_path = module and relative and (module .. "/" .. relative) or nil
+
     local best_data = nil
     local best_match_length = -1
 
     for profile_file, data in pairs(profile_data) do
+        local matched = false
+
         -- Handle command-line-arguments/ prefix (outside-module coverage)
         if vim.startswith(profile_file, "command-line-arguments/") then
             local clean = profile_file:sub(#"command-line-arguments/" + 1)
-            if vim.endswith(buf_path, "/" .. clean) or buf_path == clean then
-                if #clean > best_match_length then
-                    best_data = data
-                    best_match_length = #clean
-                end
-            end
+            matched = buf_path == clean or vim.endswith(buf_path, "/" .. clean)
         elseif profile_file:sub(1, 1) == "/" then
-            local profile_path = vim.fn.fnamemodify(profile_file, ":p")
-            if buf_path == profile_path then
-                best_data = data
-                best_match_length = #profile_path
-            end
-        elseif vim.endswith(buf_path, "/" .. profile_file) or buf_path == profile_file then
-            if #profile_file > best_match_length then
-                best_data = data
-                best_match_length = #profile_file
-            end
+            matched = buf_path == vim.fn.fnamemodify(profile_file, ":p")
+        else
+            matched = (import_path ~= nil and profile_file == import_path)
+                or (relative ~= nil and profile_file == relative)
+                or buf_path == profile_file
+                or vim.endswith(buf_path, "/" .. profile_file)
+        end
+
+        if matched and #profile_file > best_match_length then
+            best_data = data
+            best_match_length = #profile_file
         end
     end
 
@@ -219,10 +220,6 @@ local function parse_coverage_func_output(output)
     local total_pct = nil
 
     for line in output:gmatch("[^\n]+") do
-        if line == "" then
-            goto continue
-        end
-
         -- total line: "total:\t\t\t(statements)\t\t62.5%"
         if line:match("^total:") then
             total_pct = line:match("([%d.]+%%)$")
@@ -235,8 +232,6 @@ local function parse_coverage_func_output(output)
                 table.insert(funcs, { name = func_name, pct = pct })
             end
         end
-
-        ::continue::
     end
 
     -- Sort: uncovered first, then by name
@@ -436,9 +431,17 @@ local function apply_coverage(profile_data)
             local buf_path = vim.api.nvim_buf_get_name(bufnr)
             local line_data = match_buffer(buf_path, profile_data)
             if line_data then
+                local signs = {}
                 for lnum, is_covered in pairs(line_data) do
-                    local name = is_covered and "GoCovCovered" or "GoCovUncovered"
-                    vim.fn.sign_place(0, COVERAGE_SIGN_GROUP, name, bufnr, { lnum = lnum })
+                    signs[#signs + 1] = {
+                        buffer = bufnr,
+                        group = COVERAGE_SIGN_GROUP,
+                        name = is_covered and "GoCovCovered" or "GoCovUncovered",
+                        lnum = lnum,
+                    }
+                end
+                if #signs > 0 then
+                    vim.fn.sign_placelist(signs)
                 end
             end
         end
@@ -477,9 +480,15 @@ function M.coverage_run(pkg)
     local buf_path = vim.api.nvim_buf_get_name(0)
     local buf_dir = buf_path ~= "" and vim.fs.dirname(vim.fn.fnamemodify(buf_path, ":p")) or vim.fn.getcwd()
 
-    local module_root = find_module_root(buf_dir)
+    local module_root = util.find_module_root(buf_dir)
     if not module_root then
         notify("go.mod not found", vim.log.levels.ERROR)
+        return
+    end
+
+    local updated, update_error = pcall(vim.cmd.update)
+    if not updated then
+        notify("Unable to save current Go file: " .. tostring(update_error), vim.log.levels.ERROR)
         return
     end
 
@@ -487,7 +496,7 @@ function M.coverage_run(pkg)
     M.coverage_clear()
 
     -- Capture current file path before async job
-    local file_path = relative_to_root(vim.fn.fnamemodify(buf_path, ":p"), module_root)
+    local file_path = util.relative_to_root(vim.fn.fnamemodify(buf_path, ":p"), module_root)
     if file_path == "" then
         file_path = module_root
     end
@@ -600,8 +609,8 @@ function M.coverage_load(profile_path)
     local buf_path = vim.api.nvim_buf_get_name(0)
     local absolute_buf_path = buf_path ~= "" and vim.fn.fnamemodify(buf_path, ":p") or ""
     local buf_dir = absolute_buf_path ~= "" and vim.fs.dirname(absolute_buf_path) or vim.fn.getcwd()
-    local module_root = find_module_root(buf_dir)
-    stats.file_path = module_root and relative_to_root(absolute_buf_path, module_root) or absolute_buf_path
+    local module_root = util.find_module_root(buf_dir)
+    stats.file_path = module_root and util.relative_to_root(absolute_buf_path, module_root) or absolute_buf_path
     local cover_cwd = module_root or vim.fs.dirname(profile_path) or "."
 
     parse_coverage_func_async(profile_path, cover_cwd, function(func_data, func_error)
@@ -640,36 +649,36 @@ end
 -- Setup: user commands & keymap
 -- =============================================================================
 
-local function create_command(name, callback, opts)
-    pcall(vim.api.nvim_del_user_command, name)
-    vim.api.nvim_create_user_command(name, callback, opts)
+--- Install this module's commands and buffer-local keymaps.
+function M.install()
+    local create_command = util.create_command
+
+    create_command("GoCoverage", function(opts)
+        M.coverage_run(opts.args)
+    end, {
+        nargs = "?",
+        desc = "Run Go test coverage",
+    })
+
+    create_command("GoCoverageLoad", function(opts)
+        M.coverage_load(opts.args)
+    end, {
+        nargs = 1,
+        desc = "Load a Go coverage profile",
+    })
+
+    create_command("GoCoverageClear", function()
+        M.coverage_clear()
+    end, {
+        nargs = 0,
+        desc = "Clear Go coverage signs and window",
+    })
+
+    vim.keymap.set("n", "<leader>gc", "<cmd>GoCoverage<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Run test coverage for package",
+    })
 end
-
-create_command("GoCoverage", function(opts)
-    M.coverage_run(opts.args)
-end, {
-    nargs = "?",
-    desc = "Run Go test coverage",
-})
-
-create_command("GoCoverageLoad", function(opts)
-    M.coverage_load(opts.args)
-end, {
-    nargs = 1,
-    desc = "Load a Go coverage profile",
-})
-
-create_command("GoCoverageClear", function()
-    M.coverage_clear()
-end, {
-    nargs = 0,
-    desc = "Clear Go coverage signs and window",
-})
-
-vim.keymap.set("n", "<leader>gc", "<cmd>GoCoverage<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Run test coverage for package",
-})
 
 return M

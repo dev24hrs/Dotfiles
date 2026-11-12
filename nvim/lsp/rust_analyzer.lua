@@ -16,7 +16,12 @@ local function user_sysroot_src()
     return vim.tbl_get(vim.lsp.config["rust_analyzer"], "settings", "rust-analyzer", "cargo", "sysrootSrc")
 end
 
+local sysroot_src_cache
 local function default_sysroot_src()
+    if sysroot_src_cache ~= nil then
+        return sysroot_src_cache or nil
+    end
+
     local sysroot = vim.tbl_get(vim.lsp.config["rust_analyzer"], "settings", "rust-analyzer", "cargo", "sysroot")
     if not sysroot then
         local rustc = os.getenv("RUSTC") or "rustc"
@@ -36,7 +41,8 @@ local function default_sysroot_src()
         end
     end
 
-    return sysroot and vim.fs.joinpath(sysroot, "lib/rustlib/src/rust/library") or nil
+    sysroot_src_cache = sysroot and vim.fs.joinpath(sysroot, "lib/rustlib/src/rust/library") or false
+    return sysroot_src_cache or nil
 end
 
 local function is_library(fname)

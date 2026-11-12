@@ -1,11 +1,14 @@
 -- Copyright (c) 2026 dev24hrs. All rights reserved.
--- SPDX-License-Identifier: MIT
+-- The source code is released under the MIT License.
 --
---- @module 'go.mock'
---- @description GoMock generation via mockgen + treesitter
+--- @module 'mock'
 --- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description GoMock generation via mockgen + treesitter
 
 local M = {}
+
+local util = require("go.util")
 
 local MOCKGEN = "mockgen"
 local RUNNING_VAR = "go_mock_running"
@@ -25,15 +28,6 @@ end
 
 local function set_running(value)
     vim.g[RUNNING_VAR] = value
-end
-
-local function ensure_bin()
-    if vim.fn.executable(MOCKGEN) == 1 then
-        return true
-    end
-
-    notify("mockgen not found. Install: go install go.uber.org/mock/mockgen@latest", vim.log.levels.ERROR)
-    return false
 end
 
 local function current_file()
@@ -56,46 +50,6 @@ local function current_file()
     end
 
     return file
-end
-
-local function find_module_root(start_dir)
-    local dir = vim.fn.resolve(start_dir)
-
-    while true do
-        if vim.fn.filereadable(dir .. "/go.mod") == 1 then
-            return dir
-        end
-
-        local parent = vim.fn.fnamemodify(dir, ":h")
-        if parent == dir then
-            return nil
-        end
-        dir = parent
-    end
-end
-
-local function relative_to_root(path, root)
-    if path == root then
-        return "."
-    end
-
-    local prefix = root .. "/"
-    if vim.startswith(path, prefix) then
-        return path:sub(#prefix + 1)
-    end
-
-    return path
-end
-
-local function command_error(result, command_name)
-    local message = vim.trim(result.stderr or "")
-    if message == "" then
-        message = vim.trim(result.stdout or "")
-    end
-    if message == "" then
-        message = result.signal and string.format("%s terminated by signal %d", command_name, result.signal) or (command_name .. " failed")
-    end
-    return message
 end
 
 local function current_package_dir(file)
@@ -224,7 +178,7 @@ local function run_command(command, cwd, destination, description, already_claim
                 set_running(false)
 
                 if result.code ~= 0 then
-                    notify(command_error(result, MOCKGEN), vim.log.levels.ERROR)
+                    notify(util.command_error(result, MOCKGEN), vim.log.levels.ERROR)
                     return
                 end
 
@@ -242,7 +196,7 @@ end
 local function generate_source(file, module_root, requested_dir, package_name)
     local dir = destination_dir(module_root, requested_dir)
     local destination = dir .. "/" .. source_output_name(file)
-    local source = relative_to_root(file, module_root)
+    local source = util.relative_to_root(file, module_root)
 
     run_command({
         MOCKGEN,
@@ -257,34 +211,48 @@ local function generate_interface(file, module_root, interface_name, requested_d
     local destination = dir .. "/" .. interface_output_name(interface_name)
     local package_dir = current_package_dir(file)
 
+    if vim.fn.executable("go") ~= 1 then
+        notify("go executable not found", vim.log.levels.ERROR)
+        return
+    end
+
     set_running(true)
 
     -- Package mode needs the import path. Resolve it asynchronously so module
     -- loading and the editor UI remain responsive in large Go workspaces.
-    vim.system({ "go", "list", "-f={{.ImportPath}}" }, { cwd = package_dir, text = true }, function(package_result)
-        vim.schedule(function()
-            if package_result.code ~= 0 then
-                set_running(false)
-                notify(command_error(package_result, "go list"), vim.log.levels.ERROR)
-                return
-            end
+    local started, spawn_error = pcall(
+        vim.system,
+        { "go", "list", "-f={{.ImportPath}}" },
+        { cwd = package_dir, text = true },
+        function(package_result)
+            vim.schedule(function()
+                if package_result.code ~= 0 then
+                    set_running(false)
+                    notify(util.command_error(package_result, "go list"), vim.log.levels.ERROR)
+                    return
+                end
 
-            local import_path = vim.trim(package_result.stdout or "")
-            if import_path == "" or import_path:find("\n", 1, true) then
-                set_running(false)
-                notify("Unable to determine the Go package import path", vim.log.levels.ERROR)
-                return
-            end
+                local import_path = vim.trim(package_result.stdout or "")
+                if import_path == "" or import_path:find("\n", 1, true) then
+                    set_running(false)
+                    notify("Unable to determine the Go package import path", vim.log.levels.ERROR)
+                    return
+                end
 
-            run_command({
-                MOCKGEN,
-                import_path,
-                interface_name,
-                "-destination=" .. destination,
-                "-package=" .. package_name,
-            }, module_root, destination, "mock for " .. interface_name, true)
-        end)
-    end)
+                run_command({
+                    MOCKGEN,
+                    import_path,
+                    interface_name,
+                    "-destination=" .. destination,
+                    "-package=" .. package_name,
+                }, module_root, destination, "mock for " .. interface_name, true)
+            end)
+        end
+    )
+    if not started then
+        set_running(false)
+        notify(tostring(spawn_error), vim.log.levels.ERROR)
+    end
 end
 
 local function save_current_file()
@@ -307,7 +275,9 @@ local function generate(mode, interface_name, requested_dir, package_name)
         return
     end
 
-    if not ensure_bin() then
+    local bin_ok, bin_error = util.ensure_bin(MOCKGEN, "go.uber.org/mock/mockgen")
+    if not bin_ok then
+        notify(bin_error, vim.log.levels.ERROR)
         return
     end
 
@@ -318,7 +288,7 @@ local function generate(mode, interface_name, requested_dir, package_name)
     end
 
     local source_dir = current_package_dir(file)
-    local module_root = find_module_root(source_dir)
+    local module_root = util.find_module_root(source_dir)
     if not module_root then
         notify("go.mod not found", vim.log.levels.ERROR)
         return
@@ -372,76 +342,80 @@ end
 -- User commands & keymaps
 -- =============================================================================
 
-local function create_command(name, callback, opts)
-    pcall(vim.api.nvim_del_user_command, name)
-    vim.api.nvim_create_user_command(name, callback, opts)
-end
+--- Install this module's commands and buffer-local keymaps.
+function M.install()
+    local create_command = util.create_command
 
-create_command("GoMockFile", function(opts)
-    M.generate_file(opts.args)
-end, {
-    nargs = "?",
-    desc = "Generate GoMock mocks for interfaces in the current file",
-})
+    create_command("GoMockFile", function(opts)
+        M.generate_file(opts.args)
+    end, {
+        nargs = "?",
+        desc = "Generate GoMock mocks for interfaces in the current file",
+    })
 
-create_command("GoMockInterface", function(opts)
-    local name = vim.trim(opts.args or "")
-    M.generate_interface(name ~= "" and name or nil)
-end, {
-    nargs = "?",
-    desc = "Generate a GoMock mock for an interface",
-})
+    create_command("GoMockInterface", function(opts)
+        local name = vim.trim(opts.args or "")
+        M.generate_interface(name ~= "" and name or nil)
+    end, {
+        nargs = "?",
+        desc = "Generate a GoMock mock for an interface",
+    })
 
-create_command("GoMockGen", function(opts)
-    local mode = "interface"
-    local interface_name = nil
-    local requested_dir = nil
-    local package_name = DEFAULT_PACKAGE
-    local index = 1
+    create_command("GoMockGen", function(opts)
+        local mode = "interface"
+        local interface_name = nil
+        local requested_dir = nil
+        local package_name = DEFAULT_PACKAGE
+        local index = 1
 
-    while index <= #opts.fargs do
-        local arg = opts.fargs[index]
-        if arg == "-s" or arg == "--source" then
-            mode = "source"
-        elseif arg == "-i" or arg == "--interface" then
-            mode = "interface"
+        while index <= #opts.fargs do
+            local arg = opts.fargs[index]
+            if arg == "-s" or arg == "--source" then
+                mode = "source"
+            elseif arg == "-i" or arg == "--interface" then
+                mode = "interface"
+                index = index + 1
+                interface_name = opts.fargs[index]
+            elseif arg == "-d" or arg == "--dir" then
+                index = index + 1
+                requested_dir = opts.fargs[index]
+            elseif arg == "-p" or arg == "--package" then
+                index = index + 1
+                package_name = opts.fargs[index]
+            elseif arg:match("^%-%-dir=") then
+                requested_dir = arg:sub(7)
+            elseif arg:match("^%-%-package=") then
+                package_name = arg:sub(11)
+            elseif arg:match("^%-%-interface=") then
+                mode = "interface"
+                interface_name = arg:sub(13)
+            elseif arg:sub(1, 1) ~= "-" then
+                if mode == "source" then
+                    notify("GoMockGen: source mode uses the current file; drop the positional argument", vim.log.levels.ERROR)
+                    return
+                end
+                interface_name = arg
+                mode = "interface"
+            end
             index = index + 1
-            interface_name = opts.fargs[index]
-        elseif arg == "-d" or arg == "--dir" then
-            index = index + 1
-            requested_dir = opts.fargs[index]
-        elseif arg == "-p" or arg == "--package" then
-            index = index + 1
-            package_name = opts.fargs[index]
-        elseif arg:match("^%-%-dir=") then
-            requested_dir = arg:sub(7)
-        elseif arg:match("^%-%-package=") then
-            package_name = arg:sub(11)
-        elseif arg:match("^%-%-interface=") then
-            mode = "interface"
-            interface_name = arg:sub(13)
-        elseif arg:sub(1, 1) ~= "-" then
-            interface_name = arg
-            mode = "interface"
         end
-        index = index + 1
-    end
 
-    generate(mode, interface_name, requested_dir, package_name)
-end, {
-    nargs = "*",
-    desc = "Generate GoMock mocks (-s source, -i interface, -p package, -d directory)",
-})
+        generate(mode, interface_name, requested_dir, package_name)
+    end, {
+        nargs = "*",
+        desc = "Generate GoMock mocks (-s source, -i interface, -p package, -d directory)",
+    })
 
-vim.keymap.set("n", "<leader>gm", "<cmd>GoMockGen<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Generate mock for interface under cursor",
-})
-vim.keymap.set("n", "<leader>gM", "<cmd>GoMockFile<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Generate mocks for current file",
-})
+    vim.keymap.set("n", "<leader>gm", "<cmd>GoMockGen<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Generate mock for interface under cursor",
+    })
+    vim.keymap.set("n", "<leader>gM", "<cmd>GoMockFile<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Generate mocks for current file",
+    })
+end
 
 return M

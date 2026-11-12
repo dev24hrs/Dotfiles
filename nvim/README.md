@@ -12,10 +12,11 @@ which keys/commands it exposes.
 
 - **Native plugin management** — `vim.pack.add()` installs and loads plugins; `nvim-pack-lock.json` pins revisions. `:PackUI` opens a floating manager for
   updates, lockfile sync, and removal.
-- **Native Neovim 0.12 UI** — `vim._core.ui2` provides the centered cmdline and message window; LSP progress and desktop notifications are rendered natively.
+- **Native Neovim 0.12 UI** — `vim._core.ui2` provides the centered cmdline and message window; LSP progress is rendered natively, and notifications use a custom
+  floating stack.
 - **Custom statusline and tabline** — written from scratch in `lua/config/statusline.lua` and `lua/config/tabline.lua`; they are not plugins.
 - **Per-server LSP configs** — 13 servers in `lsp/`, enabled through `vim.lsp.enable()`; no `nvim-lspconfig` dependency.
-- **Custom Go tooling** — tests, benchmarks, coverage, interface stubs, mocks, and struct tags live in `ftplugin/go/`.
+- **Custom Go tooling** — benchmarks, coverage, mocks, and struct tags live in `lua/go/`.
 - **Personal snippets** — VSCode-style snippets in `snippets/`, loaded by blink.cmp.
 
 ## Requirements & Installation
@@ -35,12 +36,14 @@ Plugins and LSPs are not the only dependencies. Install the editor-level tools f
 | --------------------- | ---------------------------------- | ------------------------------------------ |
 | `git`                 | `brew install git`                 | `vim.pack`, gitsigns                       |
 | `ripgrep`             | `brew install ripgrep`             | `grepprg`, fzf-lua live grep               |
+| `tree-sitter-cli`     | `brew install tree-sitter-cli`     | nvim-treesitter parser builds              |
 | `fzf`                 | `brew install fzf`                 | fzf-lua                                    |
 | `imagemagick`         | `brew install imagemagick`         | image.nvim `magick_cli`; img-clip resize   |
 | `curl`                | `brew install curl`                | image.nvim remote image downloads          |
 | `wrangler`            | `npm i -g wrangler`                | img-clip R2 uploads (`wrangler login`)     |
 | `go`                  | `brew install go`                  | Go tooling, `go install`                   |
 | `gopls`               | `brew install gopls`               | Go LSP (intentionally not Mason-managed)   |
+| `golangci-lint`       | `brew install golangci-lint`       | Go linter (`nvim-lint`)                    |
 | `lua-language-server` | `brew install lua-language-server` | Lua LSP (intentionally not Mason-managed)  |
 | `rust-analyzer`       | `brew install rust-analyzer`       | Rust LSP (intentionally not Mason-managed) |
 | `node`                | `brew install node`                | Mason-installed npm-based servers          |
@@ -48,11 +51,9 @@ Plugins and LSPs are not the only dependencies. Install the editor-level tools f
 | `fish`                | `brew install fish`                | `fish_indent` and the `fish` linter        |
 | Xcode CLI tools       | `xcode-select --install`           | sourcekit-lsp on macOS                     |
 
-Go helper binaries used by `ftplugin/go/`:
+Go helper binaries used by `lua/go/`:
 
 ```bash
-go install github.com/cweill/gotests/gotests@latest
-go install github.com/josharian/impl@latest
 go install github.com/fatih/gomodifytags@latest
 go install go.uber.org/mock/mockgen@latest
 ```
@@ -72,19 +73,21 @@ no DAP plugin or debug adapter is configured.
 - `:checkhealth` — Neovim-wide health.
 - `:checkhealth vim.lsp` — enabled servers and client errors.
 - `:Mason` — managed LSP/formatter/linter installations.
-- `:PackUI` — installed plugins, pending updates, and lockfile state.
+- `:PackUI` — installed plugins, pinned revisions, and lockfile sync/update actions.
 
 ## Directory Structure
 
 ```text
-~/.config/nvim -> ~/Dotfiles/nvim/
-├── init.lua                  # Entry point: basic -> config -> plugins -> config.pack
+~/.config/nvim -> ~/Documents/Dotfiles/nvim/
+├── init.lua                  # Entry point: basic -> config -> plugins
 ├── lua/
 │   ├── basic/                # options, global keymaps, autocmds
 │   ├── config/               # LSP, diagnostics, folding, indent, statusline, tabline,
 │   │                         # fileheader, :PackUI, native ui2 extensions
+│   ├── go/                   # Go tooling: benchmarks, coverage, mocks, tags
+│   │                         # (util.lua holds the shared helpers)
 │   └── plugins/              # vim.pack specs and per-plugin setup
-├── ftplugin/go/              # Go tooling: tests, benchmarks, coverage, mocks, tags, impl
+├── ftplugin/go.lua           # entry point: require("go").setup()
 ├── lsp/                      # one config per LSP server (13 files)
 ├── snippets/                 # personal VSCode-style snippets
 ├── tasks/                    # development notes
@@ -94,17 +97,17 @@ no DAP plugin or debug adapter is configured.
 ## Supported Languages
 
 The table is derived from `vim.lsp.enable()` in `lua/config/lsp.lua`, the filetypes declared in `lsp/*.lua`, `formatters_by_ft` in `lua/plugins/conform.lua`,
-and `linters_by_ft` in `lua/plugins/lint.lua`.
+`linters_by_ft` in `lua/plugins/lint.lua`, and LSP diagnostic sources (oxlint, sourcekit).
 
 | Language              | Filetypes                         | LSP             | Formatter(s)                                       | Linter                                  |
 | --------------------- | --------------------------------- | --------------- | -------------------------------------------------- | --------------------------------------- |
 | Go                    | `go`, `gomod`, `gowork`, `gotmpl` | `gopls`         | `goimports` then `gofumpt` (`go` only)             | `golangci-lint` (`go` only)             |
 | Rust                  | `rust`                            | `rust_analyzer` | `rustfmt` (LSP fallback)                           | Clippy via rust-analyzer                |
-| Python                | `python`                          | `pyright`       | `ruff_organize_imports`, `ruff_format`, `ruff_fix` | `ruff`                                  |
+| Python                | `python`                          | `pyright`       | `ruff_organize_imports`, `ruff_fix`, `ruff_format` | `ruff`                                  |
 | Lua                   | `lua`                             | `lua_ls`        | `stylua`                                           | `selene`                                |
 | JavaScript            | `javascript`, `javascriptreact`   | `oxlint`        | `oxfmt`                                            | `oxlint`                                |
 | TypeScript            | `typescript`, `typescriptreact`   | `oxlint`        | `oxfmt`                                            | `oxlint`                                |
-| JSON / JSONC          | `json`, `jsonc`                   | `jsonls`        | `oxfmt`                                            | `jsonlint`                              |
+| JSON / JSONC          | `json`, `jsonc`                   | `jsonls`        | `oxfmt`                                            | `jsonlint` (`json` only)                |
 | YAML                  | `yaml`                            | `yamlls`        | `yamlfmt`                                          | `yamllint`                              |
 | TOML                  | `toml`                            | `tombi`         | `tombi`                                            | — (LSP diagnostics)                     |
 | Bash / Shell          | `bash`, `sh`                      | `bashls`        | `shfmt`                                            | `shellcheck` (`sh` only)                |
@@ -120,17 +123,17 @@ and `linters_by_ft` in `lua/plugins/lint.lua`.
 Notes:
 
 - `trim_whitespace` runs for every filetype as the `_` fallback in conform.
-- `pyright` is configured with `analysis.ignore = { "*" }`; it provides navigation, completion, and inlay hints, while `ruff` is the actual Python linter.
+- `pyright` runs in `standard` type-checking mode; `ruff` remains the linting layer, so some type diagnostics may overlap with Ruff's checks.
 - `oxlint` is a linter exposed through the LSP protocol; type-aware mode requires `tsgolint` plus TypeScript in the project's `.oxlintrc.json`, and `tsgolint`
   is not installed.
 - Rust diagnostics come from rust-analyzer's `check = "clippy"`, not from nvim-lint.
 - `sourcekit` is enabled unconditionally and requires macOS with Xcode command-line tools.
-- `tsx` files are mapped to the `typescript` filetype; there is no separate TSX filetype, and TypeScript-family files use `oxlint` as their LSP.
-- Files larger than 1.5 MB skip LSP, treesitter folding, and other heavy features (see `lua/basic/autocmds.lua`).
+- `tsx` files use the default `typescriptreact` filetype (and the `tsx` parser); TypeScript-family files use `oxlint` as their LSP.
+- Files larger than 1.5 MB detach LSP for that buffer and disable folds, spell, list, swap, and persistent undo (see `lua/basic/autocmds.lua`).
 
-### UI & Appearance
+## UI & Appearance
 
-#### alpha-nvim
+### alpha-nvim
 
 [alpha-nvim](https://github.com/goolord/alpha-nvim) — defined in `lua/plugins/alpha.lua`. Provides the start screen: ASCII art, time-based greeting and date, a
 random quote, and dashboard buttons.
@@ -142,21 +145,21 @@ random quote, and dashboard buttons.
 | `h`           | Dotfiles picker (`:FzfLua files cwd=~/.config/nvim`) |
 | `q`           | `:qa`                                                |
 
-Commands: `:Alpha`, `:AlphaRedraw`, `:AlphaRemap`. The statusline and tabline stay hidden on alpha buffers.
+Commands: `:Alpha`, `:AlphaRedraw`, `:AlphaRemap`. The statusline is hidden on alpha buffers; the tabline is not created until the first real file is opened.
 
-#### gruvbox.nvim
+### gruvbox.nvim
 
 [gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim) — defined in `lua/plugins/theme.lua`. Loads the `gruvbox` colorscheme with soft contrast,
 transparent background, terminal colors, italics, undercurl/underline/strikethrough, and inverted signs. No custom keymaps; switch with `:colorscheme gruvbox`.
 
-#### hlchunk.nvim
+### hlchunk.nvim
 
 [hlchunk.nvim](https://github.com/shellRaining/hlchunk.nvim) — defined in `lua/plugins/indent.lua`. Draws chunk and indent guides (`│`, highlight `#806d9c`).
 Line-number and blank-line chunks are disabled.
 
 Commands: `:EnableHLChunk`, `:DisableHLChunk`, `:EnableHLIndent`, `:DisableHLIndent`. No custom keymaps.
 
-#### which-key.nvim
+### which-key.nvim
 
 [which-key.nvim](https://github.com/folke/which-key.nvim) — defined in `lua/plugins/whichKey.lua`. Uses the `modern` preset and shows keybinding hints after a
 prefix.
@@ -167,22 +170,22 @@ prefix.
 
 Command: `:WhichKey [mode] [keys]`.
 
-#### nvim-web-devicons
+### nvim-web-devicons
 
 [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) — a shared icon dependency, declared in `lua/plugins/alpha.lua`, `fzf.lua`, `nvimTree.lua`,
 and `whichKey.lua`. It is also used directly by the custom statusline and tabline. No keymaps or commands.
 
-#### plenary.nvim
+### plenary.nvim
 
-[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — a Lua utility dependency for alpha-nvim, nvim-spectre, and todo-comments.nvim search. No keymaps or
-commands.
+[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) — declared in `lua/plugins/spectre.lua`; required by nvim-spectre. No keymaps or commands.
 
-### Completion & Editing
+## Completion & Editing
 
-#### blink.cmp
+### blink.cmp
 
-[blink.cmp](https://github.com/saghen/blink.cmp) — defined in `lua/plugins/blink.lua`. Completion engine with LSP, snippets, buffer, and path sources. Setup is
-deferred until `InsertEnter`, `CmdlineEnter`, or `LspAttach` (once). Ghost text, signature help on trigger characters, and cmdline completion are enabled.
+[blink.cmp](https://github.com/saghen/blink.cmp) — defined in `lua/plugins/blink.lua`. Completion engine with LSP, snippets, buffer, path, and minuet sources.
+Setup is deferred until `InsertEnter`, `CmdlineEnter`, or `LspAttach` (once). Ghost text, signature help on trigger characters, and cmdline completion are
+enabled.
 
 | Mode    | Key                | Action                                                |
 | ------- | ------------------ | ----------------------------------------------------- |
@@ -200,12 +203,27 @@ Commands: `:BlinkCmp status`, `:BlinkCmp build`, `:BlinkCmp build-log`. `:BlinkC
 `snippets/` only; friendly-snippets is disabled. `lua/basic/keymaps.lua` also maps insert-mode `<S-Tab>` to outdent; while the completion menu is open, blink
 uses it to select the previous item instead.
 
-#### friendly-snippets
+### friendly-snippets
 
-[friendly-snippets](https://github.com/rafamadriz/friendly-snippets) — installed in `lua/plugins/blink.lua` but **not used**: the blink snippet provider sets
-`friendly_snippets = false` and searches only `snippets/`. No keymaps or commands. It can be removed without changing completion behavior.
+[friendly-snippets](https://github.com/rafamadriz/friendly-snippets) — **not installed**. The spec is commented out in `lua/plugins/blink.lua`, and the snippet
+provider sets `friendly_snippets = false` and searches only `snippets/`. Enable both if you want the upstream snippet collection.
 
-#### Comment.nvim
+### minuet-ai.nvim
+
+[minuet-ai.nvim](https://github.com/milanglacier/minuet-ai.nvim) — defined in `lua/plugins/minuet.lua`. Inline AI completion via DeepSeek's FIM endpoint
+(`openai_fim_compatible`). Setup is deferred until the first `InsertEnter`, `CmdlineEnter`, or `LspAttach`. Requires `DEEPSEEK_API_KEY` in the environment;
+suggestions are enabled for Lua, TypeScript, Go, and Rust.
+
+| Key     | Action              |
+| ------- | ------------------- |
+| `<C-,>` | Accept suggestion   |
+| `<C-;>` | Previous suggestion |
+| `<C-'>` | Next suggestion     |
+| `<C-x>` | Dismiss suggestion  |
+
+The provider is also registered as a blink.cmp completion source (`minuet.blink`).
+
+### Comment.nvim
 
 [Comment.nvim](https://github.com/numToStr/Comment.nvim) — defined in `lua/plugins/comment.lua`. Toggles line and block comments; `commentstring` falls back to
 `//%s` for unsupported filetypes.
@@ -219,12 +237,12 @@ uses it to select the previous item instead.
 
 The plugin's own basic/extra mappings are disabled; only the mappings above are active. No user commands.
 
-#### mini.pairs
+### mini.pairs
 
 [mini.pairs](https://github.com/nvim-mini/mini.pairs) — defined in `lua/plugins/comment.lua`. Auto-closes brackets, quotes, and backticks in insert mode, with
 automatic `<BS>` and `<CR>` handling. These are plugin defaults; no project-specific keymaps or commands.
 
-#### mini.surround
+### mini.surround
 
 [mini.surround](https://github.com/nvim-mini/mini.surround) — defined in `lua/plugins/comment.lua` with default settings. Add, delete, replace, find, and
 highlight surrounding characters.
@@ -240,7 +258,7 @@ highlight surrounding characters.
 Suffixes `l` (previous) and `n` (next) are supported by the plugin. These are plugin defaults, not project mappings. Because `s*` mappings exist, a bare `s`
 also waits for `timeoutlen` before flash.nvim's `s` jump fires.
 
-#### conform.nvim
+### conform.nvim
 
 [conform.nvim](https://github.com/stevearc/conform.nvim) — defined in `lua/plugins/conform.lua`. Async formatting with LSP fallback. Format-on-save is enabled
 unless the path contains `/node_modules/`, `/.git/`, or `/vendor/`.
@@ -252,15 +270,15 @@ unless the path contains `/node_modules/`, `/.git/`, or `/vendor/`.
 The visual-mode mapping still formats the whole buffer, not only the selection. Command: `:ConformInfo`. Formatter chains are listed in
 [Supported Languages](#supported-languages).
 
-#### nvim-lint
+### nvim-lint
 
-[nvim-lint](https://github.com/mfussenegger/nvim-lint) — defined in `lua/plugins/lint.lua`. Runs on `BufReadPost` and `BufWritePost` and configures async
-linters per filetype: `golangcilint`, `selene`, `shellcheck`, `yamllint`, `jsonlint`, `sqlfluff`, `ruff`, `markdownlint`, and `fish`. No custom keymaps. A
+[nvim-lint](https://github.com/mfussenegger/nvim-lint) — defined in `lua/plugins/lint.lua`. Runs on `BufReadPost`, `BufWritePost`, and `FileType` and configures
+async linters per filetype: `golangcilint`, `selene`, `shellcheck`, `yamllint`, `jsonlint`, `sqlfluff`, `ruff`, `markdownlint`, and `fish`. No custom keymaps. A
 manual pass is available with `:lua require("lint").try_lint()`.
 
-### Search & Navigation
+## Search & Navigation
 
-#### fzf-lua
+### fzf-lua
 
 [fzf-lua](https://github.com/ibhagwan/fzf-lua) — defined in `lua/plugins/fzf.lua`. Fuzzy file, buffer, grep, help, mark, and recent-file pickers;
 `vim.ui.select` is routed through fzf-lua on `VimEnter`.
@@ -277,7 +295,7 @@ manual pass is available with `:lua require("lint").try_lint()`.
 
 Command: `:FzfLua <picker>`. LSP-integrated pickers are bound in `lua/config/lsp.lua`. Requires `fzf` and `ripgrep`.
 
-#### nvim-spectre
+### nvim-spectre
 
 [nvim-spectre](https://github.com/nvim-pack/nvim-spectre) — defined in `lua/plugins/spectre.lua`. Project-wide and file-scoped search/replace.
 
@@ -290,7 +308,7 @@ Command: `:FzfLua <picker>`. LSP-integrated pickers are bound in `lua/config/lsp
 Panel keys: `<Tab>` / `<S-Tab>` switch queries, `o` opens a result, `<CR>` replaces the current line, `<S-CR>` replaces all. Command:
 `:Spectre [path] [key=value ...]`. The panel opens in a 60-column vertical split.
 
-#### nvim-tree.lua
+### nvim-tree.lua
 
 [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua) — defined in `lua/plugins/nvimTree.lua`. Floating file explorer with git status, devicons, and
 filters.
@@ -306,7 +324,7 @@ The plugin's default mappings remain available, including `a` create, `d` delete
 help. The tree floats at 30% width and 60% height, closes on focus loss, and closes after opening a file. Commands: `:NvimTreeToggle`, `:NvimTreeOpen`,
 `:NvimTreeClose`, `:NvimTreeFocus`, `:NvimTreeFindFile`, and the rest of the plugin's command set.
 
-#### aerial.nvim
+### aerial.nvim
 
 [aerial.nvim](https://github.com/stevearc/aerial.nvim) — defined in `lua/plugins/aerial.lua`. Code outline backed by treesitter/LSP, with a 30-column right-side
 panel.
@@ -321,7 +339,7 @@ panel.
 
 Commands: `:AerialToggle`, `:AerialOpen`, `:AerialClose`, `:AerialNext`, `:AerialPrev`, `:AerialGo`, `:AerialInfo`.
 
-#### flash.nvim
+### flash.nvim
 
 [flash.nvim](https://github.com/folke/flash.nvim) — defined in `lua/plugins/flash.lua`. Fast character and treesitter jumps with rainbow labels.
 
@@ -332,7 +350,7 @@ Commands: `:AerialToggle`, `:AerialOpen`, `:AerialClose`, `:AerialNext`, `:Aeria
 
 Character mode is enabled, so native `f`/`F`/`t`/`T` motions get jump labels too. No custom commands.
 
-#### todo-comments.nvim
+### todo-comments.nvim
 
 [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) — defined in `lua/plugins/todo.lua`. Highlights TODO/FIXME/NOTE/WARN/TEST markers and jumps
 between them. Signs are disabled; setup is deferred until the first buffer.
@@ -345,9 +363,9 @@ between them. Signs are disabled; setup is deferred until the first buffer.
 
 Commands: `:TodoFzfLua`, `:TodoQuickFix`, `:TodoLocList`. The plugin also defines `:TodoTelescope` and `:TodoTrouble`, but those integrations are not installed.
 
-### Git
+## Git
 
-#### gitsigns.nvim
+### gitsigns.nvim
 
 [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) — defined in `lua/plugins/git.lua`. Git diff signs in the sign column, current-line blame, and hunk
 operations.
@@ -359,17 +377,18 @@ operations.
 
 Command: `:Gitsigns <action>`, e.g. `:Gitsigns preview_hunk`, `:Gitsigns stage_hunk`, `:Gitsigns blame_line`, `:Gitsigns toggle_current_line_blame`.
 
-### Treesitter & Tooling
+## Treesitter & Tooling
 
-#### nvim-treesitter
+### nvim-treesitter
 
-[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) — defined in `lua/plugins/treesitter.lua`, pinned to the `main` branch with `:TSUpdate` as
-its build hook. Setup and parser installation are deferred until the first buffer. Configured parsers: `bash`, `fish`, `go`, `gomod`, `gosum`, `gowork`,
-`gotmpl`, `rust`, `sql`, `python`, `typescript`, `javascript`, `tsx`, `json`, `toml`, `html`, `yaml`, `dockerfile` (plus the Neovim 0.12 defaults for Lua, Vim,
-Vimdoc, Markdown). Commands: `:TSInstall`, `:TSUpdate`, `:TSUninstall`, `:TSLog`. No project-specific keymaps in this file. Every buffer whose filetype has a
-Treesitter parser gets the Treesitter `indentexpr`; buffers without a parser keep their existing indentation.
+[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) — defined in `lua/plugins/treesitter.lua`, pinned to the `main` branch. A `PackChanged`
+hook runs `:TSUpdate` after plugin updates. Setup and parser installation are deferred until the first buffer. Configured parsers: `bash`, `fish`, `go`, `gomod`,
+`gosum`, `gowork`, `gotmpl`, `rust`, `sql`, `python`, `typescript`, `javascript`, `tsx`, `json`, `toml`, `html`, `yaml`, `dockerfile` (plus the Neovim 0.12
+bundled Vim, Vimdoc, and Markdown parsers; Lua queries are installed explicitly). Commands: `:TSInstall`, `:TSUpdate`, `:TSUninstall`, `:TSLog`. No
+project-specific keymaps in this file. The Treesitter `indentexpr` is set only when both a parser and an `indents` query exist; other buffers keep their
+existing indentation.
 
-#### nvim-treesitter-textobjects
+### nvim-treesitter-textobjects
 
 [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) — defined in `lua/plugins/treesitter.lua`, pinned to `main`.
 Treesitter-based selection and movement.
@@ -390,38 +409,40 @@ Treesitter-based selection and movement.
 Selection modes are `v` for parameters, `V` for functions, and `<C-v>` for classes. The operator-pending `ci`/`co` mappings shadow Vim's built-in change-inside
 prefix (for example `ciw` or `ci"`); disable these mappings if you rely on those combinations. `]]`/`[[` also override Vim's section motions.
 
-#### nvim-treesitter-context
+### nvim-treesitter-context
 
 [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context) — installed in `lua/plugins/treesitter.lua` with plugin defaults. Pins the
 enclosing function/class header at the top of the window while scrolling. Command: `:TSContext enable|disable|toggle`. No custom keymaps or setup overrides.
 
-#### mason.nvim
+### mason.nvim
 
 [mason.nvim](https://github.com/mason-org/mason.nvim) — defined in `lua/plugins/mason.lua`. Installs and updates LSP servers, formatters, and linters. The
-configured `ensure_installed` list is installed asynchronously after startup; unknown packages are reported with a warning.
+configured `ensure_installed` list is installed after startup (registry refresh is deferred to `VimEnter`); unknown packages are reported with a warning.
 
 Commands: `:Mason`, `:MasonInstall <name>`, `:MasonUninstall <name>`, `:MasonUninstallAll`, `:MasonUpdate`, `:MasonLog`. No keymaps. gopls, lua-language-server,
 and rust-analyzer are deliberately installed with Homebrew instead of Mason. `delve` is installed, but this config has no DAP plugin, so no debugging UI is
 available.
 
-#### lazydev.nvim
+### lazydev.nvim
 
 [lazydev.nvim](https://github.com/folke/lazydev.nvim) — defined in `lua/plugins/lazydev.lua`. Extends lua_ls with the `vim.pack` `opt` plugin directory so
 Neovim and plugin APIs resolve correctly. Command: `:LazyDev`. No custom keymaps.
 
-### Language-Specific
+## Language-Specific
 
-#### image.nvim
+### image.nvim
 
 [image.nvim](https://github.com/3rd/image.nvim) — defined in `lua/plugins/image.lua`. Inline image rendering for Markdown using the Kitty graphics protocol
 (`backend = "kitty"`, `kitty_method = "normal"`) and ImageMagick (`processor = "magick_cli"`). Remote images are downloaded with curl, and download failures are
-ignored (`ignore_download_error = true`). No custom keymaps. Rendering requires a compatible terminal; images are cleared in insert mode.
+ignored (`ignore_download_error = true`). Setup is deferred until the first Markdown/Vimwiki/HTML buffer. No custom keymaps. Rendering requires a
+compatible terminal; images are cleared in insert mode.
 
-#### img-clip.nvim
+### img-clip.nvim
 
-[img-clip.nvim](https://github.com/HakonHarnes/img-clip.nvim) — defined in `lua/plugins/image.lua`. Pastes clipboard images into the buffer with `<leader>mp`
-(`:PasteImage`). Images are resized to 50% with ImageMagick (`convert - -resize 50% -`), saved as PNG files in `stdpath("cache")/img-clip` with a timestamp
-name, and inserted with an absolute path, so a failed upload still links to a readable local file.
+[img-clip.nvim](https://github.com/HakonHarnes/img-clip.nvim) — defined in `lua/plugins/image.lua`. Setup is deferred until the first Markdown/Vimwiki/HTML
+buffer or `<leader>mp`. Pastes clipboard images with `<leader>mp` (`:PasteImage`). Images are resized to 50% with ImageMagick
+(`convert - -resize 50% -`), saved as PNG files in `stdpath("cache")/img-clip` with a timestamp name, and inserted with an absolute path, so a failed upload
+still links to a readable local file.
 
 In Markdown buffers, each pasted image is also uploaded to Cloudflare R2 by `r2-upload-images.sh` at the dotfiles repository root (resolved from
 `stdpath("config")` in `setup_r2_upload()` in the same file). The local path is inserted immediately; when the upload finishes, the path is replaced in place
@@ -432,14 +453,14 @@ uploaded filetypes (default `{ "markdown" }`), and the notification title.
 
 ## Custom Configuration
 
-Every custom module is listed below. The `lua/basic` layer runs before plugins; `lua/config` runs before and after plugin setup as ordered by `init.lua`.
+Every custom module is listed below. `init.lua` loads `lua/basic`, then `lua/config` (including `:PackUI`), then `lua/plugins`.
 
 ### lua/basic/options.lua
 
 Sets plugin-independent editor options: system clipboard, persistent undo, no swap/backup files, `updatetime = 250`, `timeoutlen = 300`, mouse support, relative
 numbers, `cmdheight = 0` for the ui2 cmdline, `winborder = "single"`, `signcolumn = "number"`, `inccommand = "nosplit"`, `completeopt`, search settings,
-`grepprg = "rg --vimgrep --no-heading"`, `splitright`, and disabled netrw. It also enables the bundled `nvim.undotree` via `packadd` and maps `gotmpl`, `mdx`,
-`tsx`, `LICENSE`, `.yamllint`, and `.yamlfmt` filetypes. No keymaps or commands.
+`grepprg = "rg --vimgrep --no-heading"`, `splitright`, and disabled netrw. It also maps `gotmpl`, `mdx`, `LICENSE`, `.yamllint`, and `.yamlfmt` filetypes. No
+keymaps or commands.
 
 ### lua/basic/keymaps.lua
 
@@ -457,7 +478,8 @@ Global editing keymaps. `<Space>` is set as both leader and localleader.
 | normal          | `<leader>cp` | Copy the relative file path                             |
 | visual          | `<leader>cp` | Copy the relative file path plus `start:end` line range |
 
-`<leader>cp` optionally prompts for a note and writes the reference to the `+` register, ready to paste into a chat.
+`<leader>cp` optionally prompts for a note and writes the reference to the `+` register, ready to paste into a chat. `wq` makes a plain `w` wait for
+`timeoutlen` (300 ms) before it acts as a motion.
 
 ### lua/basic/autocmds.lua
 
@@ -467,8 +489,8 @@ Core autocommands and `:H`:
 - A global `FileType` hook removes `c`, `r`, and `o` from `formatoptions`, stopping automatic comment continuation.
 - `BufReadPost` restores the last cursor position.
 - Markdown buffers get `textwidth = 120`, wrapping, `linebreak`, `conceallevel = 2`, and `concealcursor = "n"`.
-- Help, quickfix, checkhealth, spectre, undotree, and similar buffers become unlisted and close with `q`.
-- Files larger than 1.5 MB disable folds, spell, list, swap, and persistent undo; attached LSP clients are stopped.
+- Help, quickfix, checkhealth, spectre, and similar buffers become unlisted and close with `q`.
+- Files larger than 1.5 MB disable folds, spell, list, swap, and persistent undo; LSP clients are detached from that buffer.
 
 Command: `:H [topic]` opens help in an 80-column vertical split with a fixed width.
 
@@ -480,20 +502,18 @@ virtual text with source/code, and `E`/`W`/`I`/`H` signs (error/warning signs al
 ### lua/config/fileheader.lua
 
 Inserts a copyright/author header into empty buffers. Templates exist for Lua, Go, Rust, TypeScript, and Python. Placeholders are filled from the date,
-filename, and `git config user.name`/`user.email`. The `BufNewFile` and `BufReadPost` autocmds only act on empty buffers; existing content is never overwritten.
-Go filenames are sanitized into valid identifiers. Command: `:FileHeader` (manual insertion). No keymaps.
+filename, and `git config user.name`/`user.email`. The `BufNewFile` autocmd only acts on empty buffers; existing files are never modified on open. Go
+filenames are sanitized into valid identifiers. Command: `:FileHeader` (manual insertion). No keymaps.
 
 ### lua/config/folding.lua
 
-Treesitter-expression folding with a custom fold text that keeps syntax highlighting and appends an `N lines folded` marker.
+Indent-based folding (`foldmethod = "indent"`) with a plain custom fold text that shows the indentation and appends an `N lines` marker.
 
 | Key  | Action                                  |
 | ---- | --------------------------------------- |
 | `zf` | Toggle the fold under the cursor (`za`) |
-| `zr` | Unfold all (`zR`)                       |
-| `zm` | Fold all (`zM`)                         |
 
-`foldcolumn` is 0 and folds start fully open. No commands.
+`foldcolumn` is 0 and folds start fully open. Native `zr`/`zm` still move one fold level; use `zR`/`zM` to open/close everything. No commands.
 
 ### lua/config/langIndent.lua
 
@@ -529,7 +549,7 @@ hints when the server supports them.
 | `[e` / `]e`  | Previous / next error      |
 | `[w` / `]w`  | Previous / next warning    |
 
-Note that plain `gi`, `gr`, `gt`, and `gd` are LSP maps; the Go tooling maps are `<leader>gi`, `<leader>gr`, etc. These maps are buffer-local and only exist
+Note that plain `gi`, `gr`, `gt`, and `gd` are LSP maps; the Go tooling maps are `<leader>gr`, `<leader>gj`, etc. These maps are buffer-local and only exist
 while an LSP client is attached.
 
 ### lua/config/pack.lua
@@ -550,7 +570,7 @@ Use it for routine updates instead of editing `nvim-pack-lock.json` by hand. The
 
 ### lua/config/statusline.lua
 
-A fully custom global statusline (`%!v:lua.statusline()`), activated after the first real file is opened.
+A fully custom global statusline (`%!v:lua.statusline()`), activated after the first named buffer is entered.
 
 - Left: mode, git branch, filename, gitsigns diff counts, and diagnostic counts per severity.
 - Right: indent style, encoding, file format (LF/CRLF/CR), filetype with devicon, and attached LSP client names.
@@ -560,7 +580,7 @@ Colors follow the gruvbox palette. The statusline is hidden on `alpha`, `dashboa
 ### lua/config/tabline.lua
 
 Custom tabline that lists loaded, listed buffers rather than real tabs. Each entry shows a devicon, `parent/filename`, and a modified marker; overflow is
-handled with `« N` / `N »` markers, and left-clicking an entry switches to that buffer.
+handled with `N «` / `» N` markers, and left-clicking an entry switches to that buffer.
 
 | Key  | Action                         |
 | ---- | ------------------------------ |
@@ -569,13 +589,13 @@ handled with `« N` / `N »` markers, and left-clicking an entry switches to tha
 | `wd` | Delete the current buffer      |
 | `wo` | Close all other listed buffers |
 
-The tabline activates after the first real file. No commands.
+The tabline activates after the first real file. `wh`/`wl`/`wd`/`wo` make a plain `w` wait for `timeoutlen` (300 ms). No commands.
 
 ### lua/config/ui2_cmd.lua
 
 Extends Neovim 0.12's built-in `vim._core.ui2` command-line UI: enables ui2, centers the floating cmdline (35% width, clamped to 40–80 columns), removes the
-message-window border, lifts the message window above the statusline, and repositions blink.cmp's completion menu after layout changes. It contains no keymaps
-or commands and relies on Neovim-internal APIs, so it is tied to 0.12.
+message-window border, lifts the message window above the statusline, and repositions blink.cmp's completion menu after layout changes (skipping the
+`set_config` call when the geometry is unchanged). It contains no keymaps or commands and relies on Neovim-internal APIs, so it is tied to 0.12.
 
 ### lua/config/ui2_lsp.lua
 
@@ -599,31 +619,13 @@ Rendering covers only the visible range of on-screen Markdown buffers and is cac
 re-filter visibility, while text changes rebuild after 150 ms. `conceallevel = 2` and `concealcursor = "n"` show the cursor line as source in insert, visual,
 and select modes, and a selection reveals its whole range. Highlights are `RenderMarkdown*` groups re-applied on `ColorScheme`.
 
-## Go Tooling (ftplugin/go)
+## Go Tooling (lua/go)
 
-Neovim's ftplugin loader sources these files automatically for Go buffers. All commands are global once created; all keymaps are buffer-local and exist only in
-Go buffers. Each command saves the buffer before running its external tool asynchronously and guards against concurrent runs.
+`ftplugin/go.lua` is sourced automatically for Go buffers and calls `require("go").setup()`, which requires the modules in `lua/go/` once and re-installs their
+buffer-local keymaps for each Go buffer. All commands are global once created; all keymaps are buffer-local and exist only in Go buffers. Each command saves
+the buffer before running its external tool asynchronously and guards against concurrent runs.
 
-### ftplugin/go/addtest.lua
-
-Generates table-driven tests with `gotests`. `:GoTestAdd` uses the treesitter function/method under the cursor, an explicit function name, or a prompt as a
-fallback.
-
-| Command                 | Action                                                        |
-| ----------------------- | ------------------------------------------------------------- |
-| `:GoTestAdd [function]` | Generate a test for the cursor function or the named function |
-| `:GoTestsAll`           | Generate tests for all functions in the file                  |
-| `:GoTestsExp`           | Generate tests for exported functions only                    |
-
-| Key          | Command       |
-| ------------ | ------------- |
-| `<leader>gt` | `:GoTestAdd`  |
-| `<leader>ga` | `:GoTestsAll` |
-| `<leader>ge` | `:GoTestsExp` |
-
-Requires `gotests` (`go install github.com/cweill/gotests/gotests@latest`). The generated `_test.go` file is written to disk but not opened.
-
-### ftplugin/go/benchmark.lua
+### lua/go/benchmark.lua
 
 Runs benchmarks with `go test` and shows parsed results in a floating window.
 
@@ -637,7 +639,7 @@ Runs benchmarks with `go test` and shows parsed results in a floating window.
 Keys: `<leader>gb` (`:GoBench`), `<leader>gB` (`:GoBenchAll`). The result window closes with `q` or `<Esc>`. Requires `go` and a `go.mod`; commands run from the
 module root.
 
-### ftplugin/go/coverage.lua
+### lua/go/coverage.lua
 
 Runs `go test` coverage and marks covered/uncovered lines in the sign column, with per-function statistics in a floating window.
 
@@ -650,18 +652,7 @@ Runs `go test` coverage and marks covered/uncovered lines in the sign column, wi
 Key: `<leader>gc` (`:GoCoverage`). Covered lines use a green `│` sign, uncovered lines a red `│`; the stats window closes with `q` or `<Esc>`. Requires `go` and
 a `go.mod`.
 
-### ftplugin/go/impl.lua
-
-Generates interface-implementation stubs with `impl`. The receiver is derived from the nearest struct above the cursor (for example `File` becomes `f *File`).
-
-| Command               | Action                                 |
-| --------------------- | -------------------------------------- |
-| `:GoImpl [interface]` | Generate stubs for the given interface |
-
-Key: `<leader>gi` (`:GoImpl`). Requires `impl` (`go install github.com/josharian/impl@latest`) and the Go treesitter parser for struct detection. Output is
-inserted after the cursor line.
-
-### ftplugin/go/mock.lua
+### lua/go/mock.lua
 
 Generates GoMock mocks with `mockgen`, either from a source file or from an interface.
 
@@ -675,7 +666,7 @@ Keys: `<leader>gm` (`:GoMockGen`), `<leader>gM` (`:GoMockFile`). The default des
 `-d/--dir`, `-p/--package`, `-i/--interface`, and `-s/--source` are supported. Requires `mockgen` (`go install go.uber.org/mock/mockgen@latest`), `go` for
 `go list` import-path resolution, and a `go.mod`. Generated files are written to disk but not opened.
 
-### ftplugin/go/tag.lua
+### lua/go/tag.lua
 
 Adds or removes struct tags with `gomodifytags`, using `camelcase` transformations.
 
@@ -690,7 +681,25 @@ afterwards. Requires `gomodifytags` (`go install github.com/fatih/gomodifytags@l
 ## LSP Server Configurations (lsp/)
 
 `lua/config/lsp.lua` enables these servers by filename; each file below is picked up automatically by Neovim's `lsp/` runtime directory. All servers share the
-buffer-local keymaps documented in `lua/config/lsp.lua`.
+buffer-local keymaps documented in `lua/config/lsp.lua`:
+
+| File | Server |
+| ---- | ------ |
+| `bashls.lua` | bash-language-server |
+| `fish_lsp.lua` | fish-lsp |
+| `gopls.lua` | gopls |
+| `jsonls.lua` | vscode-json-language-server |
+| `lua_ls.lua` | lua-language-server |
+| `marksman.lua` | marksman |
+| `oxlint.lua` | oxlint |
+| `pyright.lua` | pyright |
+| `rust_analyzer.lua` | rust-analyzer |
+| `sourcekit.lua` | sourcekit-lsp |
+| `sqls.lua` | sqls |
+| `tombi.lua` | tombi |
+| `yamlls.lua` | yaml-language-server |
+
+Server-specific commands: `LspPyrightOrganizeImports`, `LspPyrightSetPythonPath`, `LspOxlintFixAll`, and `LspCargoReload`.
 
 ## Snippets
 
@@ -718,10 +727,11 @@ snippets/
 ```
 
 Typical triggers include `hea` (file header), `struct` (Go struct with JSON tags), `func`, `method`, `ifok`, `lock`, `once`, `wg` (Go), `mod`/`req` (Lua), and
-`sort` (Go `slices.Sort`). Snippets are completed through blink.cmp's snippet source.
+`gosort` (Go `slices.Sort`). Snippets are completed through blink.cmp's snippet source.
 
-All paths in `package.json` resolve to files in this directory; the Dockerfile and Docker Compose sets are loaded alongside the language-specific snippet sets.
+All paths in `package.json` resolve to files in this directory. Dockerfile snippets load for the `dockerfile` filetype; Docker Compose snippets are scoped to
+`docker-compose*` and `compose*` YAML files.
 
-# License
+## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE).

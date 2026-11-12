@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'lint'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description nvim-lint linters triggered on read, write and filetype
+
 vim.pack.add({
     { src = "https://github.com/mfussenegger/nvim-lint" },
 })
@@ -18,7 +26,6 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "FileType" }, {
                 sh = { "shellcheck" },
                 yaml = { "yamllint" },
                 json = { "jsonlint" },
-                jsonc = { "jsonlint" },
                 sql = { "sqlfluff" },
                 python = { "ruff" },
                 markdown = { "markdownlint" },
@@ -29,6 +36,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "FileType" }, {
                 "lint",
                 "--format=json",
                 "--dialect=mysql",
+                "-",
             }
             -- markdownlint 是按 linter 进程的 cwd 查找配置文件，因此需要显式传 '--config'
             -- 指向nvim 配置目录下的 .markdownlint.json

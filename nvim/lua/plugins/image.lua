@@ -10,19 +10,9 @@ vim.pack.add({
     { src = "https://github.com/3rd/image.nvim" },
     { src = "https://github.com/HakonHarnes/img-clip.nvim" },
 })
-require("image").setup({
-    backend = "kitty",
-    kitty_method = "normal",
-    processor = "magick_cli",
-    ignore_download_error = true, -- don't throw on remote image download failures
-    integrations = {
-        markdown = {
-            enabled = true,
-            clear_in_insert_mode = true,
-            download_remote_images = true,
-        },
-    },
-})
+-- img-clip's plugin script replaces vim.paste at startup, so apply its options at
+-- startup too; otherwise text pastes hit the default verbose=true and warn
+-- "Content is not an image." until the lazy setup runs.
 require("img-clip").setup({
     default = {
         verbose = false,
@@ -58,7 +48,22 @@ require("img-clip").setup({
         },
     },
 })
-vim.keymap.set("n", "<leader>mp", "<cmd>PasteImage<cr>", { desc = "[img-clip]:Paste image from clipboard" })
+
+local function setup_image()
+    require("image").setup({
+        backend = "kitty",
+        kitty_method = "normal",
+        processor = "magick_cli",
+        ignore_download_error = true, -- don't throw on remote image download failures
+        integrations = {
+            markdown = {
+                enabled = true,
+                clear_in_insert_mode = true,
+                download_remote_images = true,
+            },
+        },
+    })
+end
 
 --- Paste the image right away, upload it to R2 in the background, and replace the local path with the URL when the upload finishes.
 --- Uploads run one at a time; a failed one keeps the local path.
@@ -199,4 +204,25 @@ local function setup_r2_upload(opts)
     end
 end
 
-setup_r2_upload()
+local configured = false
+
+local function setup()
+    if configured then
+        return
+    end
+    configured = true
+
+    setup_image()
+    setup_r2_upload()
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("User_ImageInit", { clear = true }),
+    pattern = { "markdown", "vimwiki", "html" },
+    callback = setup,
+})
+
+vim.keymap.set("n", "<leader>mp", function()
+    setup()
+    vim.cmd("PasteImage")
+end, { desc = "[img-clip]:Paste image from clipboard" })

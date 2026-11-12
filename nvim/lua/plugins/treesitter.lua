@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'treesitter'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Install treesitter parsers and enable highlighting, textobjects and indent.
+
 vim.api.nvim_create_autocmd("PackChanged", {
     callback = function(ev)
         local name, kind = ev.data.spec.name, ev.data.kind
@@ -11,7 +19,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
 })
 
 vim.pack.add({
-    { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main", build = ":TSUpdate" },
+    { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
 })
@@ -34,6 +42,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
             "gotmpl",
             "rust",
             "sql",
+            "swift",
             "python",
             "typescript",
             "javascript",
@@ -97,14 +106,28 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
     end,
 })
 
+-- User_TreesitterIndent: use treesitter indentexpr only when an indents query exists.
 vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("User_TreesitterIndent", { clear = true }),
     callback = function(args)
         local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
-        -- The treesitter indentexpr returns 0 (o/<CR> indent to column 0) for languages
-        -- without an indents query, so only enable it when the query exists
         if vim.treesitter.get_parser(args.buf, nil, { error = false }) and lang and #vim.treesitter.query.get_files(lang, "indents") > 0 then
             vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end
+    end,
+})
+
+-- filetype names that differ from parser names
+local ts_lang = vim.treesitter.language
+ts_lang.register("tsx", "typescriptreact")
+ts_lang.register("javascript", "javascriptreact")
+ts_lang.register("bash", "sh")
+
+-- User_TreesitterHighlight: enable treesitter highlighting for every buffer with an available parser.
+vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("User_TreesitterHighlight", { clear = true }),
+    callback = function(args)
+        -- filetypes without an installed parser fall back to regex syntax
+        pcall(vim.treesitter.start, args.buf)
     end,
 })

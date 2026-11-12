@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'fileheader'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Automatic copyright headers and the :FileHeader command
+
 local api = vim.api
 
 -- 1. Cache git user info (stable within a session)
@@ -101,6 +109,7 @@ local templates = {
         "",
     },
 }
+templates.typescriptreact = templates.typescript
 
 -- 4. Sanitize Go package name: replace illegal chars with _, prefix _ if starts with digit
 local function add_go_safe_placeholder(ph)
@@ -129,7 +138,7 @@ end
 -- 6. Single autocmd for all filetypes
 local header_group = vim.api.nvim_create_augroup("User_FileHeader", { clear = true })
 
-api.nvim_create_autocmd({ "BufNewFile", "BufReadPost" }, {
+api.nvim_create_autocmd("BufNewFile", {
     group = header_group,
     callback = function(args)
         local buf = args.buf

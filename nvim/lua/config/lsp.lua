@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'lsp'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Enable LSP servers and buffer-local keymaps
+
 vim.lsp.enable({
     "lua_ls",
     "gopls",
@@ -107,7 +115,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         end
 
         if client:supports_method("textDocument/documentColor") then
-            vim.lsp.document_color.enable(true, { bufnr = bufnr, style = "virtual" })
+            vim.lsp.document_color.enable(true, { bufnr = bufnr }, { style = "virtual" })
         end
 
         if client:supports_method("textDocument/inlayHint") then

@@ -82,7 +82,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
         if vim.b.bigfile then
             for _, client in ipairs(vim.lsp.get_clients({ bufnr = args.buf })) do
-                client:stop()
+                vim.lsp.buf_detach_client(args.buf, client.id)
             end
         end
     end,

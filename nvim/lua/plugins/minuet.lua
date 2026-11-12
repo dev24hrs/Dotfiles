@@ -10,8 +10,11 @@ vim.pack.add({
     { src = "https://github.com/milanglacier/minuet-ai.nvim" },
 })
 
-local minuet_ok, minuet = pcall(require, "minuet")
-if minuet_ok then
+local function setup()
+    local ok, minuet = pcall(require, "minuet")
+    if not ok then
+        return
+    end
     minuet.setup({
         virtualtext = {
             auto_trigger_ft = { "lua", "typescript", "go", "rust" },
@@ -19,7 +22,7 @@ if minuet_ok then
                 accept = "<C-,>",
                 prev = "<C-;>",
                 next = "<C-'>",
-                dismiss = "C-x",
+                dismiss = "<C-x>",
             },
         },
         provider = "openai_fim_compatible",
@@ -51,3 +54,9 @@ if minuet_ok then
         },
     })
 end
+
+vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter", "LspAttach" }, {
+    group = vim.api.nvim_create_augroup("User_MinuetInit", { clear = true }),
+    once = true,
+    callback = setup,
+})

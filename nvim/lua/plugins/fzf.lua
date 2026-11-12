@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'fzf'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description fzf-lua fuzzy finder for files, buffers and live grep
+
 vim.pack.add({
     { src = "https://github.com/ibhagwan/fzf-lua" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
@@ -12,10 +20,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
 require("fzf-lua").setup({
     winopts = {
         border = "single",
-        height = 0.55,
-        width = 0.50,
-        row = 0.45,
-        col = 0.40,
+        height = 0.65,
+        width = 0.60,
+        row = 0.55,
+        col = 0.50,
         preview = {
             border = "single",
             horizontal = "right:60%",
@@ -27,8 +35,12 @@ require("fzf-lua").setup({
     fzf_colors = true,
 })
 
+local function project_root()
+    return vim.fs.root(vim.fn.getcwd(), ".git") or vim.fn.getcwd()
+end
+
 vim.keymap.set("n", "<leader>fl", function()
-    require("fzf-lua").files()
+    require("fzf-lua").files({ cwd = project_root() })
 end, { noremap = true, silent = true, desc = "[Fzf]: Files List in project" })
 
 vim.keymap.set("n", "<leader>fw", function()
@@ -36,7 +48,7 @@ vim.keymap.set("n", "<leader>fw", function()
 end, { noremap = true, silent = true, desc = "[Fzf]: Find Word in current buffer" })
 
 vim.keymap.set("n", "<leader>fg", function()
-    require("fzf-lua").live_grep()
+    require("fzf-lua").live_grep({ cwd = project_root() })
 end, { noremap = true, silent = true, desc = "[Fzf]: Find Grep words in project" })
 
 vim.keymap.set("n", "<leader>fr", function()

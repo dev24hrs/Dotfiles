@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'langIndent'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Per-language tab, shiftwidth and expandtab settings
+
 -- this file is for indent settings
 
 local indent_configs = {
@@ -5,7 +13,21 @@ local indent_configs = {
     {
         size = 2,
         expand = true,
-        fts = { "json", "jsonc", "yaml", "markdown", "sh", "toml", "sql", "gitcommit", "javascript", "typescript" },
+        fts = {
+            "json",
+            "jsonc",
+            "yaml",
+            "yaml.docker-compose",
+            "markdown",
+            "sh",
+            "toml",
+            "sql",
+            "gitcommit",
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+        },
     },
     -- 4 空格缩进组
     {

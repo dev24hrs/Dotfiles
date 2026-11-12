@@ -1,6 +1,13 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'alpha'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Dashboard start screen with ASCII art and shortcuts
+
 vim.pack.add({
     { src = "https://github.com/goolord/alpha-nvim" },
-    { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
 })
 
@@ -48,7 +55,7 @@ dashboard.section.header.val = header_art
 dashboard.section.buttons.val = {
     dashboard.button("f", "󰈞  Find file", ":FzfLua files<CR>"),
     dashboard.button("r", "  Recent", ":FzfLua oldfiles<CR>"),
-    dashboard.button("h", "  Dotfiles", ":FzfLua files cwd=~/.config/nvim<CR>"),
+    dashboard.button("t", "  Todos", ":TodoFzfLua<CR>"),
     dashboard.button("q", "󰈆  Quit Nvim", ":qa<CR>"),
 }
 

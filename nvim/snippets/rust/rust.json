@@ -284,7 +284,7 @@
     "body": [
       "#[bench]",
       "fn ${1:name}(b: &mut test::Bencher) {",
-      "    ${2:b.iter(|| ${3:/* benchmark code */})}",
+      "    b.iter(|| ${2:/* benchmark code */})",
       "}",
       "${0}"
     ],
@@ -414,7 +414,7 @@
     "prefix": "if_l",
     "body": [
       "if let ${1:Some(pat)} = ${2:expr} {",
-      "    ${0:todo!();}",
+      "    ${3:todo!();}",
       "}",
       "${0}"
     ],
@@ -632,7 +632,7 @@
     "prefix": "while_l",
     "body": [
       "while let ${1:Some(pat)} = ${2:expr} {",
-      "    ${0:todo!();}",
+      "    ${3:todo!();}",
       "}",
       "${0}"
     ],

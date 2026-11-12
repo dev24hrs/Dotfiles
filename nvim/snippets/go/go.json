@@ -17,7 +17,7 @@
   },
   "Struct definition": {
     "prefix": "struct",
-    "body": ["type ${1:StructName} struct {", "\t${2:Field} ${3:type} `json:\"${4:${2:Field}}\"`", "}$0"],
+    "body": ["type ${1:StructName} struct {", "\t${2:Field} ${3:type} `json:\"${4:Field}\"`", "}$0"],
     "description": "Struct with JSON tags"
   },
   "Struct embedding": {
@@ -51,7 +51,7 @@
     "description": "if ok."
   },
   "For loop": {
-    "prefix": "for",
+    "prefix": "gofor",
     "body": ["for ${1:i} := 0; ${1:i} < ${2:n}; ${1:i}++ {", "\t${0}", "}"],
     "description": "C-style counted loop — for simple 0..n use 'forn' (Go 1.22+)"
   },
@@ -61,7 +61,7 @@
     "description": "Loop n times with range-over-int (Go 1.22+)"
   },
   "For range slice": {
-    "prefix": "forr",
+    "prefix": "goforr",
     "body": ["for ${1:index}, ${2:value} := range ${3:slice} {", "\t${0}", "}"],
     "description": "For range over slice"
   },
@@ -524,7 +524,7 @@
     "description": "Table-driven test"
   },
   "Test main": {
-    "prefix": "test_maim",
+    "prefix": "test_main",
     "body": ["func TestMain(m *testing.M) {", "\t$1", "", "\tos.Exit(m.Run())", "}"],
     "description": "Snippet for TestMain function"
   },
@@ -880,7 +880,7 @@
   },
   "Time now and since": {
     "prefix": "time_now",
-    "body": ["${1:start} := time.Now()", "${0}", "${2:// elapsed := time.Since(${1:start})}"],
+    "body": ["${1:start} := time.Now()", "${0}", "${2:// elapsed := time.Since(start)}"],
     "description": "time.Now() + time.Since() — measure elapsed time"
   },
   "Time parse": {

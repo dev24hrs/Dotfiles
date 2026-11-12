@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'nvimTree'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Nvim-tree file explorer with lazy loading
+
 vim.pack.add({
     { src = "https://github.com/nvim-tree/nvim-tree.lua" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },

@@ -38,8 +38,6 @@ return {
         },
         python = {
             analysis = {
-                -- Ignore all files for analysis to use Ruff for linting
-                ignore = { "*" },
                 typeCheckingMode = "standard",
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,

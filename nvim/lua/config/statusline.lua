@@ -1,9 +1,17 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'statusline'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Custom statusline with git, diagnostics and LSP info
+
 local M = {}
 
 local colors = {
-    MAGENTA = "#A89984",
+    GRAY = "#A89984",
     RED = "#FB4934",
-    CYAN = "#8EC07C",
+    AQUA = "#8EC07C",
     GREEN = "#B8BB26",
     YELLOW = "#E5C07B",
     ORANGE = "#FE8019",
@@ -40,18 +48,18 @@ function M.set_highlights()
     -- b: git
     vim.api.nvim_set_hl(0, "StatusGit", { fg = colors.BLUE, bg = "NONE" })
     -- b: diff
-    vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.CYAN, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiffAdd", { fg = colors.AQUA, bg = "NONE" })
     vim.api.nvim_set_hl(0, "StatusDiffChange", { fg = colors.ORANGE, bg = "NONE" })
     vim.api.nvim_set_hl(0, "StatusDiffRemove", { fg = colors.RED, bg = "NONE" })
     -- b: diagnostics (per-severity colors)
     vim.api.nvim_set_hl(0, "StatusDiagError", { fg = colors.RED, bg = "NONE" })
     vim.api.nvim_set_hl(0, "StatusDiagWarn", { fg = colors.YELLOW, bg = "NONE" })
     vim.api.nvim_set_hl(0, "StatusDiagInfo", { fg = colors.BLUE, bg = "NONE" })
-    vim.api.nvim_set_hl(0, "StatusDiagHint", { fg = colors.MAGENTA, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusDiagHint", { fg = colors.GRAY, bg = "NONE" })
     -- c: filename
-    vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.MAGENTA, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusFile", { fg = colors.GRAY, bg = "NONE" })
     -- x: indent, encoding, fileformat
-    vim.api.nvim_set_hl(0, "StatusInfo", { fg = colors.MAGENTA, bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusInfo", { fg = colors.GRAY, bg = "NONE" })
     -- y: filetype
     vim.api.nvim_set_hl(0, "StatusFiletype", { fg = colors.BLUE, bg = "NONE" })
     -- z: lsp
@@ -135,18 +143,8 @@ local diag_hl = {
 }
 
 local function diagnostics()
-    -- Use vim.diagnostic.count() on Neovim >= 0.10 for O(1) performance
-    -- (lualine's nvim_diagnostic source does the same)
-    local counts
-    if vim.diagnostic.count ~= nil then
-        counts = vim.diagnostic.count(0)
-    else
-        -- Fallback for Neovim < 0.10
-        counts = { 0, 0, 0, 0 }
-        for _, d in ipairs(vim.diagnostic.get(0)) do
-            counts[d.severity] = (counts[d.severity] or 0) + 1
-        end
-    end
+    -- O(1) counts provided by Neovim 0.10+.
+    local counts = vim.diagnostic.count(0)
 
     local parts = {}
     for _, sev in ipairs({ diag_severity.ERROR, diag_severity.WARN, diag_severity.INFO, diag_severity.HINT }) do
@@ -289,18 +287,16 @@ function M.setup()
     vim.opt.statusline = "%!v:lua.statusline()"
 end
 
--- Start with no statusline; activate on first buffer backed by a real file
+-- Start with no statusline so the alpha dashboard stays full-screen. Activate as
+-- soon as a named buffer is entered, including new files and buffers saved later.
 vim.opt.laststatus = 0
 
 local setup_done = false
 local setup_group = vim.api.nvim_create_augroup("StatuslineDefer", { clear = true })
-vim.api.nvim_create_autocmd("BufEnter", {
+vim.api.nvim_create_autocmd({ "BufEnter", "BufFilePost", "BufWritePost" }, {
     group = setup_group,
     callback = function()
-        if setup_done then
-            return
-        end
-        if vim.fn.filereadable(vim.api.nvim_buf_get_name(0)) ~= 1 then
+        if setup_done or disabled_ft[vim.bo.filetype] or vim.api.nvim_buf_get_name(0) == "" then
             return
         end
         M.setup()

@@ -58,10 +58,5 @@
     "prefix": "map_vals",
     "body": ["${1:values} := slices.Collect(maps.Values(${2:m}))${0}"],
     "description": "Collect all values into a slice (Go 1.23+)"
-  },
-  "Map iterate sorted by key": {
-    "prefix": "map_sortk",
-    "body": ["for _, ${1:k} := range slices.Sorted(maps.Keys(${2:m})) {", "\t${3:v} := ${2:m}[${1:k}]", "\t${0}", "}"],
-    "description": "Range over map entries in sorted key order (Go 1.23+)"
   }
 }

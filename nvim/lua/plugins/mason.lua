@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'mason'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Mason installer for LSP servers, DAP and linters
+
 vim.pack.add({
     { src = "https://github.com/mason-org/mason.nvim" },
 })
@@ -53,7 +61,7 @@ local opts = {
     },
 }
 
-require("mason").setup(opts)
+require("mason").setup({ ui = opts.ui })
 
 -- Auto-install ensure_installed tools with better error handling
 local registry = require("mason-registry")
@@ -77,8 +85,18 @@ local function ensure_installed()
     end
 end
 
-if registry.refresh then
-    registry.refresh(ensure_installed)
-else
-    ensure_installed()
+local function install_missing()
+    if registry.refresh then
+        registry.refresh(ensure_installed)
+    else
+        ensure_installed()
+    end
 end
+
+-- Registry refresh hits the network; keep it off the startup path.
+vim.api.nvim_create_autocmd("VimEnter", {
+    once = true,
+    callback = function()
+        vim.schedule(install_missing)
+    end,
+})

@@ -10,7 +10,7 @@
     "description": ""
   },
   "Volume Driver": {
-    "prefix": "vol",
+    "prefix": "voldrv",
     "body": ["volume_driver: ${1:driver}"],
     "description": ""
   },

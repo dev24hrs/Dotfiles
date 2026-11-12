@@ -15,7 +15,6 @@ end
 
 local api = vim.api
 local ns = api.nvim_create_namespace("md-render")
-local enabled = true
 
 local hl_links = {
     H1 = "@markup.heading.1.markdown",
@@ -104,7 +103,7 @@ local callouts = {
 local link_icons = {
     { "youtube%.com", "󰗃 " },
     { "github%.com", "󰊤 " },
-    { "neovim%.io", "NEOVIM_ICON" },
+    { "neovim%.io", vim.fn.nr2char(0xe62b) .. " " },
     { "stackoverflow%.com", "󰓌 " },
     { "discord%.com", "󰙯 " },
     { "reddit%.com", "󰑍 " },
@@ -123,7 +122,6 @@ local function get_queries()
             "markdown",
             [[
 			(atx_heading) @heading
-			(fenced_code_block) @code
 			(thematic_break) @dash
 			[(list_marker_minus) (list_marker_plus) (list_marker_star)] @bullet
 			(block_quote) @quote
@@ -243,11 +241,6 @@ function handlers.heading(ctx, node)
         sign_hl_group = hl,
     }, "sign")
 end
-
--- Fenced code blocks are intentionally left as source, so this capture has
--- nothing to draw. The fence rows stay visible because fence_conceal_off()
--- disables the query patterns that hide them when 'conceallevel' is positive.
-function handlers.code() end
 
 function handlers.dash(ctx, node)
     local row, col = node:start()
@@ -706,7 +699,7 @@ end
 ---there is no win
 local function window_of(buf)
     local wins = vim.fn.win_findbuf(buf)
-    if not enabled or #wins == 0 then
+    if #wins == 0 then
         return nil, {}
     end
     local cur_win = api.nvim_get_current_win()

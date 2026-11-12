@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'conform'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Conform formatter configuration
+
 vim.pack.add({
     { src = "https://github.com/stevearc/conform.nvim" },
 })
@@ -21,7 +29,7 @@ conform.setup({
         css = { "oxfmt" },
 
         -- Python: ruff_format 已包含格式化，ruff_fix 处理 lint 修复
-        python = { "ruff_organize_imports", "ruff_format", "ruff_fix" },
+        python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
 
         sql = { "sqlfmt" },
         sh = { "shfmt" },
@@ -55,11 +63,10 @@ vim.keymap.set({ "n", "v" }, "<leader>w", function()
         vim.schedule(function()
             -- `silent` keeps the built-in "written" message out of the ui2 msg
             -- window; the notification below is the user-facing feedback.
-            if vim.bo.modified then
-                vim.cmd("silent update")
+            local changed = vim.bo.modified
+            vim.cmd("silent update")
+            if changed then
                 vim.notify("Formatted & Saved", vim.log.levels.INFO, { title = "Conform" })
-            else
-                vim.cmd("silent update")
             end
         end)
     end)

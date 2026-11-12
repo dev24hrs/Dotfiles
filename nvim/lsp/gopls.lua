@@ -102,10 +102,6 @@ return {
             gofumpt = true,
             -- 补全时使用占位符，方便跳转编辑
             usePlaceholders = true,
-            -- 补全未 import 的包，选中后自动添加 import
-            completeUnimported = true,
-            -- 启用 staticcheck 静态分析（SA 系列检查）
-            staticcheck = true,
             -- 语义级语法高亮（比 Tree-sitter 更精确的类型着色）
             semanticTokens = true,
             -- 额外处理的独立构建标签（不影响默认文件的分析）
@@ -128,14 +124,13 @@ return {
                 compositeLiteralFields = true, -- 显示复合字面量的字段名
                 compositeLiteralTypes = false, -- 不显示复合字面量的类型（较吵）
                 constantValues = true, -- 显示常量的计算结果值
-                fillReturns = true, -- 提示填充 return 语句的零值
                 functionTypeParameters = true, -- 显示泛型函数的类型参数
                 parameterNames = true, -- 显示函数调用时的参数名
                 rangeVariableTypes = false, -- 不显示 range 循环变量的类型（较吵）
             },
             -- 静态分析器：编码时实时检查代码问题
             analyses = {
-                useany = true, -- 建议用 any 替代 interface{}
+                any = true, -- 建议用 any 替代 interface{}
                 unusedparams = true, -- 检测未使用的函数参数
                 unusedwrite = true, -- 检测写入但从未读取的变量
                 unusedfunc = true, -- 检测未使用的函数/方法

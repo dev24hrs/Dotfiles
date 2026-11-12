@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'pack'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description vim.pack plugin manager panel
+
 local M = {}
 
 -- 1. 状态跟踪变量
@@ -14,8 +22,9 @@ local function get_pack_data_via_api()
         return nil, nil, "未找到 vim.pack.get 接口"
     end
 
+    -- info=false: skip per-plugin git branch/tag queries on every UI render.
     -- 使用 or {} 消除 LSP 的 table|nil 警告
-    local all_packs = pack.get() or {}
+    local all_packs = pack.get(nil, { info = false }) or {}
 
     local active_plugins = {}
     local inactive_plugins = {}
@@ -33,7 +42,6 @@ local function get_pack_data_via_api()
                 src = src_url,
                 rev = tostring(commit_rev),
                 is_loaded = p.active or false,
-                has_update = p.outdated or false,
             }
 
             if item.is_loaded then
@@ -88,11 +96,9 @@ local function render_ui(buf)
 
         if sections_expanded.active then
             for _, p in ipairs(active) do
-                local status_icon = p.has_update and "⏳" or "✔"
                 local arrow = expanded_plugins[p.name] and "▼" or "▶"
-                local update_tag = p.has_update and " [有新版本!]" or ""
 
-                table.insert(lines, string.format("    %s %s %-28s%s", status_icon, arrow, p.name, update_tag))
+                table.insert(lines, string.format("    ✔ %s %-28s", arrow, p.name))
                 line_to_plugin[#lines] = { type = "main", name = p.name, list = "active" }
 
                 if expanded_plugins[p.name] then
@@ -205,12 +211,9 @@ function M.toggle_panel()
             if pack and pack.update then
                 vim.notify("⚡ [vim.pack] 开始更新: " .. line_info.name, vim.log.levels.INFO)
 
-                pack.update({ line_info.name }, { force = true }, function()
-                    vim.schedule(function()
-                        vim.notify("✨ [vim.pack] " .. line_info.name .. " 更新已完成！", vim.log.levels.INFO)
-                        render_ui(buf)
-                    end)
-                end)
+                pack.update({ line_info.name }, { force = true })
+                vim.notify("✨ [vim.pack] " .. line_info.name .. " 更新已完成！", vim.log.levels.INFO)
+                render_ui(buf)
             end
         end
     end, { buffer = buf, silent = true })
@@ -221,12 +224,9 @@ function M.toggle_panel()
         if pack and pack.update then
             vim.notify("⚡ [vim.pack] 更新全部插件，请稍候...", vim.log.levels.INFO)
 
-            pack.update(nil, { force = true }, function()
-                vim.schedule(function()
-                    vim.notify("✨ [vim.pack] 全部插件更新完毕！", vim.log.levels.INFO)
-                    render_ui(buf)
-                end)
-            end)
+            pack.update(nil, { force = true })
+            vim.notify("✨ [vim.pack] 全部插件更新完毕！", vim.log.levels.INFO)
+            render_ui(buf)
         end
     end, { buffer = buf, silent = true })
 
@@ -236,12 +236,9 @@ function M.toggle_panel()
         if pack and pack.update then
             vim.notify("⚡ [vim.pack] 开始同步lockfile...", vim.log.levels.INFO)
 
-            pack.update(nil, { force = true, target = "lockfile" }, function()
-                vim.schedule(function()
-                    vim.notify("✨ [vim.pack] 同步lockfile完毕！", vim.log.levels.INFO)
-                    render_ui(buf)
-                end)
-            end)
+            pack.update(nil, { force = true, target = "lockfile" })
+            vim.notify("✨ [vim.pack] 同步lockfile完毕！", vim.log.levels.INFO)
+            render_ui(buf)
         end
     end, { buffer = buf, silent = true })
 

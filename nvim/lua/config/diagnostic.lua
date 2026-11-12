@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'diagnostic'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Diagnostic display settings (floats, virtual text and signs)
+
 vim.diagnostic.config({
     update_in_insert = false,
     severity_sort = true,
@@ -15,7 +23,14 @@ vim.diagnostic.config({
     virtual_text = {
         format = function(diagnostic)
             local msg = diagnostic.message:gsub("\n", " ")
-            return string.format("%s [%s] [%s]", msg, diagnostic.source, diagnostic.code)
+            local parts = {}
+            if diagnostic.source then
+                parts[#parts + 1] = "[" .. diagnostic.source .. "]"
+            end
+            if diagnostic.code then
+                parts[#parts + 1] = "[" .. tostring(diagnostic.code) .. "]"
+            end
+            return #parts > 0 and (msg .. " " .. table.concat(parts, " ")) or msg
         end,
         spacing = 4,
         source = "if_many",

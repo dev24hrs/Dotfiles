@@ -1,11 +1,14 @@
 -- Copyright (c) 2026 dev24hrs. All rights reserved.
--- SPDX-License-Identifier: MIT
+-- The source code is released under the MIT License.
 --
---- @module 'go.tag'
---- @description struct-tag manipulation via gomodifytags
+--- @module 'tag'
 --- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description struct-tag manipulation via gomodifytags
 
 local M = {}
+
+local util = require("go.util")
 
 local ACTION_FLAGS = {
     add = "-add-tags",
@@ -17,18 +20,6 @@ local RUNNING_VAR = "go_tag_running"
 -- =============================================================================
 -- Private helpers
 -- =============================================================================
-
---- Ensure a CLI tool is executable, notify with install hint if missing.
---- @param bin string binary name
---- @param repo string "owner/repo" for go install hint
---- @return boolean
-local function ensure_bin(bin, repo)
-    if vim.fn.executable(bin) == 1 then
-        return true
-    end
-    vim.notify(string.format("[Go] %s not found. Install: go install github.com/%s@latest", bin, repo), vim.log.levels.ERROR)
-    return false
-end
 
 local function notify(message, level)
     vim.notify(message, level or vim.log.levels.INFO, { title = "Go Tags" })
@@ -64,17 +55,6 @@ local function current_file()
     return file
 end
 
-local function command_error(result)
-    local message = vim.trim(result.stderr or "")
-    if message == "" then
-        message = vim.trim(result.stdout or "")
-    end
-    if message == "" then
-        message = result.signal and string.format("gomodifytags terminated by signal %d", result.signal) or "gomodifytags failed"
-    end
-    return message
-end
-
 -- =============================================================================
 -- Tag manipulation — https://github.com/fatih/gomodifytags
 -- =============================================================================
@@ -105,7 +85,9 @@ function M.modify_tag(action, tag_name)
         return
     end
 
-    if not ensure_bin("gomodifytags", "fatih/gomodifytags") then
+    local bin_ok, bin_error = util.ensure_bin("gomodifytags", "fatih/gomodifytags")
+    if not bin_ok then
+        notify(bin_error, vim.log.levels.ERROR)
         return
     end
 
@@ -147,7 +129,7 @@ function M.modify_tag(action, tag_name)
                 set_running(false)
 
                 if result.code ~= 0 then
-                    notify(command_error(result), vim.log.levels.ERROR)
+                    notify(util.command_error(result, "gomodifytags"), vim.log.levels.ERROR)
                     return
                 end
 
@@ -177,28 +159,28 @@ end
 -- Setup: user commands & keymaps
 -- =============================================================================
 
-local function create_command(name, callback, opts)
-    pcall(vim.api.nvim_del_user_command, name)
-    vim.api.nvim_create_user_command(name, callback, opts)
+--- Install this module's commands and buffer-local keymaps.
+function M.install()
+    local create_command = util.create_command
+
+    create_command("GoAddTag", function(opts)
+        M.modify_tag("add", opts.args ~= "" and opts.args or "json")
+    end, { nargs = "?" })
+
+    create_command("GoRemoveTag", function(opts)
+        M.modify_tag("remove", opts.args ~= "" and opts.args or "json")
+    end, { nargs = "?" })
+
+    vim.keymap.set("n", "<leader>gj", "<cmd>GoAddTag<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Add struct tag (default: json)",
+    })
+    vim.keymap.set("n", "<leader>gr", "<cmd>GoRemoveTag<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Remove struct tag (default: json)",
+    })
 end
-
-create_command("GoAddTag", function(opts)
-    M.modify_tag("add", opts.args ~= "" and opts.args or "json")
-end, { nargs = "?" })
-
-create_command("GoRemoveTag", function(opts)
-    M.modify_tag("remove", opts.args ~= "" and opts.args or "json")
-end, { nargs = "?" })
-
-vim.keymap.set("n", "<leader>gj", "<cmd>GoAddTag<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Add struct tag (default: json)",
-})
-vim.keymap.set("n", "<leader>gr", "<cmd>GoRemoveTag<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Remove struct tag (default: json)",
-})
 
 return M

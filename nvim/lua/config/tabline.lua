@@ -1,6 +1,13 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'tabline'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Custom buffer tabline and navigation mappings
+
 local M = {}
 
-local SEP = "" -- separator between tabs
 local MODIFIED = "" -- indicator for buffers with unsaved changes
 local NO_NAME = "[NO NAME]"
 local OVERFLOW_LEFT = "«"
@@ -18,7 +25,6 @@ function M.set_highlights()
     vim.api.nvim_set_hl(0, "TabLineFill", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "MyBufInactive", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "MyBufActive", { fg = fg, bg = "NONE", bold = true })
-    vim.api.nvim_set_hl(0, "MyBufSeparator", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "MyBufModified", { fg = fg, bg = "NONE" })
 end
 
@@ -67,7 +73,7 @@ end
 
 ----------------------------------------------------------------------
 -- Mouse click handler (called by %<bufnr>@v:lua.tabline_click@...%X)
--- Left-click: switch to buffer   Middle-click: close buffer
+-- Left-click: switch to buffer
 ----------------------------------------------------------------------
 function _G.tabline_click(minwid, clicks, button, modifiers)
     _ = clicks
@@ -95,8 +101,6 @@ local function render_buf(bufnr, current)
         "%" .. bufnr .. "@v:lua.tabline_click@",
         "%#" .. hl .. "# ",
         content,
-        "%#MyBufSeparator#",
-        SEP,
     })
 end
 
@@ -149,9 +153,9 @@ function _G.tabline()
         total = total + widths[i]
     end
 
-    -- Fast path: everything fits (strip trailing separator)
+    -- Fast path: everything fits
     if total <= columns then
-        local line = table.concat(chunks):gsub(vim.pesc(SEP) .. "$", "")
+        local line = table.concat(chunks)
         _tab_cache = line
         _tab_cache_key = key
         return line
@@ -203,7 +207,7 @@ function _G.tabline()
         visible[#visible + 1] = "%#MyBufInactive# " .. OVERFLOW_RIGHT .. " " .. right_count .. " "
     end
 
-    local line = table.concat(visible):gsub(vim.pesc(SEP) .. "$", "")
+    local line = table.concat(visible)
     _tab_cache = line
     _tab_cache_key = key
     return line

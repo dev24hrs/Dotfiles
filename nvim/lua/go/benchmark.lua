@@ -1,20 +1,20 @@
 -- Copyright (c) 2026 dev24hrs. All rights reserved.
--- SPDX-License-Identifier: MIT
+-- The source code is released under the MIT License.
 --
---- @module 'go.benchmark'
---- @description Go benchmark runner with Treesitter detection and a floating result window
+--- @module 'benchmark'
 --- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Go benchmark runner with Treesitter detection and a floating result window
 
 local M = {}
+
+local util = require("go.util")
 
 local RUNNING_VAR = "go_benchmark_running"
 local JOB_VAR = "go_benchmark_job"
 local GENERATION_VAR = "go_benchmark_generation"
 
-local benchmark_float = {
-    win = nil,
-    buf = nil,
-}
+local benchmark_float = util.floats.benchmark
 
 -- =============================================================================
 -- Shared state and helpers
@@ -62,33 +62,6 @@ local function current_file()
     end
 
     return file
-end
-
-local function find_module_root(start_dir)
-    local dir = vim.fn.resolve(start_dir)
-    while true do
-        if vim.fn.filereadable(dir .. "/go.mod") == 1 then
-            return dir
-        end
-
-        local parent = vim.fn.fnamemodify(dir, ":h")
-        if parent == dir then
-            return nil
-        end
-        dir = parent
-    end
-end
-
-local function relative_to_root(path, root)
-    if path == root then
-        return "."
-    end
-
-    local prefix = root .. "/"
-    if vim.startswith(path, prefix) then
-        return path:sub(#prefix + 1)
-    end
-    return path
 end
 
 local function valid_benchmark_name(name)
@@ -294,7 +267,7 @@ local function run_benchmark(benchmark_name, package_name, benchtime)
     end
 
     local source_dir = vim.fs.dirname(file) or "."
-    local module_root = find_module_root(source_dir)
+    local module_root = util.find_module_root(source_dir)
     if not module_root then
         notify("go.mod not found", vim.log.levels.ERROR)
         return
@@ -302,7 +275,7 @@ local function run_benchmark(benchmark_name, package_name, benchtime)
 
     local package_arg = vim.trim(package_name or "")
     if package_arg == "" then
-        local relative_dir = relative_to_root(source_dir, module_root)
+        local relative_dir = util.relative_to_root(source_dir, module_root)
         package_arg = relative_dir == "." and "./." or "./" .. relative_dir
     end
 
@@ -413,58 +386,58 @@ end
 -- Commands and keymaps
 -- =============================================================================
 
-local function create_command(name, callback, opts)
-    pcall(vim.api.nvim_del_user_command, name)
-    vim.api.nvim_create_user_command(name, callback, opts)
+--- Install this module's commands and buffer-local keymaps.
+function M.install()
+    local create_command = util.create_command
+
+    create_command("GoBench", function(opts)
+        local name = vim.trim(opts.args or "")
+        M.run_current(name ~= "" and name or nil, nil)
+    end, {
+        nargs = "?",
+        desc = "Run the Go benchmark under the cursor",
+    })
+
+    create_command("GoBenchAll", function(opts)
+        M.run_all(opts.args, nil)
+    end, {
+        nargs = "?",
+        desc = "Run all Go benchmarks in the current package",
+    })
+
+    create_command("GoBenchTime", function(opts)
+        local benchtime = vim.trim(opts.args or "")
+        if benchtime == "" then
+            vim.ui.input({ prompt = "Benchtime: " }, function(input)
+                if input and vim.trim(input) ~= "" then
+                    M.run_current(nil, vim.trim(input))
+                end
+            end)
+            return
+        end
+        M.run_current(nil, benchtime)
+    end, {
+        nargs = "?",
+        desc = "Run the current Go benchmark for a custom duration",
+    })
+
+    create_command("GoBenchClear", function()
+        M.clear()
+    end, {
+        nargs = 0,
+        desc = "Stop Go benchmark and close its result window",
+    })
+
+    vim.keymap.set("n", "<leader>gb", "<cmd>GoBench<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Run benchmark under cursor",
+    })
+    vim.keymap.set("n", "<leader>gB", "<cmd>GoBenchAll<CR>", {
+        silent = true,
+        buffer = true,
+        desc = "[Go]: Run all benchmarks in package",
+    })
 end
-
-create_command("GoBench", function(opts)
-    local name = vim.trim(opts.args or "")
-    M.run_current(name ~= "" and name or nil, nil)
-end, {
-    nargs = "?",
-    desc = "Run the Go benchmark under the cursor",
-})
-
-create_command("GoBenchAll", function(opts)
-    M.run_all(opts.args, nil)
-end, {
-    nargs = "?",
-    desc = "Run all Go benchmarks in the current package",
-})
-
-create_command("GoBenchTime", function(opts)
-    local benchtime = vim.trim(opts.args or "")
-    if benchtime == "" then
-        vim.ui.input({ prompt = "Benchtime: " }, function(input)
-            if input and vim.trim(input) ~= "" then
-                M.run_current(nil, vim.trim(input))
-            end
-        end)
-        return
-    end
-    M.run_current(nil, benchtime)
-end, {
-    nargs = "?",
-    desc = "Run the current Go benchmark for a custom duration",
-})
-
-create_command("GoBenchClear", function()
-    M.clear()
-end, {
-    nargs = 0,
-    desc = "Stop Go benchmark and close its result window",
-})
-
-vim.keymap.set("n", "<leader>gb", "<cmd>GoBench<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Run benchmark under cursor",
-})
-vim.keymap.set("n", "<leader>gB", "<cmd>GoBenchAll<CR>", {
-    silent = true,
-    buffer = true,
-    desc = "[Go]: Run all benchmarks in package",
-})
 
 return M

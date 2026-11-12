@@ -1,6 +1,6 @@
 {
   "Sort with slices.Sort": {
-    "prefix": "sort",
+    "prefix": "gosort",
     "body": ["slices.Sort(${1:slice})${0}"],
     "description": "Sort ordered slice in-place (Go 1.21+)"
   },

@@ -1,3 +1,11 @@
+-- Copyright (c) 2026 dev24hrs. All rights reserved.
+-- The source code is released under the MIT License.
+--
+--- @module 'git'
+--- @author dev24hrs <asang24dev@gmail.com>
+--- @date 2026-11-12
+--- @description Gitsigns signs, hunk actions and blame
+
 vim.pack.add({
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
